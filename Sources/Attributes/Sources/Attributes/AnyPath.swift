@@ -68,20 +68,23 @@ public struct AnyPath<Root> {
     
     let _isNil: (Root) -> Bool
     
-    private init<P: ReadOnlyPathProtocol>(_ path: P, isOptional: Bool, isNil: @escaping (Root) -> Bool) where P.Root == Root {
+    let _isSame: (PartialKeyPath<Root>) -> Bool
+    
+    private init<P: ReadOnlyPathProtocol>(_ path: P, isOptional: Bool, isNil: @escaping (Root) -> Bool, isSame: @escaping (PartialKeyPath<Root>) -> Bool) where P.Root == Root {
         self.ancestors = path.ancestors
         self.partialKeyPath = path.keyPath
         self._value = { $0[keyPath: path.keyPath] as Any }
         self.isOptional = isOptional || (path.ancestors.last?.isOptional ?? false)
         self._isNil = { root in (path.ancestors.last?.isNil(root) ?? false) || isNil(root) }
+        self._isSame = isSame
     }
     
     public init<P: ReadOnlyPathProtocol>(_ path: P) where P.Root == Root {
-        self.init(path, isOptional: false, isNil: { _ in false })
+        self.init(path, isOptional: false, isNil: { _ in false }, isSame: { $0 == path.keyPath })
     }
     
     public init<P: ReadOnlyPathProtocol, V>(optional path: P) where P.Root == Root, P.Value == V? {
-        self.init(path, isOptional: true, isNil: { nil == $0[keyPath: path.keyPath] })
+        self.init(path, isOptional: true, isNil: { nil == $0[keyPath: path.keyPath] }, isSame: { $0 == path.keyPath || $0 == path.keyPath.appending(path: \.wrappedValue) })
     }
     
     public func hasValue(_ root: Root) -> Bool {
@@ -94,6 +97,18 @@ public struct AnyPath<Root> {
     
     public func isNil(_ root: Root) -> Bool {
         return self._isNil(root)
+    }
+    
+    public func isSame(as path: AnyPath<Root>) -> Bool {
+        return self._isSame(path.partialKeyPath)
+    }
+    
+    public func isSame(as path: PartialKeyPath<Root>) -> Bool {
+        return self._isSame(path)
+    }
+    
+    public func isSame<Path: ReadOnlyPathProtocol>(as path: Path) -> Bool where Path.Root == Root {
+        return self._isSame(path.keyPath)
     }
     
 }
