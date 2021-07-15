@@ -1,9 +1,9 @@
 /*
- * PathProtocol.swift
- * Attributes
+ * ComplexProperty.swift
+ * 
  *
- * Created by Callum McColl on 4/11/20.
- * Copyright © 2020 Callum McColl. All rights reserved.
+ * Created by Callum McColl on 12/6/21.
+ * Copyright © 2021 Callum McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,52 +56,37 @@
  *
  */
 
-public protocol ReadOnlyPathProtocol: Hashable {
+protocol SchemaAttributeConvertible {
     
-    associatedtype Root
-    associatedtype Value
-    
-    var ancestors: [AnyPath<Root>] { get }
-    
-    var keyPath: KeyPath<Root, Value> { get }
-    
-    func isNil(_ root: Root) -> Bool
+    var schemaAttribute: Any { get }
     
 }
 
-extension ReadOnlyPathProtocol {
+@propertyWrapper
+public struct ComplexProperty<Base: ComplexProtocol> {
     
-    public var fullPath: [AnyPath<Root>] {
-        return self.ancestors + [AnyPath(self)]
+    public var projectedValue: ComplexProperty<Base> {
+        self
+    }
+    
+    public var wrappedValue: Base
+    
+    public var label: String
+    
+    public init(base: Base, label: String) {
+        self.wrappedValue = base
+        self.label = label
     }
     
 }
 
-public protocol PathProtocol: ReadOnlyPathProtocol {
+extension ComplexProperty: SchemaAttributeConvertible {
     
-    associatedtype Root
-    associatedtype Value
-    
-    var readOnly: ReadOnlyPath<Root, Value> { get }
-    
-    var path: WritableKeyPath<Root, Value> { get }
-    
-    func changeRoot<Prefix: PathProtocol>(path: Prefix) -> Path<Prefix.Root, Value> where Prefix.Value == Root
-    
-}
-
-extension PathProtocol {
-    
-    public var keyPath: KeyPath<Root, Value> {
-        return self.path as KeyPath<Root, Value>
-    }
-    
-}
-
-extension PathProtocol {
-    
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.path == rhs.path
+    var schemaAttribute: Any {
+        let fields = wrappedValue.properties.map {
+            Field(name: $0.label, type: $0.type)
+        }
+        return SchemaAttribute(label: label, type: .complex(layout: fields), validate: AnyValidator([wrappedValue.propertiesValidator, wrappedValue.extraValidation]))
     }
     
 }

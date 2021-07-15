@@ -1,9 +1,9 @@
 /*
- * PathProtocol.swift
+ * MakeAvailableTrigger.swift
  * Attributes
  *
- * Created by Callum McColl on 4/11/20.
- * Copyright © 2020 Callum McColl. All rights reserved.
+ * Created by Callum McColl on 21/6/21.
+ * Copyright © 2021 Callum McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,52 +56,48 @@
  *
  */
 
-public protocol ReadOnlyPathProtocol: Hashable {
+public struct MakeAvailableTrigger<Source: ReadOnlyPathProtocol, Fields: PathProtocol, Attributes: PathProtocol>: TriggerProtocol where Source.Root == Fields.Root, Fields.Root == Attributes.Root, Fields.Value == [Field], Attributes.Value == [String: Attribute] {
     
-    associatedtype Root
-    associatedtype Value
+    public typealias Root = Fields.Root
     
-    var ancestors: [AnyPath<Root>] { get }
-    
-    var keyPath: KeyPath<Root, Value> { get }
-    
-    func isNil(_ root: Root) -> Bool
-    
-}
-
-extension ReadOnlyPathProtocol {
-    
-    public var fullPath: [AnyPath<Root>] {
-        return self.ancestors + [AnyPath(self)]
+    public var path: AnyPath<Root> {
+        AnyPath(source)
     }
     
-}
-
-public protocol PathProtocol: ReadOnlyPathProtocol {
+    let field: Field
     
-    associatedtype Root
-    associatedtype Value
+    let order: [String]
     
-    var readOnly: ReadOnlyPath<Root, Value> { get }
+    let source: Source
     
-    var path: WritableKeyPath<Root, Value> { get }
+    let fields: Fields
     
-    func changeRoot<Prefix: PathProtocol>(path: Prefix) -> Path<Prefix.Root, Value> where Prefix.Value == Root
+    let attributes: Attributes
     
-}
-
-extension PathProtocol {
-    
-    public var keyPath: KeyPath<Root, Value> {
-        return self.path as KeyPath<Root, Value>
+    public init(field: Field, after order: [String], source: Source, fields: Fields, attributes: Attributes) {
+        self.field = field
+        self.order = order
+        self.source = source
+        self.fields = fields
+        self.attributes = attributes
     }
     
-}
-
-extension PathProtocol {
+    public func performTrigger(_ root: inout Source.Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Source.Root>> {
+        if nil != root[keyPath: fields.keyPath].first(where: { $0.name == field.name }) {
+            return .success(false)
+        }
+        let indices = order.compactMap {
+            root[keyPath: fields.path].lazy.map(\.name).firstIndex(of: $0)
+        }
+        root[keyPath: fields.path].insert(field, at: indices.first ?? 0)
+        if nil == root[keyPath: attributes.keyPath][field.name] {
+            root[keyPath: attributes.path][field.name] = field.type.defaultValue
+        }
+        return .success(true)
+    }
     
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.path == rhs.path
+    public func isTriggerForPath(_ path: AnyPath<Root>, in _: Root) -> Bool {
+        path.isChild(of: self.path) || path.isSame(as: self.path)
     }
     
 }

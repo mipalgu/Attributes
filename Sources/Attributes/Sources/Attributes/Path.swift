@@ -137,6 +137,17 @@ public struct Path<Root, Value>: PathProtocol {
         return Path<Root, AppendedValue>(path: path.appending(path: member), ancestors: fullPath)
     }
     
+    public func appending<NewValue>(path: Path<Value, NewValue>) -> Path<Root, NewValue> {
+        path.changeRoot(path: self)
+    }
+    
+    public func changeRoot<Prefix: PathProtocol>(path: Prefix) -> Path<Prefix.Root, Value> where Prefix.Value == Root {
+        let ancestors = path.ancestors + self.ancestors.map {
+            $0.changeRoot(path: path.readOnly)
+        }
+        return Path<Prefix.Root, Value>(path: path.path.appending(path: self.path), ancestors: ancestors)
+    }
+    
     public func isNil(_ root: Root) -> Bool {
         return self._isNil(root)
     }
@@ -158,8 +169,16 @@ extension Path {
 
 extension Path {
     
-    public func validate(@ValidatorBuilder<Root> builder: (ValidationPath<Path<Root, Value>>) -> [AnyValidator<Root>]) -> AnyValidator<Root> {
-        return AnyValidator(builder(ValidationPath(path: Path(path: self.path, ancestors: self.fullPath))))
+    public func validate(@ValidatorBuilder<Root> builder: (ValidationPath<Path<Root, Value>>) -> AnyValidator<Root>) -> AnyValidator<Root> {
+        return builder(ValidationPath(path: Path(path: self.path, ancestors: self.fullPath)))
+    }
+    
+}
+
+extension Path {
+    
+    public func trigger(@TriggerBuilder<Root> builder: (WhenChanged<Path<Root, Value>, IdentityTrigger<Root>>) -> [AnyTrigger<Root>]) -> AnyTrigger<Root> {
+        return AnyTrigger(builder(WhenChanged(Path(path: self.path, ancestors: self.fullPath))))
     }
     
 }

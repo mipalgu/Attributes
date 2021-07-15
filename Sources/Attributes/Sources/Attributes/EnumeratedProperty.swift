@@ -1,9 +1,9 @@
 /*
- * PathProtocol.swift
- * Attributes
+ * EnumeratedProperty.swift
+ * 
  *
- * Created by Callum McColl on 4/11/20.
- * Copyright © 2020 Callum McColl. All rights reserved.
+ * Created by Callum McColl on 21/6/21.
+ * Copyright © 2021 Callum McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,52 +56,32 @@
  *
  */
 
-public protocol ReadOnlyPathProtocol: Hashable {
+@propertyWrapper
+public struct EnumeratedProperty {
     
-    associatedtype Root
-    associatedtype Value
-    
-    var ancestors: [AnyPath<Root>] { get }
-    
-    var keyPath: KeyPath<Root, Value> { get }
-    
-    func isNil(_ root: Root) -> Bool
-    
-}
-
-extension ReadOnlyPathProtocol {
-    
-    public var fullPath: [AnyPath<Root>] {
-        return self.ancestors + [AnyPath(self)]
+    public var projectedValue: EnumeratedProperty {
+        self
     }
     
-}
-
-public protocol PathProtocol: ReadOnlyPathProtocol {
+    public var wrappedValue: SchemaAttribute
     
-    associatedtype Root
-    associatedtype Value
-    
-    var readOnly: ReadOnlyPath<Root, Value> { get }
-    
-    var path: WritableKeyPath<Root, Value> { get }
-    
-    func changeRoot<Prefix: PathProtocol>(path: Prefix) -> Path<Prefix.Root, Value> where Prefix.Value == Root
-    
-}
-
-extension PathProtocol {
-    
-    public var keyPath: KeyPath<Root, Value> {
-        return self.path as KeyPath<Root, Value>
+    public init(wrappedValue: SchemaAttribute) {
+        self.wrappedValue = wrappedValue
     }
     
-}
-
-extension PathProtocol {
-    
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.path == rhs.path
+    public init(
+        label: String,
+        validValues: Set<String>,
+        validation validatorFactories: ValidatorFactory<String> ...
+    ) {
+        let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).lineAttribute.enumeratedValue
+        let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
+        let attribute = SchemaAttribute(
+            label: label,
+            type: .enumerated(validValues: validValues),
+            validate: validator
+        )
+        self.init(wrappedValue: attribute)
     }
     
 }

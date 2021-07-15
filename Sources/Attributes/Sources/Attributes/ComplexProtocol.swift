@@ -1,9 +1,9 @@
 /*
- * PathProtocol.swift
+ * ComplexProtocol.swift
  * Attributes
  *
- * Created by Callum McColl on 4/11/20.
- * Copyright © 2020 Callum McColl. All rights reserved.
+ * Created by Callum McColl on 12/6/21.
+ * Copyright © 2021 Callum McColl. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -56,52 +56,24 @@
  *
  */
 
-public protocol ReadOnlyPathProtocol: Hashable {
+public protocol ComplexProtocol: Attributable where AttributeRoot == Attribute {
     
-    associatedtype Root
-    associatedtype Value
+    @TriggerBuilder<Root>
+    var triggers: AnyTrigger<Root> { get }
     
-    var ancestors: [AnyPath<Root>] { get }
-    
-    var keyPath: KeyPath<Root, Value> { get }
-    
-    func isNil(_ root: Root) -> Bool
+    @ValidatorBuilder<AttributeRoot>
+    var extraValidation: AnyValidator<AttributeRoot> { get }
     
 }
 
-extension ReadOnlyPathProtocol {
+public extension ComplexProtocol {
     
-    public var fullPath: [AnyPath<Root>] {
-        return self.ancestors + [AnyPath(self)]
+    var pathToFields: Path<Attribute, [Field]> {
+        Path<Attribute, Attribute>(path: \.self, ancestors: []).blockAttribute.complexFields
     }
     
-}
-
-public protocol PathProtocol: ReadOnlyPathProtocol {
-    
-    associatedtype Root
-    associatedtype Value
-    
-    var readOnly: ReadOnlyPath<Root, Value> { get }
-    
-    var path: WritableKeyPath<Root, Value> { get }
-    
-    func changeRoot<Prefix: PathProtocol>(path: Prefix) -> Path<Prefix.Root, Value> where Prefix.Value == Root
-    
-}
-
-extension PathProtocol {
-    
-    public var keyPath: KeyPath<Root, Value> {
-        return self.path as KeyPath<Root, Value>
-    }
-    
-}
-
-extension PathProtocol {
-    
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.path == rhs.path
+    var pathToAttributes: Path<Attribute, [String: Attribute]> {
+        Path<Attribute, Attribute>(path: \.self, ancestors: []).blockAttribute.complexValue
     }
     
 }
