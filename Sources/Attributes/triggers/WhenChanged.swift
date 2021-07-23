@@ -52,6 +52,10 @@ extension WhenChanged where Trigger == IdentityTrigger<Path.Root> {
         SyncTrigger(source: actualPath, target: target)
     }
     
+    public func sync<TargetPath: SearchablePath>(target: TargetPath, transform: @escaping (Path.Value) -> TargetPath.Value) -> SyncWithTransformTrigger<Path, TargetPath> where TargetPath.Root == Root {
+        SyncWithTransformTrigger(source: actualPath, target: target, transform: transform)
+    }
+    
     public func makeAvailable<FieldsPath: PathProtocol, AttributesPath: PathProtocol>(field: Field, after order: [String], fields: FieldsPath, attributes: AttributesPath) -> MakeAvailableTrigger<Path, FieldsPath, AttributesPath> where FieldsPath.Root == Root, FieldsPath.Value == [Field], AttributesPath.Value == [String: Attribute] {
         MakeAvailableTrigger(field: field, after: order, source: self.actualPath, fields: fields, attributes: attributes)
     }

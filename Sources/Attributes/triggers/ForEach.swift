@@ -108,6 +108,12 @@ extension ForEach where Trigger == WhenChanged<Path<SearchPath.Root, SearchPath.
             SyncTrigger(source: $0, target: target)
         }
     }
+    
+    public func sync<TargetPath: SearchablePath>(target: TargetPath, transform: @escaping (SearchPath.Value) -> TargetPath.Value) -> ForEach<SearchPath, SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>> where TargetPath.Root == Root {
+        ForEach<SearchPath, SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>>(path) {
+            SyncWithTransformTrigger(source: $0, target: target, transform: transform)
+        }
+    }
 
     public func makeAvailable<FieldsPath: PathProtocol, AttributesPath: PathProtocol>(field: Field, after order: [String], fields: FieldsPath, attributes: AttributesPath) -> ForEach<SearchPath, MakeAvailableTrigger<Path<SearchPath.Root, SearchPath.Value>, FieldsPath, AttributesPath>> where FieldsPath.Root == Root, FieldsPath.Value == [Field], AttributesPath.Value == [String: Attribute] {
         ForEach<SearchPath, MakeAvailableTrigger<Path<SearchPath.Root, SearchPath.Value>, FieldsPath, AttributesPath>>(path) {
