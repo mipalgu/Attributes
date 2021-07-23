@@ -450,5 +450,13 @@ extension ValidationPushProtocol where Value: StringProtocol {
         }
     }
     
+    public func greyList(_ list: Set<String>) -> PushValidator {
+        return push { (_, val) in
+            guard let _ = list.first(where: { val.contains($0) }) else {
+                throw ValidationError(message: "\(val) is not valid, it must contain pre-existing words. Candidates: \(list)", path: path)
+            }
+        }
+    }
+    
 }
 
