@@ -90,9 +90,7 @@ public struct AnyValidator<Root>: ValidatorProtocol {
     
     public func toNewRoot<NewPath: ReadOnlyPathProtocol>(path: NewPath) -> AnyValidator<NewPath.Root> where NewPath.Value == Root {
         AnyValidator<NewPath.Root>(validate: {
-            let keyPath = path.keyPath
-            let root = $0[keyPath: keyPath]
-            try performValidation(root)
+            try performValidation($0[keyPath: path.keyPath])
         })
     }
     
