@@ -7,8 +7,4 @@
 
 import Foundation
 
-struct EmptySchema<RootType: Modifiable>: SchemaProtocol {
-
-    typealias Root = RootType
-    
-}
+struct EmptySchema<Root: Modifiable>: SchemaProtocol {}
