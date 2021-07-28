@@ -7,4 +7,8 @@
 
 import Foundation
 
-struct EmptySchema<Root: Modifiable>: SchemaProtocol {}
+public struct EmptySchema<Root: Modifiable>: SchemaProtocol {
+    
+    public init() {}
+    
+}
