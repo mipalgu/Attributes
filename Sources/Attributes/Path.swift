@@ -79,6 +79,10 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
         self.init(keyPath: keyPath, ancestors: ancestors, isNil: { root in root[keyPath: keyPath] == nil })
     }
     
+    public init(_ type: Value.Type) where Root == Value {
+        self.init(keyPath: \.self, ancestors: [])
+    }
+    
     public subscript<AppendedValue>(dynamicMember member: KeyPath<Value, AppendedValue>) -> ReadOnlyPath<Root, AppendedValue> {
         return ReadOnlyPath<Root, AppendedValue>(keyPath: keyPath.appending(path: member), ancestors: fullPath)
     }
@@ -123,6 +127,10 @@ public struct Path<Root, Value>: PathProtocol {
     
     public init<T>(path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>]) where Value == Optional<T> {
         self.init(path: path, ancestors: ancestors, isNil: { root in root[keyPath: path] == nil })
+    }
+    
+    public init(_ type: Value.Type) where Root == Value {
+        self.init(path: \.self, ancestors: [])
     }
     
     public var readOnly: ReadOnlyPath<Root, Value> {
