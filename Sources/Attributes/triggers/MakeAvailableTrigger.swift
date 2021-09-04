@@ -83,7 +83,7 @@ public struct MakeAvailableTrigger<Source: ReadOnlyPathProtocol, Fields: PathPro
     }
     
     public func performTrigger(_ root: inout Source.Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Source.Root>> {
-        if nil == root[keyPath: fields.keyPath].first(where: { $0.name == field.name }) {
+        if nil != root[keyPath: fields.keyPath].first(where: { $0.name == field.name }) {
             return .success(false)
         }
         let indices = order.compactMap {
