@@ -109,7 +109,7 @@ extension ForEach where Trigger == WhenChanged<Path<SearchPath.Root, SearchPath.
         }
     }
     
-    public func sync<TargetPath: SearchablePath>(target: TargetPath, transform: @escaping (SearchPath.Value) -> TargetPath.Value) -> ForEach<SearchPath, SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>> where TargetPath.Root == Root {
+    public func sync<TargetPath: SearchablePath>(target: TargetPath, transform: @escaping (SearchPath.Value, TargetPath.Value) -> TargetPath.Value) -> ForEach<SearchPath, SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>> where TargetPath.Root == Root {
         ForEach<SearchPath, SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>>(path) {
             SyncWithTransformTrigger(source: $0, target: target, transform: transform)
         }

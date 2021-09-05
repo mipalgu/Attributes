@@ -52,7 +52,7 @@ extension WhenChanged where Trigger == IdentityTrigger<Path.Root> {
         SyncTrigger(source: actualPath, target: target)
     }
     
-    public func sync<TargetPath: SearchablePath>(target: TargetPath, transform: @escaping (Path.Value) -> TargetPath.Value) -> SyncWithTransformTrigger<Path, TargetPath> where TargetPath.Root == Root {
+    public func sync<TargetPath: SearchablePath>(target: TargetPath, transform: @escaping (Path.Value, TargetPath.Value) -> TargetPath.Value) -> SyncWithTransformTrigger<Path, TargetPath> where TargetPath.Root == Root {
         SyncWithTransformTrigger(source: actualPath, target: target, transform: transform)
     }
     

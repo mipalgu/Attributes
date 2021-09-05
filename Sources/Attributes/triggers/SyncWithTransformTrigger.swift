@@ -19,9 +19,9 @@ public struct SyncWithTransformTrigger<Source: PathProtocol, Target: SearchableP
     
     let target: Target
     
-    let transform: (Source.Value) -> Target.Value
+    let transform: (Source.Value, Target.Value) -> Target.Value
     
-    public init(source: Source, target: Target, transform: @escaping (Source.Value) -> Target.Value) {
+    public init(source: Source, target: Target, transform: @escaping (Source.Value, Target.Value) -> Target.Value) {
         self.source = source
         self.target = target
         self.transform = transform
@@ -29,7 +29,7 @@ public struct SyncWithTransformTrigger<Source: PathProtocol, Target: SearchableP
     
     public func performTrigger(_ root: inout Source.Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Source.Root>> {
         for path in target.paths(in: root) {
-            root[keyPath: path.path] = transform(root[keyPath: source.keyPath])
+            root[keyPath: path.path] = transform(root[keyPath: source.keyPath], root[keyPath: path.keyPath])
         }
         return .success(true)
     }
