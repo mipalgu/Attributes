@@ -71,10 +71,11 @@ public struct TextProperty {
     
     public init(
         label: String,
-        validation validatorFactories: ValidatorFactory<String> ...
+        @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, String>>) -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.textValue
-        let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
+        let validationPath = ValidationPath(path: path)
+        let validator = builder(validationPath)
         let attribute = SchemaAttribute(
             label: label,
             type: .text,

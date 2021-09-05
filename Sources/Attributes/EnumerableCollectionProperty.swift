@@ -72,10 +72,11 @@ public struct EnumerableCollectionProperty {
     public init(
         label: String,
         validValues: Set<String>,
-        validation validatorFactories: ValidatorFactory<Set<String>> ...
+        @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, Set<String>>>) -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.enumerableCollectionValue
-        let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
+        let validationPath = ValidationPath(path: path)
+        let validator = builder(validationPath)
         let attribute = SchemaAttribute(
             label: label,
             type: .enumerableCollection(validValues: validValues),

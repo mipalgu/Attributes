@@ -72,10 +72,11 @@ public struct CodeProperty {
     public init(
         label: String,
         language: Language,
-        validation validatorFactories: ValidatorFactory<Code> ...
+        @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, Code>>) -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.codeValue
-        let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
+        let validationPath = ValidationPath(path: path)
+        let validator = builder(validationPath)
         let attribute = SchemaAttribute(
             label: label,
             type: .code(language: language),
