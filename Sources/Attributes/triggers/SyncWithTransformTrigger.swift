@@ -28,11 +28,13 @@ public struct SyncWithTransformTrigger<Source: PathProtocol, Target: SearchableP
     }
     
     public func performTrigger(_ root: inout Source.Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Source.Root>> {
+        print("Performing Triggers...")
         for path in target.paths(in: root) {
             guard !path.isNil(root) else {
                 print("Tried to trigger update to nil path: \(path)")
                 return .failure(AttributeError(message: "Tried to trigger update to nil path", path: path))
             }
+            print("performing trigger for: \(path)")
             root[keyPath: path.path] = transform(root[keyPath: source.keyPath], root[keyPath: path.keyPath])
         }
         return .success(true)
