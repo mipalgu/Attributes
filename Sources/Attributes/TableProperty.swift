@@ -72,14 +72,15 @@ public struct TableProperty {
     public init(
         label: String,
         columns: [TableColumn],
-        validation validatorFactories: ValidatorFactory<[[LineAttribute]]> ...
+        @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, [[LineAttribute]]>>) -> AnyValidator<Attribute>
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.tableValue
-        let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
+        let validationPath = ValidationPath(path: path)
+        let tableValidator = builder(validationPath)
         let attribute: SchemaAttribute = SchemaAttribute(
             label: label,
             type: .table(columns: columns.map { ($0.label, $0.type) }),
-            validate: validator
+            validate: tableValidator
         )
         self.init(wrappedValue: attribute)
     }
