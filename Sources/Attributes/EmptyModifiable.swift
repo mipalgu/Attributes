@@ -70,10 +70,13 @@ public struct EmptyModifiable: Modifiable {
     
     public var errorBag: ErrorBag<EmptyModifiable>
     
-    public init(attributes: [AttributeGroup] = [], metaData: [AttributeGroup] = [], errorBag: ErrorBag<EmptyModifiable> = ErrorBag()) {
+    private let modifyTriggsy: () -> Result<Bool, AttributeError<EmptyModifiable>>
+    
+    public init(attributes: [AttributeGroup] = [], metaData: [AttributeGroup] = [], errorBag: ErrorBag<EmptyModifiable> = ErrorBag(), modifyTriggsy: @escaping () -> Result<Bool, AttributeError<EmptyModifiable>> = { .success(false) }) {
         self.attributes = attributes
         self.metaData = metaData
         self.errorBag = errorBag
+        self.modifyTriggsy = modifyTriggsy
     }
     
     public mutating func addItem<Path, T>(_ item: T, to attribute: Path) -> Result<Bool, AttributeError<EmptyModifiable>> where EmptyModifiable == Path.Root, Path : PathProtocol, Path.Value == [T] {
@@ -100,7 +103,7 @@ public struct EmptyModifiable: Modifiable {
     
     public mutating func modify<Path>(attribute: Path, value: Path.Value) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path : PathProtocol {
         self[keyPath: attribute.path] = value
-        return .success(false)
+        return self.modifyTriggsy()
     }
     
     public func validate() throws {}
