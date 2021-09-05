@@ -72,7 +72,7 @@ public struct TableProperty {
     public init(
         label: String,
         columns: [TableColumn],
-        @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, [[LineAttribute]]>>) -> AnyValidator<Attribute>
+        @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, [[LineAttribute]]>>) -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.tableValue
         let validationPath = ValidationPath(path: path)
