@@ -23,9 +23,12 @@ public struct WhenChanged<Path: ReadOnlyPathProtocol, Trigger: TriggerProtocol>:
     }
     
     public func performTrigger(_ root: inout Path.Root, for path: AnyPath<Root>) -> Result<Bool, AttributeError<Path.Root>> {
+        print("Performing WhenChanged triggers...")
         if isTriggerForPath(path, in: root) {
+            print("Trigger in path")
             return trigger.performTrigger(&root, for: path)
         }
+        print("WhenChanged trigger isn't in root path")
         return .success(false)
     }
     
