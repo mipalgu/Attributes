@@ -28,7 +28,7 @@ public struct WhenChanged<Path: ReadOnlyPathProtocol, Trigger: TriggerProtocol>:
             print("Trigger in path")
             return trigger.performTrigger(&root, for: path)
         }
-        print("WhenChanged trigger isn't in root path")
+        print("WhenChanged trigger isn't in root path: \(path)")
         return .success(false)
     }
     
