@@ -89,6 +89,10 @@ public struct ValidatorFactory<Value> {
         .init(required: false) { AnyValidator() }
     }
     
+    public func validate(@ValidatorBuilder<Value> builder: (Self) -> AnyValidator<Value>) -> AnyValidator<Value> {
+        return builder(self)
+    }
+    
     internal func push<Validator: ValidatorProtocol>(_ make: @escaping (ValidationPath<ReadOnlyPath<Value, Value>>) -> Validator) -> ValidatorFactory<Value> where Validator.Root == Value {
         ValidatorFactory(required: required) {
             let newValidator = make(ValidationPath(path: ReadOnlyPath(keyPath: \Value.self, ancestors: [])))
