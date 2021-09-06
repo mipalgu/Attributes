@@ -67,6 +67,8 @@ public protocol Attributable {
     var pathToFields: Path<AttributeRoot, [Field]> { get }
     
     var pathToAttributes: Path<AttributeRoot, [String: Attribute]> { get }
+    
+    var available: Set<String> { get }
 
     var properties: [SchemaAttribute] { get }
     
