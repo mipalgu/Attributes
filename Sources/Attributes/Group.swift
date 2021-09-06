@@ -5,15 +5,25 @@
 //  Created by Morgan McColl on 31/5/21.
 //
 
+protocol ConvertibleToGroup {
+    
+    var anyGroup: Any { get }
+    
+}
+
 @propertyWrapper
-public struct Group<Root: Modifiable> {
+public struct Group<GroupType: GroupProtocol>: ConvertibleToGroup {
     
-    public var projectedValue: Group<Root> { self }
+    public var projectedValue: Group<GroupType> { self }
     
-    public var wrappedValue: AnyGroup<Root>
+    public var wrappedValue: GroupType
     
-    public init<GroupType: GroupProtocol>(wrappedValue group: GroupType) where GroupType.Root == Root {
-        self.wrappedValue = AnyGroup(group)
+    public var anyGroup: Any {
+        return AnyGroup<GroupType.Root>(wrappedValue)
+    }
+    
+    public init(wrappedValue group: GroupType) {
+        self.wrappedValue = group
     }
     
 }
