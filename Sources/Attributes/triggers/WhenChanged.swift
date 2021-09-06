@@ -67,4 +67,8 @@ extension WhenChanged where Trigger == IdentityTrigger<Path.Root> {
         MakeUnavailableTrigger(field: field, source: actualPath, fields: fields)
     }
     
+    public func custom(_ trigger: @escaping (inout Root) -> Result<Bool, AttributeError<Root>>) -> CustomTrigger<Path> {
+        CustomTrigger(path: actualPath, trigger: trigger)
+    }
+    
 }
