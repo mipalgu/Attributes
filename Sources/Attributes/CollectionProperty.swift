@@ -83,7 +83,7 @@ public struct CollectionProperty {
         }
         let attribute = SchemaAttribute(
             label: label,
-            type: .bool,
+            type: .collection(type: .bool),
             validate: validator
         )
         self.init(wrappedValue: attribute)
@@ -103,7 +103,7 @@ public struct CollectionProperty {
         }
         let attribute = SchemaAttribute(
             label: label,
-            type: .integer,
+            type: .collection(type: .integer),
             validate: validator
         )
         self.init(wrappedValue: attribute)
@@ -123,7 +123,7 @@ public struct CollectionProperty {
         }
         let attribute = SchemaAttribute(
             label: label,
-            type: .float,
+            type: .collection(type: .float),
             validate: validator
         )
         self.init(wrappedValue: attribute)
@@ -144,7 +144,7 @@ public struct CollectionProperty {
         }
         let attribute = SchemaAttribute(
             label: label,
-            type: .expression(language: language),
+            type: .collection(type: .expression(language: language)),
             validate: validator
         )
         self.init(wrappedValue: attribute)
@@ -165,7 +165,7 @@ public struct CollectionProperty {
         }
         let attribute = SchemaAttribute(
             label: label,
-            type: .enumerated(validValues: validValues),
+            type: .collection(type: .enumerated(validValues: validValues)),
             validate: validator
         )
         self.init(wrappedValue: attribute)
@@ -185,7 +185,7 @@ public struct CollectionProperty {
         }
         let attribute = SchemaAttribute(
             label: label,
-            type: .line,
+            type: .collection(type: .line),
             validate: validator
         )
         self.init(wrappedValue: attribute)
