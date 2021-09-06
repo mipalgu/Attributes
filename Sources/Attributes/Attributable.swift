@@ -88,6 +88,10 @@ public extension Attributable {
     
     typealias ComplexProperty<Base> = Attributes.ComplexProperty<Base> where Base: ComplexProtocol, Base.Root == AttributeRoot
     
+    var available: Set<String> {
+        Set(properties.map(\.label))
+    }
+    
     var triggers: AnyTrigger<Root> {
         AnyTrigger<Root>()
     }
