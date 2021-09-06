@@ -12,7 +12,8 @@ public protocol GroupProtocol: Attributable where AttributeRoot == AttributeGrou
     @ValidatorBuilder<AttributeGroup>
     var groupValidation: AnyValidator<AttributeRoot> { get }
     
-    var rootValidaiton: AnyValidator<Root> { get }
+    @ValidatorBuilder<Root>
+    var rootValidation: AnyValidator<Root> { get }
     
 }
 
