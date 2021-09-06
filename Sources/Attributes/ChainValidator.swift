@@ -9,18 +9,22 @@ import Foundation
 
 struct ChainValidator<Path: ReadOnlyPathProtocol, Validator: ValidatorProtocol>: ValidatorProtocol where Path.Value == Validator.Root {
 
-  var path: Path
+    var path: Path
 
-  var validator: Validator
+    var validator: Validator
 
-  init(path: Path, validator: Validator) {
-    self.path = path
-    self.validator = validator
-  }
+    init(path: Path, validator: Validator) {
+        self.path = path
+        self.validator = validator
+    }
 
-  func performValidation(_ root: Path.Root) throws {
-    let value = root[keyPath: path.keyPath]
-    try validator.performValidation(value)
-  }
+    func performValidation(_ root: Path.Root) throws {
+      let value = root[keyPath: path.keyPath]
+      do {
+          try validator.performValidation(value)
+      } catch let e as AttributeError<Validator.Root> {
+          throw AttributeError(message: e.message, path: AnyPath(path).appending(e.path)!)
+      }
+    }
 
 }
