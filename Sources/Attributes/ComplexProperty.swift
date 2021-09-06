@@ -86,7 +86,7 @@ extension ComplexProperty: SchemaAttributeConvertible {
         let fields = wrappedValue.properties.map {
             Field(name: $0.label, type: $0.type)
         }
-        return SchemaAttribute(label: label, type: .complex(layout: fields), validate: AnyValidator([wrappedValue.propertiesValidator, wrappedValue.extraValidation]))
+        return SchemaAttribute(label: label, type: .complex(layout: fields), validate: AnyValidator([wrappedValue.propertiesValidator, wrappedValue.groupValidation]))
     }
     
 }

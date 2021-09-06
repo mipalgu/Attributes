@@ -28,7 +28,9 @@ public struct AnyGroup<Root: Modifiable> {
     
     private let _triggers: () -> AnyTrigger<Root>
     
-    private let _extraValidation: () -> AnyValidator<AttributeGroup>
+    private let _groupValidation: () -> AnyValidator<AttributeGroup>
+    
+    private let _rootValidation: () -> AnyValidator<Root>
     
     private let _findProperty: (AnyPath<Root>, Root) -> SchemaAttribute?
     
@@ -58,8 +60,12 @@ public struct AnyGroup<Root: Modifiable> {
         self._triggers()
     }
     
-    public var extraValidation: AnyValidator<AttributeGroup> {
-        return self._extraValidation()
+    public var groupValidation: AnyValidator<AttributeGroup> {
+        return self._groupValidation()
+    }
+    
+    public var rootValidation: AnyValidator<Root> {
+        return self._rootValidation()
     }
     
     public init<Base: GroupProtocol>(_ base: Base) where Base.Root == Root {
@@ -69,7 +75,8 @@ public struct AnyGroup<Root: Modifiable> {
         self._properties = { base.properties }
         self._propertiesValidator = { base.propertiesValidator }
         self._triggers = { base.triggers }
-        self._extraValidation = { base.extraValidation }
+        self._groupValidation = { base.groupValidation }
+        self._rootValidation = { base.rootValidation }
         self._findProperty = { base.findProperty(path: $0, in: $1) }
         self.base = base
     }

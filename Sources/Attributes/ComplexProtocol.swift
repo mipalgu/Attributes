@@ -62,7 +62,10 @@ public protocol ComplexProtocol: Attributable where AttributeRoot == Attribute {
     var triggers: AnyTrigger<Root> { get }
     
     @ValidatorBuilder<AttributeRoot>
-    var extraValidation: AnyValidator<AttributeRoot> { get }
+    var groupValidation: AnyValidator<AttributeRoot> { get }
+    
+    @ValidatorBuilder<Root>
+    var rootValidation: AnyValidator<Root> { get }
     
 }
 

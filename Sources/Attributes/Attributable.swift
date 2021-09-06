@@ -74,7 +74,9 @@ public protocol Attributable {
     
     var triggers: AnyTrigger<Root> { get }
     
-    var extraValidation: AnyValidator<AttributeRoot> { get }
+    var groupValidation: AnyValidator<AttributeRoot> { get }
+
+    var rootValidation: AnyValidator<Root> { get }
     
 }
 
@@ -88,12 +90,12 @@ public extension Attributable {
         AnyTrigger<Root>()
     }
     
-    var extraValidation: AnyValidator<AttributeRoot> {
+    var groupValidation: AnyValidator<AttributeRoot> {
         AnyValidator<AttributeRoot>()
     }
     
-    var validate: ValidationPath<ReadOnlyPath<AttributeRoot, AttributeRoot>> {
-        ValidationPath(path: ReadOnlyPath(keyPath: \.self, ancestors: []))
+    var rootValidation: AnyValidator<Root> {
+        AnyValidator<Root>()
     }
     
     var properties: [SchemaAttribute] {
@@ -138,7 +140,7 @@ public extension Attributable {
         let propertyValidators = properties.map {
             $0.validate.toNewRoot(path: pathToAttributes[$0.label].wrappedValue)
         }
-        return AnyValidator(propertyValidators + [AnyValidator(extraValidation)])
+        return AnyValidator(propertyValidators)
     }
     
     func findProperty(path: AnyPath<Root>, in root: Root) -> SchemaAttribute? {
