@@ -28,6 +28,8 @@ public struct AnyGroup<Root: Modifiable> {
     
     private let _triggers: () -> AnyTrigger<Root>
     
+    private let _allTriggers: () -> AnyTrigger<Root>
+    
     private let _groupValidation: () -> AnyValidator<AttributeGroup>
     
     private let _rootValidation: () -> AnyValidator<Root>
@@ -60,6 +62,10 @@ public struct AnyGroup<Root: Modifiable> {
         self._triggers()
     }
     
+    public var allTriggers: AnyTrigger<Root> {
+        self._allTriggers()
+    }
+    
     public var groupValidation: AnyValidator<AttributeGroup> {
         return self._groupValidation()
     }
@@ -75,6 +81,7 @@ public struct AnyGroup<Root: Modifiable> {
         self._properties = { base.properties }
         self._propertiesValidator = { base.propertiesValidator }
         self._triggers = { base.triggers }
+        self._allTriggers = { base.allTriggers }
         self._groupValidation = { base.groupValidation }
         self._rootValidation = { base.rootValidation }
         self._findProperty = { base.findProperty(path: $0, in: $1) }

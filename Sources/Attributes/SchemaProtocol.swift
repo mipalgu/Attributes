@@ -24,7 +24,7 @@ public extension SchemaProtocol {
     typealias Group<GroupType: GroupProtocol> = Attributes.Group<GroupType>
     
     var trigger: AnyTrigger<Root> {
-        AnyTrigger(groups.map(\.triggers))
+        AnyTrigger(groups.map(\.allTriggers))
     }
     
     var groups: [AnyGroup<Root>] {

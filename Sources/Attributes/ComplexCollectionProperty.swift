@@ -76,6 +76,10 @@ public struct ComplexCollectionProperty<Base: ComplexProtocol> {
 
 extension ComplexCollectionProperty: SchemaAttributeConvertible {
     
+    var triggers: Any {
+        wrappedValue.triggers
+    }
+    
     var schemaAttribute: Any {
         let fields = wrappedValue.properties.map {
             Field(name: $0.label, type: $0.type)

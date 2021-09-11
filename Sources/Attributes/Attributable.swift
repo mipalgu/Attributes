@@ -76,6 +76,8 @@ public protocol Attributable {
     
     var triggers: AnyTrigger<Root> { get }
     
+    var allTriggers: AnyTrigger<Root> { get }
+    
     var groupValidation: AnyValidator<AttributeRoot> { get }
 
     var rootValidation: AnyValidator<Root> { get }
@@ -94,6 +96,20 @@ public extension Attributable {
     
     var triggers: AnyTrigger<Root> {
         AnyTrigger<Root>()
+    }
+    
+    var allTriggers: AnyTrigger<Root> {
+        let mirror = Mirror(reflecting: self)
+        let childTriggers: [AnyTrigger<Root>] = mirror.children.compactMap {
+            guard
+                let val = $0.value as? SchemaAttributeConvertible,
+                let triggers = val.triggers as? AnyTrigger<Root>
+            else {
+                return nil
+            }
+            return triggers
+        }
+        return AnyTrigger([triggers, AnyTrigger(childTriggers)])
     }
     
     var groupValidation: AnyValidator<AttributeRoot> {

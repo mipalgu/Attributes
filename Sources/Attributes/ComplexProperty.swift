@@ -58,6 +58,8 @@
 
 protocol SchemaAttributeConvertible {
     
+    var triggers: Any { get }
+    
     var schemaAttribute: Any { get }
     
 }
@@ -81,6 +83,10 @@ public struct ComplexProperty<Base: ComplexProtocol> {
 }
 
 extension ComplexProperty: SchemaAttributeConvertible {
+    
+    var triggers: Any {
+        wrappedValue.triggers
+    }
     
     var schemaAttribute: Any {
         let fields = wrappedValue.properties.map {
