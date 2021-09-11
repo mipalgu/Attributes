@@ -103,7 +103,7 @@ public extension Attributable {
         let childTriggers: [AnyTrigger<Root>] = mirror.children.compactMap {
             guard
                 let val = $0.value as? SchemaAttributeConvertible,
-                let triggers = val.triggers as? AnyTrigger<Root>
+                let triggers = val.allTriggers as? AnyTrigger<Root>
             else {
                 return nil
             }

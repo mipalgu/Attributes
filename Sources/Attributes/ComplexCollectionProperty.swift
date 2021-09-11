@@ -76,8 +76,8 @@ public struct ComplexCollectionProperty<Base: ComplexProtocol> {
 
 extension ComplexCollectionProperty: SchemaAttributeConvertible {
     
-    var triggers: Any {
-        wrappedValue.triggers
+    var allTriggers: Any {
+        wrappedValue.allTriggers
     }
     
     var schemaAttribute: Any {
