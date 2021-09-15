@@ -80,6 +80,15 @@ public enum BlockAttributeType: Hashable {
     case enumerableCollection(validValues: Set<String>)
     case table(columns: [TableColumn])
     
+    public var isTable: Bool {
+        switch self {
+        case .table:
+            return true
+        default:
+            return false
+        }
+    }
+    
     public var defaultValue: BlockAttribute {
         switch self {
         case .code(let language):

@@ -81,6 +81,15 @@ public enum AttributeType: Hashable {
         }
     }
     
+    public var isTable: Bool {
+        switch self {
+        case .block(let type):
+            return type.isTable
+        default:
+            return false
+        }
+    }
+    
     public var defaultValue: Attribute {
         switch self {
         case .line(let lineAttribute):

@@ -198,6 +198,18 @@ public extension Attributable {
         }
     }
     
+    func WhenChanged<T>(_ value: Path<[LineAttribute], T>, in attribute: SchemaAttribute, perform: @escaping (inout Root) -> Result<Bool, AttributeError<Root>>) -> ForEach<Self.SearchPath, ForEach<CollectionSearchPath<Self.Root, [[LineAttribute]], T>, CustomTrigger<Path<CollectionSearchPath<Self.Root, [[LineAttribute]], T>.Root, CollectionSearchPath<Self.Root, [[LineAttribute]], T>.Value>>>> {
+        if !attribute.type.isTable {
+            fatalError("Calling `WhenChanged(_:in:)` on attribute that is not a table property")
+        }
+        return ForEach(self.path) { groupPath in
+            let attributePath = self.path(for: attribute, in: groupPath)
+            ForEach(CollectionSearchPath(collectionPath: attributePath.tableValue, elementPath: value)) { path in
+                Attributes.WhenChanged(path).custom(perform)
+            }
+        }
+    }
+    
     func WhenTrue(_ attribute: SchemaAttribute, makeAvailable hiddenAttribute: SchemaAttribute) -> ForEach<Self.SearchPath, WhenChanged<Path<Self.Root, Attribute>, ConditionalTrigger<MakeAvailableTrigger<Path<Self.Root, Attribute>, Path<Self.Root, [Field]>, Path<Self.Root, [String : Attribute]>>>>> {
         if attribute.type != .bool {
             fatalError("Calling `WhenTrue` when attributes type is not `bool`.")
