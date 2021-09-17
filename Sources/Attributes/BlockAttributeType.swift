@@ -80,6 +80,15 @@ public enum BlockAttributeType: Hashable {
     case enumerableCollection(validValues: Set<String>)
     case table(columns: [TableColumn])
     
+    public var isRecursive: Bool {
+        switch self {
+        case .collection, .complex, .table:
+            return true
+        default:
+            return false
+        }
+    }
+    
     public var isTable: Bool {
         switch self {
         case .table:

@@ -81,6 +81,15 @@ public enum AttributeType: Hashable {
         }
     }
     
+    public var isRecursive: Bool {
+        switch self {
+        case .block(let blockType):
+            return blockType.isRecursive
+        default:
+            return false
+        }
+    }
+    
     public var isTable: Bool {
         switch self {
         case .block(let type):
