@@ -656,63 +656,63 @@ extension BlockAttribute: Codable {
     }
 
     private struct CodeAttribute: Hashable, Codable {
-        
+
         var value: String
-        
+
         var language: Language
-        
+
     }
 
     private struct TextAttribute: Hashable, Codable {
-        
+
         var value: String
-        
+
         init(_ value: String) {
             self.value = value
         }
-        
+
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             self.value = try container.decode(String.self)
         }
-        
+
         func encode(to encoder: Encoder) throws {
             var container = encoder.singleValueContainer()
             try container.encode(self.value)
         }
-        
+
     }
 
     private struct CollectionAttribute: Hashable, Codable {
-        
+
         var type: AttributeType
-        
+
         var values: [Attribute]
-        
+
     }
 
     private struct ComplexAttribute: Hashable, Codable {
-        
+
         var values: [String: Attribute]
-        
+
         var layout: [Field]
-        
+
     }
 
     private struct EnumCollectionAttribute: Hashable, Codable {
-        
+
         var cases: Set<String>
-        
+
         var values: Set<String>
-        
+
     }
 
     private struct TableAttribute: Hashable, Codable {
-        
+
         var rows: [[LineAttribute]]
-        
+
         var columns: [BlockAttributeType.TableColumn]
-        
+
     }
 
 }

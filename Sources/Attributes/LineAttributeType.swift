@@ -139,43 +139,43 @@ extension LineAttributeType: Codable {
     }
 
     private struct BoolAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "BoolAttributeType" }
-        
+
     }
 
     private struct IntegerAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "IntegerAttributeType" }
-        
+
     }
 
     private struct FloatAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "FloatAttributeType" }
-        
+
     }
 
     private struct ExpressionAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "ExpressionAttributeType" }
-        
+
         var language: Language
-        
+
     }
 
     private struct EnumAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "EnumAttributeType" }
-        
+
         var validValues: Set<String>
-        
+
     }
 
     private struct LineAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "LineAttributeType" }
-        
+
     }
 
 }

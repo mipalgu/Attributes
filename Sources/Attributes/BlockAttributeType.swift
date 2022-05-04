@@ -61,16 +61,16 @@ import XMI
 public enum BlockAttributeType: Hashable {
 
     public struct TableColumn: Hashable, Codable {
-        
+
         public var name: Label
-        
+
         public var type: LineAttributeType
-        
+
         public init(name: String, type: LineAttributeType) {
             self.name = name
             self.type = type
         }
-        
+
     }
 
     case code(language: Language)
@@ -169,49 +169,49 @@ extension BlockAttributeType: Codable {
     }
 
     private struct CodeAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "CodeAttributeType" }
-        
+
         var language: Language
-        
+
     }
 
     private struct TextAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "TextAttributeType" }
-        
+
     }
 
     private struct CollectionAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "CollectionAttributeType" }
-        
+
         var type: AttributeType
-        
+
     }
 
     private struct ComplexAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "ComplexAttributeType" }
-        
+
         var layout: [Field]
-        
+
     }
 
     private struct EnumCollectionAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "EnumCollectionAttributeType" }
-        
+
         var validValues: Set<String>
-        
+
     }
 
     private struct TableAttributeType: Hashable, Codable, XMIConvertible {
-        
+
         var xmiName: String? { "TableAttributeType" }
-        
+
         var columns: [BlockAttributeType.TableColumn]
-        
+
     }
 
 }

@@ -322,99 +322,99 @@ extension LineAttribute: Codable {
     }
 
     private struct BoolAttribute: Hashable, Codable {
-        
+
         var value: Bool
-        
+
         init(_ value: Bool) {
             self.value = value
         }
-        
+
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             self.value = try container.decode(Bool.self)
         }
-        
+
         func encode(to encoder: Encoder) throws {
             var container = encoder.singleValueContainer()
             try container.encode(self.value)
         }
-        
+
     }
 
     private struct IntegerAttribute: Hashable, Codable {
-        
+
         var value: Int
-        
+
         init(_ value: Int) {
             self.value = value
         }
-        
+
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             self.value = try container.decode(Int.self)
         }
-        
+
         func encode(to encoder: Encoder) throws {
             var container = encoder.singleValueContainer()
             try container.encode(self.value)
         }
-        
+
     }
 
     private struct FloatAttribute: Hashable, Codable {
-        
+
         var value: Double
-        
+
         init(_ value: Double) {
             self.value = value
         }
-        
+
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             self.value = try container.decode(Double.self)
         }
-        
+
         func encode(to encoder: Encoder) throws {
             var container = encoder.singleValueContainer()
             try container.encode(self.value)
         }
-        
+
     }
 
     private struct ExpressionAttribute: Hashable, Codable {
-        
+
         var value: Expression
-        
+
         var language: Language
-        
+
     }
 
     private struct EnumAttribute: Hashable, Codable {
-        
+
         var cases: Set<String>
-        
+
         var value: String
-        
+
     }
 
     private struct LineAttribute: Hashable, Codable {
-        
+
         var value: String
-        
+
         init(_ value: String) {
             self.value = value
         }
-        
+
         init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             self.value = try container.decode(String.self)
         }
-        
+
         func encode(to encoder: Encoder) throws {
             var container = encoder.singleValueContainer()
             try container.encode(self.value)
         }
-        
+
     }
 
 }
