@@ -59,14 +59,14 @@
 import XMI
 
 public enum Attribute: Hashable, Identifiable {
-    
+
     public var id: Int {
         AttributeIDCache.id(for: self)
     }
-    
+
     case line(LineAttribute)
     case block(BlockAttribute)
-    
+
     public var type: AttributeType {
         switch self {
         case .line(let attribute):
@@ -101,7 +101,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var isLine: Bool {
         switch self {
         case .line:
@@ -110,7 +110,7 @@ public enum Attribute: Hashable, Identifiable {
             return false
         }
     }
-    
+
     public var isBlock: Bool {
         switch self {
         case .block:
@@ -119,7 +119,7 @@ public enum Attribute: Hashable, Identifiable {
             return false
         }
     }
-    
+
     public var lineAttribute: LineAttribute {
         get {
             switch self {
@@ -132,7 +132,7 @@ public enum Attribute: Hashable, Identifiable {
             self = .line(newValue)
         }
     }
-    
+
     public var blockAttribute: BlockAttribute {
         get {
             switch self {
@@ -145,7 +145,7 @@ public enum Attribute: Hashable, Identifiable {
             self = .block(newValue)
         }
     }
-    
+
     public var strValue: String? {
         switch self {
         case .line(let lineAttribute):
@@ -154,7 +154,7 @@ public enum Attribute: Hashable, Identifiable {
             return blockAttribute.strValue
         }
     }
-    
+
     public var boolValue: Bool {
         get {
             switch self {
@@ -173,14 +173,16 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var integerValue: Int {
         get {
             switch self {
             case .line(let attribute):
                 return attribute.integerValue
             default:
-                fatalError("Attempting to fetch an integer value on an attribute which is not a line attribute")
+                fatalError(
+                    "Attempting to fetch an integer value on an attribute which is not a line attribute"
+                )
             }
         }
         set {
@@ -192,7 +194,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var floatValue: Double {
         get {
             switch self {
@@ -211,14 +213,16 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var expressionValue: Expression {
         get {
             switch self {
             case .line(let value):
                 return value.expressionValue
             default:
-                fatalError("Attempting to fetch an expression value on an attribute which is not a line attribute")
+                fatalError(
+                    "Attempting to fetch an expression value on an attribute which is not a line attribute"
+                )
             }
         }
         set {
@@ -226,18 +230,22 @@ public enum Attribute: Hashable, Identifiable {
             case .line(.expression(_, let language)):
                 self = .line(.expression(newValue, language: language))
             default:
-                fatalError("Attempting to set an expression value on an attribute which is not a line attribute")
+                fatalError(
+                    "Attempting to set an expression value on an attribute which is not a line attribute"
+                )
             }
         }
     }
-    
+
     public var enumeratedValue: String {
         get {
             switch self {
             case .line(let value):
                 return value.enumeratedValue
             default:
-                fatalError("Attempting to fetch an enumerated value on an attribute which is not a line attribute")
+                fatalError(
+                    "Attempting to fetch an enumerated value on an attribute which is not a line attribute"
+                )
             }
         }
         set {
@@ -245,11 +253,13 @@ public enum Attribute: Hashable, Identifiable {
             case .line(.enumerated(_, let validValues)):
                 self = .line(.enumerated(newValue, validValues: validValues))
             default:
-                fatalError("Attempting to set an enumerated value on a line attribute which is not a line attribute")
+                fatalError(
+                    "Attempting to set an enumerated value on a line attribute which is not a line attribute"
+                )
             }
         }
     }
-    
+
     public var enumeratedValidValues: Set<String> {
         get {
             switch self {
@@ -268,7 +278,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var lineValue: String {
         get {
             switch self {
@@ -287,7 +297,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var codeValue: String {
         get {
             switch self {
@@ -306,7 +316,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var textValue: String {
         get {
             switch self {
@@ -325,7 +335,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionValue: [Attribute] {
         get {
             switch self {
@@ -344,7 +354,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var complexFields: [Field] {
         get {
             switch self {
@@ -363,7 +373,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var complexValue: [Label: Attribute] {
         get {
             switch self {
@@ -382,7 +392,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var enumerableCollectionValue: Set<String> {
         get {
             switch self {
@@ -401,7 +411,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var enumerableCollectionValidValues: Set<String> {
         get {
             switch self {
@@ -420,7 +430,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var tableValue: [[LineAttribute]] {
         get {
             switch self {
@@ -438,7 +448,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionBools: [Bool] {
         get {
             switch self {
@@ -458,7 +468,9 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .bool:
-                    self = .block(.collection(newValue.map { Attribute.bool($0) }, display: display, type: type))
+                    self = .block(
+                        .collection(newValue.map { Attribute.bool($0) }, display: display, type: type)
+                    )
                 default:
                     fatalError("Attempting to set a collection bool value on an attribute which is not a block attribute")
                 }
@@ -467,7 +479,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionIntegers: [Int] {
         get {
             switch self {
@@ -487,7 +499,9 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .integer:
-                    self = .block(.collection(newValue.map { Attribute.integer($0) }, display: display, type: type))
+                    self = .block(
+                        .collection(newValue.map { Attribute.integer($0) }, display: display, type: type)
+                    )
                 default:
                     fatalError("Attempting to set a collection integer value on an attribute which is not a block attribute")
                 }
@@ -496,7 +510,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionFloats: [Double] {
         get {
             switch self {
@@ -516,7 +530,9 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .float:
-                    self = .block(.collection(newValue.map { Attribute.float($0) }, display: display, type: type))
+                    self = .block(
+                        .collection(newValue.map { Attribute.float($0) }, display: display, type: type)
+                    )
                 default:
                     fatalError("Attempting to set a collection float value on an attribute which is not a block attribute")
                 }
@@ -525,7 +541,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionExpressions: [Expression] {
         get {
             switch self {
@@ -545,7 +561,13 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .line(.expression(let language)):
-                    self = .block(.collection(newValue.map { Attribute.expression($0, language: language) }, display: display, type: type))
+                    self = .block(
+                        .collection(
+                            newValue.map { Attribute.expression($0, language: language) },
+                            display: display,
+                            type: type
+                        )
+                    )
                 default:
                     fatalError("Attempting to set a collection expression value on an attribute which is not a block attribute")
                 }
@@ -554,7 +576,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionEnumerated: [String] {
         get {
             switch self {
@@ -574,7 +596,13 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .line(.enumerated(let validValues)):
-                    self = .block(.collection(newValue.map { Attribute.enumerated($0, validValues: validValues) }, display: display, type: type))
+                    self = .block(
+                        .collection(
+                            newValue.map { Attribute.enumerated($0, validValues: validValues) },
+                            display: display,
+                            type: type
+                        )
+                    )
                 default:
                     fatalError("Attempting to set a collection enumerated value on an attribute which is not a block attribute")
                 }
@@ -583,7 +611,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionLines: [String] {
         get {
             switch self {
@@ -603,7 +631,9 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .line(.line):
-                    self = .block(.collection(newValue.map { Attribute.line($0) }, display: display, type: type))
+                    self = .block(
+                        .collection(newValue.map { Attribute.line($0) }, display: display, type: type)
+                    )
                 default:
                     fatalError("Attempting to set a collection lines value on an attribute which is not a block attribute")
                 }
@@ -612,7 +642,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionCode: [String] {
         get {
             switch self {
@@ -632,7 +662,13 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .block(.code(let language)):
-                    self = .block(.collection(newValue.map { Attribute.code($0, language: language) }, display: display, type: type))
+                    self = .block(
+                        .collection(
+                            newValue.map { Attribute.code($0, language: language) },
+                            display: display,
+                            type: type
+                        )
+                    )
                 default:
                     fatalError("Attempting to set a collection code value on an attribute which is not a block attribute")
                 }
@@ -641,7 +677,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionText: [String] {
         get {
             switch self {
@@ -661,7 +697,9 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .block(.text):
-                    self = .block(.collection(newValue.map { Attribute.text($0) }, display: display, type: type))
+                    self = .block(
+                        .collection(newValue.map { Attribute.text($0) }, display: display, type: type)
+                    )
                 default:
                     fatalError("Attempting to set a collection text value on an attribute which is not a block attribute")
                 }
@@ -670,7 +708,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionComplex: [[Label: Attribute]] {
         get {
             switch self {
@@ -690,7 +728,13 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .block(.complex(let layout)):
-                    self = .block(.collection(newValue.map { Attribute.complex($0, layout: layout) }, display: display, type: type))
+                    self = .block(
+                        .collection(
+                            newValue.map { Attribute.complex($0, layout: layout) },
+                            display: display,
+                            type: type
+                        )
+                    )
                 default:
                     fatalError("Attempting to set a collection complex value on an attribute which is not a block attribute")
                 }
@@ -699,7 +743,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionEnumerableCollection: [Set<String>] {
         get {
             switch self {
@@ -719,7 +763,13 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .block(.enumerableCollection(let validValues)):
-                    self = .block(.collection(newValue.map { Attribute.enumerableCollection($0, validValues: validValues) }, display: display, type: type))
+                    self = .block(
+                        .collection(
+                            newValue.map { Attribute.enumerableCollection($0, validValues: validValues) },
+                            display: display,
+                            type: type
+                        )
+                    )
                 default:
                     fatalError("Attempting to set a collection enumerable collection value on an attribute which is not a block attribute")
                 }
@@ -728,7 +778,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionTable: [[[LineAttribute]]] {
         get {
             switch self {
@@ -748,7 +798,13 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 switch type {
                 case .block(.table(let columns)):
-                    self = .block(.collection(newValue.map { Attribute.table($0, columns: columns.map { ($0.name, $0.type) }) }, display: display, type: type))
+                    self = .block(
+                        .collection(
+                            newValue.map { Attribute.table($0, columns: columns.map { ($0.name, $0.type) }) },
+                            display: display,
+                            type: type
+                        )
+                    )
                 default:
                     fatalError("Attempting to set a collection table value on an attribute which is not a block attribute")
                 }
@@ -757,7 +813,7 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionDisplay: ReadOnlyPath<Attribute, LineAttribute>? {
         get {
             switch self {
@@ -776,115 +832,189 @@ public enum Attribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public init(lineAttribute: LineAttribute) {
         self = .line(lineAttribute)
     }
-    
+
     public init(blockAttribute: BlockAttribute) {
         self = .block(blockAttribute)
     }
-    
+
     public static func bool(_ value: Bool) -> Attribute {
-        return .line(.bool(value))
+        .line(.bool(value))
     }
-    
+
     public static func integer(_ value: Int) -> Attribute {
-        return .line(.integer(value))
+        .line(.integer(value))
     }
-    
+
     public static func float(_ value: Double) -> Attribute {
-        return .line(.float(value))
+        .line(.float(value))
     }
-    
+
     public static func expression(_ value: Expression, language: Language) -> Attribute {
-        return .line(.expression(value, language: language))
+        .line(.expression(value, language: language))
     }
-    
+
     public static func line(_ value: String) -> Attribute {
-        return .line(.line(value))
+        .line(.line(value))
     }
-    
+
     public static func code(_ value: String, language: Language) -> Attribute {
-        return .block(.code(value, language: language))
+        .block(.code(value, language: language))
     }
-    
+
     public static func text(_ value: String) -> Attribute {
-        return .block(.text(value))
+        .block(.text(value))
     }
-    
+
     public static func collection(bools: [Bool]) -> Attribute {
-        return .block(.collection(bools.map { Attribute.bool($0) }, display: nil, type: .bool))
+        .block(.collection(bools.map { Attribute.bool($0) }, display: nil, type: .bool))
     }
-    
+
     public static func collection(integers: [Int]) -> Attribute {
-        return .block(.collection(integers.map { Attribute.integer($0) }, display: nil, type: .integer))
+        .block(.collection(integers.map { Attribute.integer($0) }, display: nil, type: .integer))
     }
-    
+
     public static func collection(floats: [Double]) -> Attribute {
-        return .block(.collection(floats.map { Attribute.float($0) }, display: nil, type: .float))
+        .block(.collection(floats.map { Attribute.float($0) }, display: nil, type: .float))
     }
-    
+
     public static func collection(expressions: [Expression], language: Language) -> Attribute {
-        return .block(.collection(expressions.map { Attribute.expression($0, language: language) }, display: nil, type: .expression(language: language)))
+        .block(
+            .collection(
+                expressions.map { Attribute.expression($0, language: language) },
+                display: nil,
+                type: .expression(language: language)
+            )
+        )
     }
-    
+
     public static func collection(lines: [String]) -> Attribute {
-        return .block(.collection(lines.map { Attribute.line($0) }, display: nil, type: .line))
+        .block(.collection(lines.map { Attribute.line($0) }, display: nil, type: .line))
     }
-    
+
     public static func collection(code: [String], language: Language) -> Attribute {
-        return .block(.collection(code.map { Attribute.code($0, language: language) }, display: nil, type: .code(language: language)))
+        .block(
+            .collection(
+                code.map { Attribute.code($0, language: language) },
+                display: nil,
+                type: .code(language: language)
+            )
+        )
     }
-    
+
     public static func collection(text: [String]) -> Attribute {
-        return .block(.collection(text.map { Attribute.text($0) }, display: nil, type: .text))
+        .block(.collection(text.map { Attribute.text($0) }, display: nil, type: .text))
     }
-    
-    public static func collection(complex: [[Label: Attribute]], layout: [Field], display: ReadOnlyPath<Attribute, LineAttribute>? = nil) -> Attribute {
-        return .block(.collection(complex.map { Attribute.complex($0, layout: layout) }, display: display, type: .complex(layout: layout)))
+
+    public static func collection(
+        complex: [[Label: Attribute]],
+        layout: [Field],
+        display: ReadOnlyPath<Attribute, LineAttribute>? = nil
+    ) -> Attribute {
+        .block(
+            .collection(
+                complex.map { Attribute.complex($0, layout: layout) },
+                display: display,
+                type: .complex(layout: layout)
+            )
+        )
     }
-    
-    public static func collection(enumerated: [String], validValues: Set<String>, display: ReadOnlyPath<Attribute, LineAttribute>? = nil) -> Attribute {
-        return .block(.collection(enumerated.map { Attribute.enumerated($0, validValues: validValues) }, display: display, type: .enumerated(validValues: validValues)))
+
+    public static func collection(
+        enumerated: [String],
+        validValues: Set<String>,
+        display: ReadOnlyPath<Attribute, LineAttribute>? = nil
+    ) -> Attribute {
+        .block(
+            .collection(
+                enumerated.map { Attribute.enumerated($0, validValues: validValues) },
+                display: display,
+                type: .enumerated(validValues: validValues)
+            )
+        )
     }
-    
-    public static func collection(enumerables: [Set<String>], validValues: Set<String>, display: ReadOnlyPath<Attribute, LineAttribute>? = nil) -> Attribute {
-        return .block(.collection(enumerables.map { Attribute.enumerableCollection($0, validValues: validValues) }, display: display, type: .enumerableCollection(validValues: validValues)))
+
+    public static func collection(
+        enumerables: [Set<String>],
+        validValues: Set<String>,
+        display: ReadOnlyPath<Attribute, LineAttribute>? = nil
+    ) -> Attribute {
+        .block(
+            .collection(
+                enumerables.map { Attribute.enumerableCollection($0, validValues: validValues) },
+                display: display,
+                type: .enumerableCollection(validValues: validValues)
+            )
+        )
     }
-    
-    public static func collection(tables: [[[LineAttribute]]], columns: [(name: Label, type: LineAttributeType)], display: ReadOnlyPath<Attribute, LineAttribute>? = nil) -> Attribute {
-        return .block(.collection(tables.map { Attribute.table($0, columns: columns) }, display: display, type: .table(columns: columns)))
+
+    public static func collection(
+        tables: [[[LineAttribute]]],
+        columns: [(name: Label, type: LineAttributeType)],
+        display: ReadOnlyPath<Attribute, LineAttribute>? = nil
+    ) -> Attribute {
+        .block(
+            .collection(
+                tables.map { Attribute.table($0, columns: columns) },
+                display: display,
+                type: .table(columns: columns)
+            )
+        )
     }
-    
-    public static func collection(collection: [[Attribute]], type: AttributeType, display: ReadOnlyPath<Attribute, LineAttribute>? = nil) -> Attribute {
-        return .block(.collection(collection.map { Attribute.collection($0, type: type) }, display: display, type: type))
+
+    public static func collection(
+        collection: [[Attribute]],
+        type: AttributeType,
+        display: ReadOnlyPath<Attribute, LineAttribute>? = nil
+    ) -> Attribute {
+        .block(
+            .collection(
+                collection.map { Attribute.collection($0, type: type) },
+                display: display,
+                type: type
+            )
+        )
     }
-    
-    public static func collection(_ values: [Attribute], type: AttributeType, display: ReadOnlyPath<Attribute, LineAttribute>? = nil) -> Attribute {
-        return .block(.collection(values, display: display, type: type))
+
+    public static func collection(
+        _ values: [Attribute],
+        type: AttributeType,
+        display: ReadOnlyPath<Attribute, LineAttribute>? = nil
+    ) -> Attribute {
+        .block(.collection(values, display: display, type: type))
     }
-    
+
     public static func complex(_ values: [Label: Attribute], layout: [Field]) -> Attribute {
-        return .block(.complex(values, layout: layout))
+        .block(.complex(values, layout: layout))
     }
-    
+
     public static func enumerated(_ value: String, validValues: Set<String>) -> Attribute {
-        return .line(.enumerated(value, validValues: validValues))
+        .line(.enumerated(value, validValues: validValues))
     }
-    
+
     public static func enumerableCollection(_ value: Set<String>, validValues: Set<String>) -> Attribute {
-        return .block(.enumerableCollection(value, validValues: validValues))
+        .block(.enumerableCollection(value, validValues: validValues))
     }
-    
-    public static func table(_ rows: [[LineAttribute]], columns: [(name: Label, type: LineAttributeType)]) -> Attribute {
-        return .block(.table(rows, columns: columns.map { BlockAttributeType.TableColumn(name: $0.name, type: $0.type) }))
+
+    public static func table(
+        _ rows: [[LineAttribute]],
+        columns: [(name: Label, type: LineAttributeType)]
+    ) -> Attribute {
+        .block(
+            .table(
+                rows,
+                columns: columns.map { BlockAttributeType.TableColumn(name: $0.name, type: $0.type) }
+            )
+        )
     }
-    
+
 }
 
 extension Attribute: Codable {
-    
+
     public init(from decoder: Decoder) throws {
         if let lineAttribute = try? LineAttribute(from: decoder) {
             self = .line(lineAttribute)
@@ -901,7 +1031,7 @@ extension Attribute: Codable {
             )
         )
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         switch self {
         case .line(let attribute):
@@ -910,11 +1040,11 @@ extension Attribute: Codable {
             try attribute.encode(to: encoder)
         }
     }
-    
+
 }
 
 extension Attribute: XMIConvertible {
-    
+
     public var xmiName: String? {
         switch self {
         case .line(let attribute):
@@ -923,5 +1053,5 @@ extension Attribute: XMIConvertible {
             return attribute.xmiName
         }
     }
-    
+
 }

@@ -57,52 +57,52 @@
  */
 
 public struct AnyValidator<Root>: ValidatorProtocol {
-    
+
     private let _validate: (Root) throws -> Void
-    
+
     public init(validate: @escaping (Root) throws -> Void) {
         self._validate = validate
     }
-    
+
     public init<V: ValidatorProtocol>(_ validator: V) where V.Root == Root {
         self._validate = { try validator.performValidation($0) }
     }
-    
+
     public init(_ validator: AnyValidator<Root>) {
         self = validator
     }
-    
+
     public init(@ValidatorBuilder<Root> builder: () -> [AnyValidator<Root>]) {
         self.init(builder())
     }
-    
+
     public init<S: Sequence>(_ validators: S) where S.Element == AnyValidator<Root> {
         self._validate = { root in try validators.forEach { try $0.performValidation(root) } }
     }
-    
+
     public init<S: Sequence, V: ValidatorProtocol>(_ validators: S) where S.Element == V, V.Root == Root {
         self._validate = { root in try validators.forEach { try $0.performValidation(root) } }
     }
-    
+
     public func performValidation(_ root: Root) throws {
         return try self._validate(root)
     }
-    
-    public func toNewRoot<NewPath: ReadOnlyPathProtocol>(path: NewPath) -> AnyValidator<NewPath.Root> where NewPath.Value == Root {
+
+    public func toNewRoot<NewPath: ReadOnlyPathProtocol>(path: NewPath)
+        -> AnyValidator<NewPath.Root> where NewPath.Value == Root {
         AnyValidator<NewPath.Root>(validate: {
             try performValidation($0[keyPath: path.keyPath])
         })
     }
-    
+
 }
 
 extension AnyValidator: ExpressibleByArrayLiteral {
-    
+
     public typealias ArrayLiteralElement = AnyValidator<Root>
-    
-    
+
     public init(arrayLiteral validators: ArrayLiteralElement...) {
         self._validate = { root in try validators.forEach { try $0.performValidation(root) } }
     }
-    
+
 }

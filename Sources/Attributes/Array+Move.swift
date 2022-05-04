@@ -59,7 +59,7 @@
 import Foundation
 
 extension Array {
-    
+
     public mutating func move(fromOffsets source: IndexSet, toOffset destination: Int) {
         let original = self
         let descending = source.sorted(by: >)
@@ -69,5 +69,5 @@ extension Array {
             self.insert(original[source], at: index)
         }
     }
-    
+
 }

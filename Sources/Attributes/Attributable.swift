@@ -57,47 +57,50 @@
  */
 
 public protocol Attributable {
-    
+
     associatedtype Root: Modifiable
     associatedtype AttributeRoot
-    associatedtype SearchPath: ConvertibleSearchablePath where SearchPath.Root == Root, SearchPath.Value == AttributeRoot
-    
+    associatedtype SearchPath: ConvertibleSearchablePath where
+        SearchPath.Root == Root, SearchPath.Value == AttributeRoot
+
     var path: SearchPath { get }
-    
+
     var pathToFields: Path<AttributeRoot, [Field]> { get }
-    
+
     var pathToAttributes: Path<AttributeRoot, [String: Attribute]> { get }
-    
+
     var available: Set<String> { get }
 
     var properties: [SchemaAttribute] { get }
-    
+
     var propertiesValidator: AnyValidator<AttributeRoot> { get }
-    
+
     var triggers: AnyTrigger<Root> { get }
-    
+
     var allTriggers: AnyTrigger<Root> { get }
-    
+
     var groupValidation: AnyValidator<AttributeRoot> { get }
 
     var rootValidation: AnyValidator<Root> { get }
-    
+
 }
 
 public extension Attributable {
-    
-    typealias ComplexCollectionProperty<Base> = Attributes.ComplexCollectionProperty<Base> where Base: ComplexProtocol, Base.Root == AttributeRoot
-    
-    typealias ComplexProperty<Base> = Attributes.ComplexProperty<Base> where Base: ComplexProtocol, Base.Root == AttributeRoot
-    
+
+    typealias ComplexCollectionProperty<Base> = Attributes.ComplexCollectionProperty<Base> where
+        Base: ComplexProtocol, Base.Root == AttributeRoot
+
+    typealias ComplexProperty<Base> = Attributes.ComplexProperty<Base> where
+        Base: ComplexProtocol, Base.Root == AttributeRoot
+
     var available: Set<String> {
         Set(properties.map(\.label))
     }
-    
+
     var triggers: AnyTrigger<Root> {
         AnyTrigger<Root>()
     }
-    
+
     var allTriggers: AnyTrigger<Root> {
         let mirror = Mirror(reflecting: self)
         let childTriggers: [AnyTrigger<Root>] = mirror.children.compactMap {
@@ -111,15 +114,15 @@ public extension Attributable {
         }
         return AnyTrigger([triggers, AnyTrigger(childTriggers)])
     }
-    
+
     var groupValidation: AnyValidator<AttributeRoot> {
         AnyValidator<AttributeRoot>()
     }
-    
+
     var rootValidation: AnyValidator<Root> {
         AnyValidator<Root>()
     }
-    
+
     var properties: [SchemaAttribute] {
         let mirror = Mirror(reflecting: self)
         return mirror.children.compactMap {
@@ -150,14 +153,14 @@ public extension Attributable {
                 if let attribute = val.schemaAttribute as? SchemaAttribute {
                     return attribute
                 } else {
-                    fallthrough
+                    return nil
                 }
             default:
                 return nil
             }
         }
     }
-    
+
     var propertiesValidator: AnyValidator<AttributeRoot>  {
         let available = self.available
         let propertyValidators: [AnyValidator<AttributeRoot>] = properties.compactMap {
@@ -168,7 +171,7 @@ public extension Attributable {
         }
         return AnyValidator(propertyValidators)
     }
-    
+
     func findProperty(path: AnyPath<Root>, in root: Root) -> SchemaAttribute? {
         guard let property = properties.first(where: {
             let searchPath = self.path(for: $0)
@@ -183,21 +186,25 @@ public extension Attributable {
             return property
         }
     }
-    
+
     func path(for attribute: SchemaAttribute) -> AnySearchablePath<Root, Attribute> {
         self.path.appending(path: self.pathToAttributes[attribute.label].wrappedValue)
     }
-    
+
     func path(for attribute: SchemaAttribute, in path: Path<Root, AttributeRoot>) -> Path<Root, Attribute> {
         pathToAttributes.changeRoot(path: path)[attribute.label].wrappedValue
     }
-    
-    func WhenChanged(_ attribute: SchemaAttribute) -> ForEach<AnySearchablePath<Self.Root, Attribute>, WhenChanged<Path<Self.Root, Attribute>, IdentityTrigger<Self.Root>>> {
+
+    func WhenChanged(_ attribute: SchemaAttribute) -> ForEach<
+        AnySearchablePath<Self.Root, Attribute>,
+        WhenChanged<Path<Self.Root, Attribute>,
+        IdentityTrigger<Self.Root>>
+    > {
         ForEach(path(for: attribute)) {
             Attributes.WhenChanged($0)
         }
     }
-    
+
     func WhenChanged<T>(_ value: Path<[LineAttribute], T>, in attribute: SchemaAttribute, perform: @escaping (inout Root) -> Result<Bool, AttributeError<Root>>) -> ForEach<Self.SearchPath, ForEach<CollectionSearchPath<Self.Root, [[LineAttribute]], T>, CustomTrigger<Path<CollectionSearchPath<Self.Root, [[LineAttribute]], T>.Root, CollectionSearchPath<Self.Root, [[LineAttribute]], T>.Value>>>> {
         if !attribute.type.isTable {
             fatalError("Calling `WhenChanged(_:in:)` on attribute that is not a table property")
@@ -209,7 +216,7 @@ public extension Attributable {
             }
         }
     }
-    
+
     func WhenTrue(_ attribute: SchemaAttribute, makeAvailable hiddenAttribute: SchemaAttribute) -> ForEach<Self.SearchPath, WhenChanged<Path<Self.Root, Attribute>, ConditionalTrigger<MakeAvailableTrigger<Path<Self.Root, Attribute>, Path<Self.Root, [Field]>, Path<Self.Root, [String : Attribute]>>>>> {
         if attribute.type != .bool {
             fatalError("Calling `WhenTrue` when attributes type is not `bool`.")
@@ -234,7 +241,7 @@ public extension Attributable {
             }
         }
     }
-    
+
     func WhenFalse(_ attribute: SchemaAttribute, makeAvailable hiddenAttribute: SchemaAttribute) -> ForEach<Self.SearchPath, WhenChanged<Path<Self.Root, Attribute>, ConditionalTrigger<MakeAvailableTrigger<Path<Self.Root, Attribute>, Path<Self.Root, [Field]>, Path<Self.Root, [String : Attribute]>>>>> {
         if attribute.type != .bool {
             fatalError("Calling `WhenTrue` when attributes type is not `bool`.")
@@ -259,7 +266,7 @@ public extension Attributable {
             }
         }
     }
-    
+
     func WhenTrue(_ attribute: SchemaAttribute, makeUnavailable hiddenAttribute: SchemaAttribute) -> ForEach<Self.SearchPath, WhenChanged<Path<Self.Root, Attribute>, ConditionalTrigger<MakeUnavailableTrigger<Path<Self.Root, Attribute>, Path<Self.Root, [Field]>>>>> {
         if attribute.type != .bool {
             fatalError("Calling `WhenTrue` when attributes type is not `bool`.")
@@ -276,7 +283,7 @@ public extension Attributable {
             }
         }
     }
-    
+
     func WhenFalse(_ attribute: SchemaAttribute, makeUnavailable hiddenAttribute: SchemaAttribute) -> ForEach<Self.SearchPath, WhenChanged<Path<Self.Root, Attribute>, ConditionalTrigger<MakeUnavailableTrigger<Path<Self.Root, Attribute>, Path<Self.Root, [Field]>>>>> {
         if attribute.type != .bool {
             fatalError("Calling `WhenTrue` when attributes type is not `bool`.")

@@ -58,24 +58,29 @@
 
 @dynamicMemberLookup
 public struct AttributeGroup: Hashable, Codable {
-    
+
     public var name: String
-    
+
     public var fields: [Field]
-    
+
     public var attributes: [Label: Attribute]
-    
+
     public var metaData: [Label: Attribute]
-    
-    public init(name: String, fields: [Field] = [], attributes: [Label: Attribute] = [:], metaData: [Label: Attribute] = [:]) {
+
+    public init(
+        name: String,
+        fields: [Field] = [],
+        attributes: [Label: Attribute] = [:],
+        metaData: [Label: Attribute] = [:]
+    ) {
         self.name = name
         self.fields = fields
         self.attributes = attributes
         self.metaData = metaData
     }
-    
+
     subscript(dynamicMember member: String) -> Attribute {
         self.attributes[member]!
     }
-    
+
 }

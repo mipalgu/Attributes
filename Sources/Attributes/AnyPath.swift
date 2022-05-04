@@ -57,22 +57,29 @@
  */
 
 public struct AnyPath<Root> {
-    
+
     public let ancestors: [AnyPath<Root>]
-    
+
     public let partialKeyPath: PartialKeyPath<Root>
-    
+
     public let isOptional: Bool
-    
+
     public let targetType: Any.Type
-    
+
     let _value: (Root) -> Any
-    
+
     let _isNil: (Root) -> Bool
-    
+
     let _isSame: (PartialKeyPath<Root>) -> Bool
-    
-    private init(_ path: PartialKeyPath<Root>, ancestors: [AnyPath<Root>], targetType: Any.Type, isOptional: Bool, isNil: @escaping (Root) -> Bool, isSame: @escaping (PartialKeyPath<Root>) -> Bool) {
+
+    private init(
+        _ path: PartialKeyPath<Root>,
+        ancestors: [AnyPath<Root>],
+        targetType: Any.Type,
+        isOptional: Bool,
+        isNil: @escaping (Root) -> Bool,
+        isSame: @escaping (PartialKeyPath<Root>) -> Bool
+    ) {
         self.ancestors = ancestors
         self.partialKeyPath = path
         self.targetType = targetType
@@ -81,75 +88,99 @@ public struct AnyPath<Root> {
         self._isNil = { root in ancestors.last?.isNil(root) ?? false || isNil(root) }
         self._isSame = isSame
     }
-    
-    private init<P: ReadOnlyPathProtocol>(_ path: P, isOptional: Bool, isNil: @escaping (Root) -> Bool, isSame: @escaping (PartialKeyPath<Root>) -> Bool) where P.Root == Root {
-        self.init(path.keyPath, ancestors: path.ancestors, targetType: P.Value.self, isOptional: isOptional, isNil: isNil, isSame: isSame)
+
+    private init<P: ReadOnlyPathProtocol>(
+        _ path: P,
+        isOptional: Bool,
+        isNil: @escaping (Root) -> Bool,
+        isSame: @escaping (PartialKeyPath<Root>) -> Bool
+    ) where P.Root == Root {
+        self.init(
+            path.keyPath,
+            ancestors: path.ancestors,
+            targetType: P.Value.self,
+            isOptional: isOptional,
+            isNil: isNil,
+            isSame: isSame
+        )
     }
-    
+
     public init<P: ReadOnlyPathProtocol>(_ path: P) where P.Root == Root {
         self.init(path, isOptional: false, isNil: { path.isNil($0) }, isSame: { $0 == path.keyPath })
     }
-    
+
     public init<P: ReadOnlyPathProtocol, V>(optional path: P) where P.Root == Root, P.Value == V? {
-        self.init(path, isOptional: true, isNil: { path.isNil($0) }, isSame: { $0 == path.keyPath || $0 == path.keyPath.appending(path: \.wrappedValue) })
+        self.init(
+            path,
+            isOptional: true,
+            isNil: { path.isNil($0) },
+            isSame: { $0 == path.keyPath || $0 == path.keyPath.appending(path: \.wrappedValue) }
+        )
     }
-    
+
     public func isParent(of path: AnyPath<Root>) -> Bool {
-        return path.isChild(of: self)
+        path.isChild(of: self)
     }
-    
+
     public func isParent<Path: ReadOnlyPathProtocol>(of path: Path) -> Bool where Path.Root == Root {
-        return self.isParent(of: AnyPath(path))
+        self.isParent(of: AnyPath(path))
     }
-    
+
     public func isChild(of path: AnyPath<Root>) -> Bool {
-        return self.isChild(of: path.partialKeyPath)
+        self.isChild(of: path.partialKeyPath)
     }
-    
+
     public func isChild(of path: PartialKeyPath<Root>) -> Bool {
-        return nil != self.ancestors.first(where: { $0.isSame(as: path) })
+        nil != self.ancestors.first(where: { $0.isSame(as: path) })
     }
-    
+
     public func isChild<Path: ReadOnlyPathProtocol>(of path: Path) -> Bool where Path.Root == Root {
-        return self.isChild(of: path.keyPath)
+        self.isChild(of: path.keyPath)
     }
-    
+
     public func hasValue(_ root: Root) -> Bool {
-        return !isOptional || !isNil(root)
+        !isOptional || !isNil(root)
     }
-    
+
     public func value(_ root: Root) -> Any {
-        return self._value(root)
+        self._value(root)
     }
-    
+
     public func isNil(_ root: Root) -> Bool {
-        return self._isNil(root)
+        self._isNil(root)
     }
-    
+
     public func isSame(as path: AnyPath<Root>) -> Bool {
-        return self._isSame(path.partialKeyPath)
+        self._isSame(path.partialKeyPath)
     }
-    
+
     public func isSame(as path: PartialKeyPath<Root>) -> Bool {
-        return self._isSame(path)
+        self._isSame(path)
     }
-    
+
     public func isSame<Path: ReadOnlyPathProtocol>(as path: Path) -> Bool where Path.Root == Root {
-        return self._isSame(path.keyPath)
+        self._isSame(path.keyPath)
     }
-    
-    public func changeRoot<Prefix: ReadOnlyPathProtocol>(path: Prefix) -> AnyPath<Prefix.Root> where Prefix.Value == Root {
-        let newPath = (path.keyPath as PartialKeyPath<Prefix.Root>).appending(path: partialKeyPath as AnyKeyPath)!
+
+    public func changeRoot<Prefix: ReadOnlyPathProtocol>(path: Prefix)
+        -> AnyPath<Prefix.Root> where Prefix.Value == Root {
+        guard let newPath = (path.keyPath as PartialKeyPath<Prefix.Root>).appending(
+            path: partialKeyPath as AnyKeyPath
+        ) else {
+            fatalError("Failed to create new path")
+        }
         return AnyPath<Prefix.Root>(
             newPath,
             ancestors: self.ancestors.map { $0.changeRoot(path: path) },
             targetType: targetType,
             isOptional: isOptional,
-            isNil: { root in path.ancestors.last?.isNil(root) ?? false || _isNil(root[keyPath: path.keyPath]) },
+            isNil: { root in
+                path.ancestors.last?.isNil(root) ?? false || _isNil(root[keyPath: path.keyPath])
+            },
             isSame: { path in path == newPath }
         )
     }
-    
+
     public func appending<Value>(_ path: AnyPath<Value>) -> AnyPath<Root>? {
         guard
             let keyPath = self.partialKeyPath as? KeyPath<Root, Value>,
@@ -166,30 +197,31 @@ public struct AnyPath<Root> {
             isSame: { $0 == newPartialKeyPath }
         )
     }
-    
+
 }
 
 extension AnyPath: Equatable {
-    
+
     public static func == <Root>(lhs: AnyPath<Root>, rhs: AnyPath<Root>) -> Bool {
         lhs.partialKeyPath == rhs.partialKeyPath
     }
-    
+
 }
 
 extension AnyPath: Hashable {
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(self.ancestors)
         hasher.combine(self.partialKeyPath)
     }
-    
+
 }
 
 extension AnyPath: CustomStringConvertible {
-    
+
     public var description: String {
-        return (self.ancestors.map { String(describing: $0.partialKeyPath) } + [String(describing: self.partialKeyPath)]).joined(separator: ", ")
+        (self.ancestors.map { String(describing: $0.partialKeyPath) } +
+            [String(describing: self.partialKeyPath)]).joined(separator: ", ")
     }
-    
+
 }

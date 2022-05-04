@@ -59,47 +59,52 @@
 import Foundation
 
 extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteger {
-    
+
     public subscript(index: Value.Index) -> ReadOnlyPath<Root, Value.Element> {
-        return ReadOnlyPath<Root, Value.Element>(
+        ReadOnlyPath<Root, Value.Element>(
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)],
             isNil: { root in root[keyPath: keyPath].count <= index }
         )
     }
-    
+
 }
 
 extension PathProtocol where Value: MutableCollection, Value.Index: BinaryInteger {
-    
+
     public subscript(index: Value.Index) -> Path<Root, Value.Element> {
-        return Path<Root, Value.Element>(
+        Path<Root, Value.Element>(
             path: self.path.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)],
             isNil: { root in root[keyPath: self.path].count <= index }
         )
     }
-    
+
 }
 
 extension Path where Value: MutableCollection, Value.Index: Hashable {
-    
+
     public func each<T>(_ f: @escaping (Value.Index, Path<Root, Value.Element>) -> T) -> (Root) -> [T] {
-        return { root in
+        { root in
             root[keyPath: self.path].indices.map {
-                return f($0, self[$0])
+                f($0, self[$0])
             }
         }
     }
-    
+
 }
 
 extension ValidationPath where P.Value: Collection, P.Value.Index: Hashable {
-    
-    public func each(@ValidatorBuilder<Root> builder: @escaping (Value.Index, ValidationPath<ReadOnlyPath<Root, Value.Element>>) -> AnyValidator<Root>) -> PushValidator {
-        return push { (root, value) in
-            let validators: [AnyValidator<Root>] = value.indices.map { (index) -> AnyValidator<Root> in
-                return builder(
+
+    public func each(
+        @ValidatorBuilder<Root> builder: @escaping (
+            Value.Index,
+            ValidationPath<ReadOnlyPath<Root, Value.Element>>
+        ) -> AnyValidator<Root>
+    ) -> PushValidator {
+        push { root, value in
+            let validators: [AnyValidator<Root>] = value.indices.map { index -> AnyValidator<Root> in
+                builder(
                     index,
                     ValidationPath<ReadOnlyPath<Root, Value.Element>>(
                         path: ReadOnlyPath<Root, Value.Element>(
@@ -112,5 +117,5 @@ extension ValidationPath where P.Value: Collection, P.Value.Index: Hashable {
             return try AnyValidator(validators).performValidation(root)
         }
     }
-    
+
 }
