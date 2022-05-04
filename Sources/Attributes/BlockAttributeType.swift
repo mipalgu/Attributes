@@ -59,7 +59,7 @@
 import XMI
 
 public enum BlockAttributeType: Hashable {
-    
+
     public struct TableColumn: Hashable, Codable {
         
         public var name: Label
@@ -72,14 +72,14 @@ public enum BlockAttributeType: Hashable {
         }
         
     }
-    
+
     case code(language: Language)
     case text
     indirect case collection(type: AttributeType)
     indirect case complex(layout: [Field])
     case enumerableCollection(validValues: Set<String>)
     case table(columns: [TableColumn])
-    
+
     public var isRecursive: Bool {
         switch self {
         case .collection, .complex, .table:
@@ -88,7 +88,7 @@ public enum BlockAttributeType: Hashable {
             return false
         }
     }
-    
+
     public var isTable: Bool {
         switch self {
         case .table:
@@ -97,7 +97,7 @@ public enum BlockAttributeType: Hashable {
             return false
         }
     }
-    
+
     public var defaultValue: BlockAttribute {
         switch self {
         case .code(let language):
@@ -117,11 +117,11 @@ public enum BlockAttributeType: Hashable {
             return .text("")
         }
     }
-    
+
 }
 
 extension BlockAttributeType: Codable {
-    
+
     public init(from decoder: Decoder) throws {
         if let code = try? CodeAttributeType(from: decoder) {
             self = .code(language: code.language)
@@ -150,7 +150,7 @@ extension BlockAttributeType: Codable {
             )
         )
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         switch self {
         case .code(let language):
@@ -167,7 +167,7 @@ extension BlockAttributeType: Codable {
             try TableAttributeType(columns: columns).encode(to: encoder)
         }
     }
-    
+
     private struct CodeAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "CodeAttributeType" }
@@ -175,13 +175,13 @@ extension BlockAttributeType: Codable {
         var language: Language
         
     }
-    
+
     private struct TextAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "TextAttributeType" }
         
     }
-    
+
     private struct CollectionAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "CollectionAttributeType" }
@@ -189,7 +189,7 @@ extension BlockAttributeType: Codable {
         var type: AttributeType
         
     }
-    
+
     private struct ComplexAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "ComplexAttributeType" }
@@ -197,7 +197,7 @@ extension BlockAttributeType: Codable {
         var layout: [Field]
         
     }
-    
+
     private struct EnumCollectionAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "EnumCollectionAttributeType" }
@@ -205,7 +205,7 @@ extension BlockAttributeType: Codable {
         var validValues: Set<String>
         
     }
-    
+
     private struct TableAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "TableAttributeType" }
@@ -213,11 +213,11 @@ extension BlockAttributeType: Codable {
         var columns: [BlockAttributeType.TableColumn]
         
     }
-    
+
 }
 
 extension BlockAttributeType: XMIConvertible {
-    
+
     public var xmiName: String? {
         switch self {
         case .code(let language):
@@ -234,5 +234,5 @@ extension BlockAttributeType: XMIConvertible {
             return TableAttributeType(columns: columns).xmiName
         }
     }
-    
+
 }

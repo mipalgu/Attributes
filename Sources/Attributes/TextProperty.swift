@@ -58,17 +58,17 @@
 
 @propertyWrapper
 public struct TextProperty {
-    
+
     public var projectedValue: TextProperty {
         self
     }
-    
+
     public var wrappedValue: SchemaAttribute
-    
+
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }
-    
+
     public init(
         label: String,
         @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, String>>) -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
@@ -83,5 +83,5 @@ public struct TextProperty {
         )
         self.init(wrappedValue: attribute)
     }
-    
+
 }

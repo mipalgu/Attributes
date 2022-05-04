@@ -58,17 +58,17 @@
 
 @propertyWrapper
 public struct CodeProperty {
-    
+
     public var projectedValue: CodeProperty {
         self
     }
-    
+
     public var wrappedValue: SchemaAttribute
-    
+
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }
-    
+
     public init(
         label: String,
         language: Language,
@@ -84,5 +84,5 @@ public struct CodeProperty {
         )
         self.init(wrappedValue: attribute)
     }
-    
+
 }

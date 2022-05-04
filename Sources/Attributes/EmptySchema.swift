@@ -8,7 +8,7 @@
 import Foundation
 
 public struct EmptySchema<Root: Modifiable>: SchemaProtocol {
-    
+
     public init() {}
-    
+
 }

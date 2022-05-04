@@ -57,17 +57,17 @@
  */
 
 public protocol PathContainer {
-    
+
     associatedtype Path: PathProtocol
-    
+
     var path: Path { get }
-    
+
 }
 
 extension PathContainer {
-    
+
     public func validate(@ValidatorBuilder<Self> builder: (ValidationPath<Path>) -> [AnyValidator<Self>]) throws {
         return try AnyValidator(builder(ValidationPath(path: self.path))).performValidation(self)
     }
-    
+
 }

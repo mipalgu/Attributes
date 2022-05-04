@@ -57,25 +57,25 @@
  */
 
 public protocol ComplexProtocol: Attributable where AttributeRoot == Attribute {
-    
+
     var triggers: AnyTrigger<Root> { get }
-    
+
     @ValidatorBuilder<Attribute>
     var groupValidation: AnyValidator<AttributeRoot> { get }
-    
+
     @ValidatorBuilder<Root>
     var rootValidation: AnyValidator<Root> { get }
-    
+
 }
 
 public extension ComplexProtocol {
-    
+
     var pathToFields: Path<Attribute, [Field]> {
         Path<Attribute, Attribute>(path: \.self, ancestors: []).blockAttribute.complexFields
     }
-    
+
     var pathToAttributes: Path<Attribute, [String: Attribute]> {
         Path<Attribute, Attribute>(path: \.self, ancestors: []).blockAttribute.complexValue
     }
-    
+
 }

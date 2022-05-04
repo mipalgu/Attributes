@@ -58,17 +58,17 @@
 
 @propertyWrapper
 public struct EnumeratedProperty {
-    
+
     public var projectedValue: EnumeratedProperty {
         self
     }
-    
+
     public var wrappedValue: SchemaAttribute
-    
+
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }
-    
+
     public init(
         label: String,
         validValues: Set<String>,
@@ -84,5 +84,5 @@ public struct EnumeratedProperty {
         )
         self.init(wrappedValue: attribute)
     }
-    
+
 }

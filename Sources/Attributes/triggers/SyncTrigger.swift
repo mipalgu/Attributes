@@ -57,31 +57,31 @@
  */
 
 public struct SyncTrigger<Source: PathProtocol, Target: SearchablePath>: TriggerProtocol where Source.Root == Target.Root, Source.Value == Target.Value {
-    
+
     public typealias Root = Source.Root
-    
+
     public var path: AnyPath<Root> {
         AnyPath(source)
     }
-    
+
     let source: Source
-    
+
     let target: Target
-    
+
     public init(source: Source, target: Target) {
         self.source = source
         self.target = target
     }
-    
+
     public func performTrigger(_ root: inout Source.Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Source.Root>> {
         for path in target.paths(in: root) {
             root[keyPath: path.path] = root[keyPath: source.keyPath]
         }
         return .success(true)
     }
-    
+
     public func isTriggerForPath(_ path: AnyPath<Root>, in _: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }
-    
+
 }

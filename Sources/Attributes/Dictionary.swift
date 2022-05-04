@@ -57,12 +57,12 @@
  */
 
 public protocol DictionaryProtocol {
-    
+
     associatedtype Key: Hashable
     associatedtype Value
-    
+
     subscript(key: Key) -> Value? { get set }
-    
+
 }
 
 extension Dictionary: DictionaryProtocol {}

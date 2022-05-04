@@ -6,27 +6,27 @@
 //
 
 public protocol SchemaProtocol {
-    
+
     associatedtype Root: Modifiable
-    
+
     var groups: [AnyGroup<Root>] { get }
-    
+
     var trigger: AnyTrigger<Root> { get }
-    
+
     func findProperty<Path: PathProtocol>(path: Path, in root: Root) -> SchemaAttribute where Path.Root == Root, Path.Value == Attribute
-    
+
     func makeValidator(root: Root) -> AnyValidator<Root>
-    
+
 }
 
 public extension SchemaProtocol {
-    
+
     typealias Group<GroupType: GroupProtocol> = Attributes.Group<GroupType>
-    
+
     var trigger: AnyTrigger<Root> {
         AnyTrigger(groups.map(\.allTriggers))
     }
-    
+
     var groups: [AnyGroup<Root>] {
         let mirror = Mirror(reflecting: self)
         return mirror.children.compactMap {
@@ -36,14 +36,14 @@ public extension SchemaProtocol {
             return nil
         }
     }
-    
+
     func findProperty<Path: PathProtocol>(path: Path, in root: Root) -> SchemaAttribute where Path.Root == Root, Path.Value == Attribute {
         guard let property = groups.compactMap({ $0.findProperty(path: AnyPath(path), in: root) }).first else {
             fatalError()
         }
         return property
     }
-    
+
     func makeValidator(root: Root) -> AnyValidator<Root> {
         AnyValidator(groups.enumerated().map {
             let path = Root.path.attributes[$0]
@@ -53,7 +53,7 @@ public extension SchemaProtocol {
             return AnyValidator([AnyValidator([propertiesValidator, groupValidator]), rootValidator])
         })
     }
-    
+
 }
 
 //struct VHDLSettings: GroupProtocol {

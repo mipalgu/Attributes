@@ -8,25 +8,25 @@
 import Foundation
 
 public struct SyncWithTransformTrigger<Source: PathProtocol, Target: SearchablePath>: TriggerProtocol where Source.Root == Target.Root {
-    
+
     public typealias Root = Source.Root
-    
+
     public var path: AnyPath<Root> {
         AnyPath(source)
     }
-    
+
     let source: Source
-    
+
     let target: Target
-    
+
     let transform: (Source.Value, Target.Value) -> Target.Value
-    
+
     public init(source: Source, target: Target, transform: @escaping (Source.Value, Target.Value) -> Target.Value) {
         self.source = source
         self.target = target
         self.transform = transform
     }
-    
+
     public func performTrigger(_ root: inout Source.Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Source.Root>> {
         print("Performing Triggers...")
         for path in target.paths(in: root) {
@@ -39,9 +39,9 @@ public struct SyncWithTransformTrigger<Source: PathProtocol, Target: SearchableP
         }
         return .success(true)
     }
-    
+
     public func isTriggerForPath(_ path: AnyPath<Root>, in _: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }
-    
+
 }

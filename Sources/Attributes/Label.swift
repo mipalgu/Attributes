@@ -61,7 +61,7 @@ import Foundation
 public typealias Label = String
 
 extension Label {
-    
+
     public var pretty: String {
         let str = self.replacingOccurrences(of: "_", with: " ")
         let words = str.components(separatedBy: " ")
@@ -72,5 +72,5 @@ extension Label {
             return first.uppercased() + String($0.dropFirst())
         }.joined(separator: " ")
     }
-    
+
 }

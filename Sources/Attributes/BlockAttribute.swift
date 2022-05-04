@@ -60,23 +60,23 @@ import XMI
 import swift_helpers
 
 public enum BlockAttribute: Hashable, Identifiable {
-    
+
     public var id: Int {
         BlockAttributeIDCache.id(for: self)
     }
-    
+
     case code(_ value: String, language: Language)
-    
+
     case text(_ value: String)
-    
+
     indirect case collection(_ values: [Attribute], display: ReadOnlyPath<Attribute, LineAttribute>?, type: AttributeType)
-    
+
     indirect case complex(_ data: [Label: Attribute], layout: [Field])
-    
+
     case enumerableCollection(_ values: Set<String>, validValues: Set<String>)
-    
+
     case table([[LineAttribute]], columns: [BlockAttributeType.TableColumn])
-    
+
     public var type: BlockAttributeType {
         switch self {
         case .code(_, let language):
@@ -93,7 +93,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             return .table(columns: columns)
         }
     }
-    
+
     public var strValue: String? {
         switch self {
         case .code(let value, _):
@@ -110,7 +110,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             return value
         }
     }
-    
+
     public var codeValue: String {
         get {
             switch self {
@@ -129,7 +129,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var textValue: String {
         get {
             switch self {
@@ -148,7 +148,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionValue: [Attribute] {
         get {
             switch self {
@@ -167,7 +167,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var complexFields: [Field] {
         get {
             switch self {
@@ -186,7 +186,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var complexValue: [Label: Attribute] {
         get {
             switch self {
@@ -205,7 +205,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var enumerableCollectionValue: Set<String> {
         get {
             switch self {
@@ -224,7 +224,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var enumerableCollectionValidValues: Set<String> {
         get {
             switch self {
@@ -243,7 +243,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var tableValue: [[LineAttribute]] {
         get {
             switch self {
@@ -261,7 +261,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionBools: [Bool] {
         get {
             switch self {
@@ -290,7 +290,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionIntegers: [Int] {
         get {
             switch self {
@@ -319,7 +319,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionFloats: [Double] {
         get {
             switch self {
@@ -348,7 +348,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionExpressions: [Expression] {
         get {
             switch self {
@@ -377,7 +377,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionEnumerated: [String] {
         get {
             switch self {
@@ -406,7 +406,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionLines: [String] {
         get {
             switch self {
@@ -435,7 +435,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionCode: [String] {
         get {
             switch self {
@@ -464,7 +464,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionText: [String] {
         get {
             switch self {
@@ -493,7 +493,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionComplex: [[Label: Attribute]] {
         get {
             switch self {
@@ -522,7 +522,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionEnumerableCollection: [Set<String>] {
         get {
             switch self {
@@ -551,7 +551,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionTable: [[[LineAttribute]]] {
         get {
             switch self {
@@ -580,7 +580,7 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var collectionDisplay: ReadOnlyPath<Attribute, LineAttribute>? {
         get {
             switch self {
@@ -599,16 +599,16 @@ public enum BlockAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
 }
 
 extension BlockAttribute: Codable {
-    
+
     public enum CodingKeys: CodingKey {
         case type
         case value
     }
-    
+
     public init(from decoder: Decoder) throws {
         if let code = try? CodeAttribute(from: decoder) {
             self = .code(code.value, language: code.language)
@@ -637,7 +637,7 @@ extension BlockAttribute: Codable {
             )
         )
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         switch self {
         case .code(let value, let language):
@@ -654,7 +654,7 @@ extension BlockAttribute: Codable {
             try TableAttribute(rows: rows, columns: columns).encode(to: encoder)
         }
     }
-    
+
     private struct CodeAttribute: Hashable, Codable {
         
         var value: String
@@ -662,7 +662,7 @@ extension BlockAttribute: Codable {
         var language: Language
         
     }
-    
+
     private struct TextAttribute: Hashable, Codable {
         
         var value: String
@@ -682,7 +682,7 @@ extension BlockAttribute: Codable {
         }
         
     }
-    
+
     private struct CollectionAttribute: Hashable, Codable {
         
         var type: AttributeType
@@ -690,7 +690,7 @@ extension BlockAttribute: Codable {
         var values: [Attribute]
         
     }
-    
+
     private struct ComplexAttribute: Hashable, Codable {
         
         var values: [String: Attribute]
@@ -698,7 +698,7 @@ extension BlockAttribute: Codable {
         var layout: [Field]
         
     }
-    
+
     private struct EnumCollectionAttribute: Hashable, Codable {
         
         var cases: Set<String>
@@ -706,7 +706,7 @@ extension BlockAttribute: Codable {
         var values: Set<String>
         
     }
-    
+
     private struct TableAttribute: Hashable, Codable {
         
         var rows: [[LineAttribute]]
@@ -714,11 +714,11 @@ extension BlockAttribute: Codable {
         var columns: [BlockAttributeType.TableColumn]
         
     }
-    
+
 }
 
 extension BlockAttribute: XMIConvertible {
-    
+
     public var xmiName: String? {
         switch self {
         case .code:
@@ -735,5 +735,5 @@ extension BlockAttribute: XMIConvertible {
             return "TableAttribute"
         }
     }
-    
+
 }

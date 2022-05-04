@@ -59,18 +59,18 @@
 import XMI
 
 public enum LineAttribute: Hashable, Identifiable {
-    
+
     public var id: Int {
         LineAttributeIDCache.id(for: self)
     }
-    
+
     case bool(Bool)
     case integer(Int)
     case float(Double)
     case expression(Expression, language: Language)
     case enumerated(String, validValues: Set<String>)
     case line(String)
-    
+
     public var type: LineAttributeType {
         switch self {
         case .bool:
@@ -87,7 +87,7 @@ public enum LineAttribute: Hashable, Identifiable {
             return .line
         }
     }
-    
+
     public var boolValue: Bool {
         get {
             switch self {
@@ -106,7 +106,7 @@ public enum LineAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var integerValue: Int {
         get {
             switch self {
@@ -125,7 +125,7 @@ public enum LineAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var floatValue: Double {
         get {
             switch self {
@@ -144,7 +144,7 @@ public enum LineAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var expressionValue: Expression {
         get {
             switch self {
@@ -163,7 +163,7 @@ public enum LineAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var enumeratedValue: String {
         get {
             switch self {
@@ -182,7 +182,7 @@ public enum LineAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var enumeratedValidValues: Set<String> {
         get {
             switch self {
@@ -201,7 +201,7 @@ public enum LineAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var lineValue: String {
         get {
             switch self {
@@ -220,7 +220,7 @@ public enum LineAttribute: Hashable, Identifiable {
             }
         }
     }
-    
+
     public var strValue: String {
         switch self {
         case .bool(let value):
@@ -237,7 +237,7 @@ public enum LineAttribute: Hashable, Identifiable {
             return value
         }
     }
-    
+
     public init?(type: LineAttributeType, value: String) {
         switch type {
         case .bool:
@@ -266,11 +266,11 @@ public enum LineAttribute: Hashable, Identifiable {
             self = .line(value)
         }
     }
-    
+
 }
 
 extension LineAttribute: Codable {
-    
+
     public init(from decoder: Decoder) throws {
         if let bool = try? BoolAttribute(from: decoder) {
             self = .bool(bool.value)
@@ -303,7 +303,7 @@ extension LineAttribute: Codable {
             )
         )
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         switch self {
         case .bool(let value):
@@ -320,7 +320,7 @@ extension LineAttribute: Codable {
             try LineAttribute(value).encode(to: encoder)
         }
     }
-    
+
     private struct BoolAttribute: Hashable, Codable {
         
         var value: Bool
@@ -340,7 +340,7 @@ extension LineAttribute: Codable {
         }
         
     }
-    
+
     private struct IntegerAttribute: Hashable, Codable {
         
         var value: Int
@@ -360,7 +360,7 @@ extension LineAttribute: Codable {
         }
         
     }
-    
+
     private struct FloatAttribute: Hashable, Codable {
         
         var value: Double
@@ -380,7 +380,7 @@ extension LineAttribute: Codable {
         }
         
     }
-    
+
     private struct ExpressionAttribute: Hashable, Codable {
         
         var value: Expression
@@ -388,7 +388,7 @@ extension LineAttribute: Codable {
         var language: Language
         
     }
-    
+
     private struct EnumAttribute: Hashable, Codable {
         
         var cases: Set<String>
@@ -396,7 +396,7 @@ extension LineAttribute: Codable {
         var value: String
         
     }
-    
+
     private struct LineAttribute: Hashable, Codable {
         
         var value: String
@@ -416,11 +416,11 @@ extension LineAttribute: Codable {
         }
         
     }
-    
+
 }
 
 extension LineAttribute: XMIConvertible {
-    
+
     public var xmiName: String? {
         switch self {
         case .bool:
@@ -437,5 +437,5 @@ extension LineAttribute: XMIConvertible {
             return "LineAttribute"
         }
     }
-    
+
 }

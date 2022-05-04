@@ -61,52 +61,52 @@ import Foundation
 /// A useful utility struct which enables quick testing of modifiable
 /// structs that use an attributes and meta data array.
 public struct EmptyModifiable: Modifiable {
-    
+
     public static var path: Path<EmptyModifiable, EmptyModifiable> = Path(path: \.self, ancestors: [])
-    
+
     public var attributes: [AttributeGroup]
-    
+
     public var metaData: [AttributeGroup]
-    
+
     public var errorBag: ErrorBag<EmptyModifiable>
-    
+
     private let modifyTriggsy: (inout EmptyModifiable) -> Result<Bool, AttributeError<EmptyModifiable>>
-    
+
     public init(attributes: [AttributeGroup] = [], metaData: [AttributeGroup] = [], errorBag: ErrorBag<EmptyModifiable> = ErrorBag(), modifyTriggsy: @escaping (inout EmptyModifiable) -> Result<Bool, AttributeError<EmptyModifiable>> = { _ in .success(false) }) {
         self.attributes = attributes
         self.metaData = metaData
         self.errorBag = errorBag
         self.modifyTriggsy = modifyTriggsy
     }
-    
+
     public mutating func addItem<Path, T>(_ item: T, to attribute: Path) -> Result<Bool, AttributeError<EmptyModifiable>> where EmptyModifiable == Path.Root, Path : PathProtocol, Path.Value == [T] {
         self[keyPath: attribute.path].append(item)
         return .success(false)
     }
-    
+
     public mutating func moveItems<Path, T>(table attribute: Path, from source: IndexSet, to destination: Int) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path : PathProtocol, Path.Value == [T] {
         self[keyPath: attribute.path].move(fromOffsets: source, toOffset: destination)
         return .success(false)
     }
-    
+
     public mutating func deleteItem<Path, T>(table attribute: Path, atIndex index: Int) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path : PathProtocol, Path.Value == [T] {
         self[keyPath: attribute.path].remove(at: index)
         return .success(false)
     }
-    
+
     public mutating func deleteItems<Path, T>(table attribute: Path, items: IndexSet) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path : PathProtocol, Path.Value == [T] {
         items.sorted().reversed().forEach {
             self[keyPath: attribute.path].remove(at: $0)
         }
         return .success(false)
     }
-    
+
     public mutating func modify<Path>(attribute: Path, value: Path.Value) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path : PathProtocol {
         self[keyPath: attribute.path] = value
         return self.modifyTriggsy(&self)
     }
-    
+
     public func validate() throws {}
-    
-    
+
+
 }

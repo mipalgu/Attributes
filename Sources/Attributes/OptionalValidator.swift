@@ -58,26 +58,26 @@
  */
 
 public struct OptionalValidator<P: ReadOnlyPathProtocol>: PathValidator where P.Value: Nilable {
-    
+
     public typealias Root = P.Root
-    
+
     public typealias Value = P.Value.Wrapped
-    
+
     public typealias PathType = P
-    
+
     public let path: PathType
-    
+
     internal let _validate: (Root, Value) throws -> Void
-    
+
     public init(path: PathType) {
         self.init(path) { (_, _) in }
     }
-    
+
     internal init(_ path: PathType, _validate: @escaping (Root, Value) throws -> Void) {
         self.path = path
         self._validate = _validate
     }
-    
+
     public func performValidation(_ root: PathType.Root) throws {
         let value = root[keyPath: self.path.keyPath]
         if value.isNil {
@@ -85,16 +85,16 @@ public struct OptionalValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
         }
         _ = try self._validate(root, value.wrappedValue)
     }
-    
+
     public func push(_ f: @escaping (Root, Value) throws -> Void) -> OptionalValidator<P> {
         return OptionalValidator(self.path) {
             try self._validate($0, $1)
             try f($0, $1)
         }
     }
-    
+
     public func validate(@ValidatorBuilder<PathType.Root> builder: (Self) -> [AnyValidator<PathType.Root>]) -> AnyValidator<PathType.Root> {
         return AnyValidator(builder(self))
     }
-    
+
 }

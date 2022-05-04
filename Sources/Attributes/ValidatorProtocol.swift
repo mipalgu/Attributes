@@ -57,9 +57,9 @@
  */
 
 public protocol ValidatorProtocol {
-    
+
     associatedtype Root
-    
+
     func performValidation(_ root: Root) throws
-    
+
 }

@@ -57,30 +57,30 @@
  */
 
 internal protocol _PushValidator {
-    
+
     associatedtype PathType: ReadOnlyPathProtocol
-    
+
     var path: PathType { get }
-    
+
 }
 
 extension _PushValidator {
-    
+
     public func push(_ f: @escaping (PathType.Root, PathType.Value) throws -> Void) -> Validator<PathType> {
         return Validator(path, _validate: f)
     }
-    
+
 }
 
 public protocol ValidationPathProtocol: ValidationPushProtocol {
-    
+
     associatedtype PathType: ReadOnlyPathProtocol
     associatedtype PushValidator = Validator<PathType>
-    
+
     var path: PathType { get }
-    
+
     init(path: PathType)
-    
+
 }
 
 internal typealias _ValidationPath = _PushValidator & ValidationPathProtocol

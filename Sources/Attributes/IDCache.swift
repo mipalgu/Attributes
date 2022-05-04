@@ -57,11 +57,11 @@
  */
 
 struct AttributeIDCache {
-    
+
     static private var latest: Int = 0
-    
+
     static private var ids: [Attribute: Int] = [:]
-    
+
     static func id(for value: Attribute) -> Int {
         if let id = Self.ids[value] {
             return id
@@ -71,15 +71,15 @@ struct AttributeIDCache {
         Self.ids[value] = newID
         return newID
     }
-    
+
 }
 
 struct LineAttributeIDCache {
-    
+
     static private var latest: Int = 0
-    
+
     static private var ids: [LineAttribute: Int] = [:]
-    
+
     static func id(for value: LineAttribute) -> Int {
         if let id = Self.ids[value] {
             return id
@@ -89,15 +89,15 @@ struct LineAttributeIDCache {
         Self.ids[value] = newID
         return newID
     }
-    
+
 }
 
 struct BlockAttributeIDCache {
-    
+
     static private var latest: Int = 0
-    
+
     static private var ids: [BlockAttribute: Int] = [:]
-    
+
     static func id(for value: BlockAttribute) -> Int {
         if let id = Self.ids[value] {
             return id
@@ -107,5 +107,5 @@ struct BlockAttributeIDCache {
         Self.ids[value] = newID
         return newID
     }
-    
+
 }

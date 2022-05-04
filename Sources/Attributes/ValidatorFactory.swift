@@ -59,16 +59,16 @@
 import Foundation
 
 public struct ValidatorFactory<Value> {
-    
+
     private let _make: () -> AnyValidator<Value>
-    
+
     private let required: Bool
-    
+
     private init(required: Bool, make: @escaping () -> AnyValidator<Value>) {
         self._make = make
         self.required = required
     }
-    
+
     func make<Path: ReadOnlyPathProtocol>(path: Path) -> AnyValidator<Path.Root> where Path.Value == Value {
         AnyValidator { root in
             if required && path.isNil(root) {
@@ -80,26 +80,26 @@ public struct ValidatorFactory<Value> {
             try _make().performValidation(root[keyPath: path.keyPath])
         }
     }
-    
+
     public static func required() -> ValidatorFactory<Value> {
         .init(required: true) { AnyValidator() }
     }
-    
+
     public static func optional() -> ValidatorFactory<Value> {
         .init(required: false) { AnyValidator() }
     }
-    
+
     public static func validate(@ValidatorBuilder<Value> builder: (ValidatorFactory<Value>) -> AnyValidator<Value>) -> AnyValidator<Value> {
         return builder(.init(required: true) { AnyValidator() })
     }
-    
+
     internal func push<Validator: ValidatorProtocol>(_ make: @escaping (ValidationPath<ReadOnlyPath<Value, Value>>) -> Validator) -> ValidatorFactory<Value> where Validator.Root == Value {
         ValidatorFactory(required: required) {
             let newValidator = make(ValidationPath(path: ReadOnlyPath(keyPath: \Value.self, ancestors: [])))
             return AnyValidator([_make(), AnyValidator(newValidator)])
         }
     }
-    
+
 }
 
 extension ValidatorFactory {
@@ -123,165 +123,165 @@ extension ValidatorFactory {
 
 
 extension ValidatorFactory where Value: Equatable {
-    
+
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence, S2: Sequence>(_ p: P, transform: @escaping (S) -> S2) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S, S2.Element == Value {
         push { $0.in(p, transform: transform) }
     }
-    
+
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S, S.Element == Value {
         push { $0.in(p) }
     }
-    
+
 }
 
 extension ValidatorFactory where Value: Hashable {
-    
+
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P, transform: @escaping (S) -> Set<Value>) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S {
         push { $0.in(p, transform: transform) }
     }
-    
+
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S, S.Element == Value {
         push { $0.in(p) }
     }
-    
+
     public func `in`<P: ReadOnlyPathProtocol>(_ p: P) -> ValidatorFactory<Value> where P.Root == Value, P.Value == Set<Value> {
         push { $0.in(p) }
     }
-    
+
     public func `in`(_ set: Set<Value>) -> ValidatorFactory<Value> {
         push { $0.in(set) }
     }
-    
+
 }
 
 extension ValidatorFactory where Value: Equatable {
-    
+
     public func equals(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.equals(value) }
     }
-    
+
     public func notEquals(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.notEquals(value) }
     }
-    
+
 }
 
 extension ValidatorFactory where Value == Bool {
-    
+
     public func equalsFalse() -> ValidatorFactory<Value>  {
         push { $0.equalsFalse() }
     }
-    
+
     public func equalsTrue() -> ValidatorFactory<Value>  {
         push { $0.equalsTrue() }
     }
-    
+
 }
 
 extension ValidatorFactory where Value: Comparable {
-    
+
     public func between(min: Value, max: Value) -> ValidatorFactory<Value> {
         push { $0.between(min: min, max: max) }
     }
-    
+
     public func lessThan(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.lessThan(value) }
     }
-    
+
     public func lessThanEqual(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.lessThanEqual(value) }
     }
-    
+
     public func greaterThan(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.greaterThan(value) }
     }
-    
+
     public func greaterThanEqual(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.greaterThanEqual(value) }
     }
-    
+
 }
 
 extension ValidatorFactory where Value: Collection {
-    
+
     public func empty() -> ValidatorFactory<Value> {
         push { $0.empty() }
     }
-    
+
     public func notEmpty() -> ValidatorFactory<Value> {
         push { $0.notEmpty() }
     }
-    
+
     public func length(_ length: Int) -> ValidatorFactory<Value> {
         push { $0.length(length) }
     }
-    
+
     public func minLength(_ length: Int) -> ValidatorFactory<Value> {
         push { $0.minLength(length) }
     }
-    
+
     public func maxLength(_ length: Int) -> ValidatorFactory<Value> {
         push { $0.maxLength(length) }
     }
-    
+
 }
 
 extension ValidatorFactory where Value: Sequence {
-    
+
     public func unique<S: Sequence>(_ transform: @escaping (Value) -> S) -> ValidatorFactory<Value> where S.Element: Hashable {
         push { $0.unique(transform) }
     }
-    
+
 }
 
 extension ValidatorFactory where Value: Sequence, Value.Element: Hashable {
-    
+
     public func unique() -> ValidatorFactory<Value> {
         push { $0.unique() }
     }
-    
+
 }
 
 extension ValidatorFactory where Value: StringProtocol {
-    
+
     public func alpha() -> ValidatorFactory<Value> {
         push { $0.alpha() }
     }
-    
+
     public func alphadash() -> ValidatorFactory<Value> {
         push { $0.alphadash() }
     }
-    
+
     public func alphafirst() -> ValidatorFactory<Value> {
         push { $0.alphafirst() }
     }
-    
+
     public func alphanumeric() -> ValidatorFactory<Value> {
         push { $0.alphanumeric() }
     }
-    
+
     public func alphaunderscore() -> ValidatorFactory<Value> {
         push { $0.alphaunderscore() }
     }
-    
+
     public func alphaunderscorefirst() -> ValidatorFactory<Value> {
         push { $0.alphaunderscorefirst() }
     }
-    
+
     public func blacklist(_ list: Set<String>) -> ValidatorFactory<Value> {
         push { $0.blacklist(list) }
     }
-    
+
     public func numeric() -> ValidatorFactory<Value> {
         push { $0.numeric() }
     }
-    
+
     public func whitelist(_ list: Set<String>) -> ValidatorFactory<Value> {
         push { $0.whitelist(list) }
     }
-    
+
     public func greylist(_ list: Set<String>) -> ValidatorFactory<Value> {
         push { $0.greyList(list) }
     }
-    
+
 }

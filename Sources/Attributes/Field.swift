@@ -57,22 +57,22 @@
  */
 
 public struct Field: Hashable, Codable {
-    
+
     public var name: Label
-    
+
     public var type: AttributeType
-    
+
     public init(name: Label, type: AttributeType) {
         self.name = name
         self.type = type
     }
-    
+
 }
 
 extension Array: ExpressibleByDictionaryLiteral where Element == Field {
-    
+
     public init(dictionaryLiteral elements: (String, AttributeType)...) {
         self = elements.map { Field(name: $0, type: $1) }
     }
-    
+
 }

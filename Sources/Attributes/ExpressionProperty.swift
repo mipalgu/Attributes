@@ -58,17 +58,17 @@
 
 @propertyWrapper
 public struct ExpressionProperty {
-    
+
     public var projectedValue: ExpressionProperty {
         self
     }
-    
+
     public var wrappedValue: SchemaAttribute
-    
+
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }
-    
+
     public init(
         label: String,
         language: Language,
@@ -84,5 +84,5 @@ public struct ExpressionProperty {
         )
         self.init(wrappedValue: attribute)
     }
-    
+
 }

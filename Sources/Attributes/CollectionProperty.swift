@@ -58,17 +58,17 @@
 
 @propertyWrapper
 public struct CollectionProperty {
-    
+
     public var projectedValue: CollectionProperty {
         self
     }
-    
+
     public var wrappedValue: SchemaAttribute
-    
+
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }
-    
+
     public init(
         label: String,
         bools validatorFactories: ValidatorFactory<Bool> ...
@@ -88,7 +88,7 @@ public struct CollectionProperty {
         )
         self.init(wrappedValue: attribute)
     }
-    
+
     public init(
         label: String,
         integers validatorFactories: ValidatorFactory<Int> ...
@@ -108,7 +108,7 @@ public struct CollectionProperty {
         )
         self.init(wrappedValue: attribute)
     }
-    
+
     public init(
         label: String,
         floats validatorFactories: ValidatorFactory<Double> ...
@@ -128,7 +128,7 @@ public struct CollectionProperty {
         )
         self.init(wrappedValue: attribute)
     }
-    
+
     public init(
         label: String,
         expressions validatorFactories: ValidatorFactory<Expression> ...,
@@ -149,7 +149,7 @@ public struct CollectionProperty {
         )
         self.init(wrappedValue: attribute)
     }
-    
+
     public init(
         label: String,
         enumerations validatorFactories: ValidatorFactory<String> ...,
@@ -170,7 +170,7 @@ public struct CollectionProperty {
         )
         self.init(wrappedValue: attribute)
     }
-    
+
     public init(
         label: String,
         lines validatorFactories: ValidatorFactory<String> ...
@@ -190,5 +190,5 @@ public struct CollectionProperty {
         )
         self.init(wrappedValue: attribute)
     }
-    
+
 }

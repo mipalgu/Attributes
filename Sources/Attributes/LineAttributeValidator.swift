@@ -57,13 +57,13 @@
  */
 
 public struct LineAttributeValidator {
-    
+
     public let path: [String]
-    
+
     public func validate(_ attribute: Attribute) throws {
         
         
         
     }
-    
+
 }

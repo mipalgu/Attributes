@@ -57,23 +57,23 @@
  */
 
 public struct MakeAvailableTrigger<Source: ReadOnlyPathProtocol, Fields: PathProtocol, Attributes: PathProtocol>: TriggerProtocol where Source.Root == Fields.Root, Fields.Root == Attributes.Root, Fields.Value == [Field], Attributes.Value == [String: Attribute] {
-    
+
     public typealias Root = Fields.Root
-    
+
     public var path: AnyPath<Root> {
         AnyPath(source)
     }
-    
+
     let field: Field
-    
+
     let order: [String]
-    
+
     let source: Source
-    
+
     let fields: Fields
-    
+
     let attributes: Attributes
-    
+
     public init(field: Field, after order: [String], source: Source, fields: Fields, attributes: Attributes) {
         self.field = field
         self.order = order
@@ -81,7 +81,7 @@ public struct MakeAvailableTrigger<Source: ReadOnlyPathProtocol, Fields: PathPro
         self.fields = fields
         self.attributes = attributes
     }
-    
+
     public func performTrigger(_ root: inout Source.Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Source.Root>> {
         if nil != root[keyPath: fields.keyPath].first(where: { $0.name == field.name }) {
             return .success(false)
@@ -95,9 +95,9 @@ public struct MakeAvailableTrigger<Source: ReadOnlyPathProtocol, Fields: PathPro
         }
         return .success(true)
     }
-    
+
     public func isTriggerForPath(_ path: AnyPath<Root>, in _: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }
-    
+
 }

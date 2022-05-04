@@ -57,25 +57,25 @@
  */
 
 public struct MakeUnavailableTrigger<Source: PathProtocol, Fields: PathProtocol>: TriggerProtocol where Source.Root == Fields.Root, Fields.Value == [Field] {
-    
+
     public typealias Root = Fields.Root
-    
+
     public var path: AnyPath<Root> {
         AnyPath(source)
     }
-    
+
     let field: Field
-    
+
     let source: Source
-    
+
     let fields: Fields
-    
+
     public init(field: Field, source: Source, fields: Fields) {
         self.field = field
         self.source = source
         self.fields = fields
     }
-    
+
     public func performTrigger(_ root: inout Source.Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Source.Root>> {
         if fields.isNil(root) {
             return .success(false)
@@ -83,9 +83,9 @@ public struct MakeUnavailableTrigger<Source: PathProtocol, Fields: PathProtocol>
         root[keyPath: fields.path].removeAll(where: { $0.name == field.name })
         return .success(true)
     }
-    
+
     public func isTriggerForPath(_ path: AnyPath<Root>, in _: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }
-    
+
 }

@@ -57,51 +57,51 @@
  */
 
 public protocol ReadOnlyPathProtocol: Hashable {
-    
+
     associatedtype Root
     associatedtype Value
-    
+
     var ancestors: [AnyPath<Root>] { get }
-    
+
     var keyPath: KeyPath<Root, Value> { get }
-    
+
     func isNil(_ root: Root) -> Bool
-    
+
 }
 
 extension ReadOnlyPathProtocol {
-    
+
     public var fullPath: [AnyPath<Root>] {
         return self.ancestors + [AnyPath(self)]
     }
-    
+
 }
 
 public protocol PathProtocol: ReadOnlyPathProtocol {
-    
+
     associatedtype Root
     associatedtype Value
-    
+
     var readOnly: ReadOnlyPath<Root, Value> { get }
-    
+
     var path: WritableKeyPath<Root, Value> { get }
-    
+
     func changeRoot<Prefix: PathProtocol>(path: Prefix) -> Path<Prefix.Root, Value> where Prefix.Value == Root
-    
+
 }
 
 extension PathProtocol {
-    
+
     public var keyPath: KeyPath<Root, Value> {
         return self.path as KeyPath<Root, Value>
     }
-    
+
 }
 
 extension PathProtocol {
-    
+
     public static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs.path == rhs.path
     }
-    
+
 }

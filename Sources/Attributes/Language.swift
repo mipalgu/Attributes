@@ -57,11 +57,11 @@
  */
 
 public enum Language: String, Hashable, Codable {
-    
+
     case c
     case cxx
     case swift
     case vhdl
     case other
-    
+
 }

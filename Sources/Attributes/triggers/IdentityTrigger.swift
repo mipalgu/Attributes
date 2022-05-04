@@ -57,13 +57,13 @@
  */
 
 public struct IdentityTrigger<Root>: TriggerProtocol {
-    
+
     public func performTrigger(_: inout Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Root>> {
         .success(false)
     }
-    
+
     public func isTriggerForPath(_: AnyPath<Root>, in _: Root) -> Bool {
         true
     }
-    
+
 }

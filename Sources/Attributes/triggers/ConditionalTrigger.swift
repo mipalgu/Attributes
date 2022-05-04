@@ -57,25 +57,25 @@
  */
 
 public struct ConditionalTrigger<Trigger: TriggerProtocol>: TriggerProtocol {
-    
+
     let condition: (Root) -> Bool
-    
+
     let trigger: Trigger
-    
+
     public init(condition: @escaping (Root) -> Bool, trigger: Trigger) {
         self.condition = condition
         self.trigger = trigger
     }
-    
+
     public func performTrigger(_ root: inout Trigger.Root, for path: AnyPath<Trigger.Root>) -> Result<Bool, AttributeError<Trigger.Root>> {
         if condition(root) {
             return trigger.performTrigger(&root, for: path)
         }
         return .success(false)
     }
-    
+
     public func isTriggerForPath(_ path: AnyPath<Trigger.Root>, in root: Trigger.Root) -> Bool {
         trigger.isTriggerForPath(path, in: root)
     }
-    
+
 }

@@ -57,69 +57,69 @@
  */
 
 public protocol SearchablePath {
-    
+
     associatedtype Root
     associatedtype Value
 
     func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool
-    
+
     func paths(in root: Root) -> [Path<Root, Value>]
-    
+
 }
 
 public protocol ConvertibleSearchablePath: SearchablePath {
-    
+
     associatedtype Value
-    
+
     func appending<Path: PathProtocol>(path: Path) -> AnySearchablePath<Root, Path.Value> where Path.Root == Value
-    
+
     func toNewRoot<Path: PathProtocol>(path: Path) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root
-    
+
 }
 
 extension Path: ConvertibleSearchablePath {
-    
+
     public func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
         let anyPath = AnyPath(self)
         return anyPath.isSame(as: path) || anyPath.isParent(of: path)
     }
-    
+
     public func paths(in root: Root) -> [Path<Root, Value>] {
         return [self]
     }
-    
+
     public func appending<Path: PathProtocol>(path: Path) -> AnySearchablePath<Root, Path.Value> where Path.Root == Value {
         let ancestors = self.ancestors + path.ancestors.map { $0.changeRoot(path: self) }
         return AnySearchablePath(Attributes.Path<Root, Path.Value>(path: self.path.appending(path: path.path), ancestors: ancestors))
     }
-    
+
     public func toNewRoot<Path: PathProtocol>(path: Path) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root {
         let ancestors = self.ancestors.map {
             $0.changeRoot(path: path)
         }
         return AnySearchablePath(Attributes.Path<Path.Root, Value>(path: path.path.appending(path: self.path), ancestors: ancestors))
     }
-    
+
 }
 
 public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchablePath where Collection: MutableCollection, Collection.Index: BinaryInteger {
-    
+
     public typealias Root = Root
     public typealias Value = Value
-    
+
     var collectionPath: Path<Root, Collection>
-    
+
     var elementPath: Path<Collection.Element, Value>
-    
+
     public init(collectionPath: Path<Root, Collection>, elementPath: Path<Collection.Element, Value>) {
         self.collectionPath = collectionPath
         self.elementPath = elementPath
     }
-    
+
     public init(_ collectionPath: Path<Root, Collection>) where Collection.Element == Value {
         self.init(collectionPath: collectionPath, elementPath: Path(path: \.self, ancestors: []))
     }
-    
+
     public func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
         nil != root[keyPath: collectionPath.keyPath].indices.first {
             let newElementPath = elementPath.changeRoot(path: collectionPath[$0])
@@ -132,36 +132,36 @@ public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchab
             return newElementPath.paths(in: root)
         }
     }
-    
+
     public func appending<Path: PathProtocol>(path: Path) -> AnySearchablePath<Root, Path.Value> where Path.Root == Value {
         let newElementPath = path.changeRoot(path: elementPath)
         return AnySearchablePath(CollectionSearchPath<Root, Collection, Path.Value>(collectionPath: self.collectionPath, elementPath: newElementPath))
     }
-    
+
     public func toNewRoot<Path: PathProtocol>(path: Path) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root {
         let newCollectionPath = collectionPath.changeRoot(path: path)
         return AnySearchablePath(CollectionSearchPath<Path.Root, Collection, Value>(collectionPath: newCollectionPath, elementPath: elementPath))
     }
-    
+
 }
 
 public struct AnySearchablePath<Root, Value>: SearchablePath {
-    
+
     private let _isAncestorOrSame: (AnyPath<Root>, Root) -> Bool
     private let _paths: (Root) -> [Path<Root, Value>]
-    
+
     public init<Base: SearchablePath>(_ base: Base) where Base.Root == Root, Base.Value == Value {
         self._isAncestorOrSame = { base.isAncestorOrSame(of: $0, in: $1) }
         self._paths = { base.paths(in: $0) }
     }
-    
+
     public func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
         self._isAncestorOrSame(path, root)
     }
-    
+
     public func paths(in root: Root) -> [Path<Root, Value>] {
         self._paths(root)
     }
-    
-    
+
+
 }

@@ -59,10 +59,10 @@
 import XMI
 
 public enum AttributeType: Hashable {
-    
+
     case line(LineAttributeType)
     case block(BlockAttributeType)
-    
+
     public var isLine: Bool {
         switch self {
         case .line:
@@ -71,7 +71,7 @@ public enum AttributeType: Hashable {
             return false
         }
     }
-    
+
     public var isBlock: Bool {
         switch self {
         case .block:
@@ -80,7 +80,7 @@ public enum AttributeType: Hashable {
             return false
         }
     }
-    
+
     public var isRecursive: Bool {
         switch self {
         case .block(let blockType):
@@ -89,7 +89,7 @@ public enum AttributeType: Hashable {
             return false
         }
     }
-    
+
     public var isTable: Bool {
         switch self {
         case .block(let type):
@@ -98,7 +98,7 @@ public enum AttributeType: Hashable {
             return false
         }
     }
-    
+
     public var defaultValue: Attribute {
         switch self {
         case .line(let lineAttribute):
@@ -107,51 +107,51 @@ public enum AttributeType: Hashable {
             return .block(blockAttribute.defaultValue)
         }
     }
-    
+
     public static var bool: AttributeType {
         return .line(.bool)
     }
-    
+
     public static var integer: AttributeType {
         return .line(.integer)
     }
-    
+
     public static var float: AttributeType {
         return .line(.float)
     }
-    
+
     public static func expression(language: Language) -> AttributeType {
         return .line(.expression(language: language))
     }
-    
+
     public static func enumerated(validValues: Set<String>) -> AttributeType {
         return .line(.enumerated(validValues: validValues))
     }
-    
+
     public static var line: AttributeType {
         return .line(.line)
     }
-    
+
     public static func code(language: Language) -> AttributeType {
         return .block(.code(language: language))
     }
-    
+
     public static var text: AttributeType {
         return .block(.text)
     }
-    
+
     public static func collection(type: AttributeType) -> AttributeType {
         return .block(.collection(type: type))
     }
-    
+
     public static func complex(layout: [Field]) -> AttributeType {
         return .block(.complex(layout: layout))
     }
-    
+
     public static func enumerableCollection(validValues: Set<String>) -> AttributeType {
         return .block(.enumerableCollection(validValues: validValues))
     }
-    
+
     public static func table(columns: [(name: String, type: LineAttributeType)]) -> AttributeType {
         return .block(.table(columns: columns.map { BlockAttributeType.TableColumn(name: $0.name, type: $0.type) }))
     }
@@ -159,7 +159,7 @@ public enum AttributeType: Hashable {
 }
 
 extension AttributeType: Codable {
-    
+
     public init(from decoder: Decoder) throws {
         if let lineAttributeType = try? LineAttributeType(from: decoder) {
             self = .line(lineAttributeType)
@@ -176,7 +176,7 @@ extension AttributeType: Codable {
             )
         )
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         switch self {
         case .line(let attributeType):
@@ -185,11 +185,11 @@ extension AttributeType: Codable {
             try attributeType.encode(to: encoder)
         }
     }
-    
+
 }
 
 extension AttributeType: XMIConvertible {
-    
+
     public var xmiName: String? {
         switch self {
         case .line(let type):
@@ -198,5 +198,5 @@ extension AttributeType: XMIConvertible {
             return type.xmiName
         }
     }
-    
+
 }

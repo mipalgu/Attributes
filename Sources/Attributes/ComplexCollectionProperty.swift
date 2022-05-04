@@ -58,33 +58,33 @@
 
 @propertyWrapper
 public struct ComplexCollectionProperty<Base: ComplexProtocol> {
-    
+
     public var projectedValue: ComplexCollectionProperty<Base> {
         self
     }
-    
+
     public var wrappedValue: Base
-    
+
     public var label: String
-    
+
     public init(base: Base, label: String) {
         self.wrappedValue = base
         self.label = label
     }
-    
+
 }
 
 extension ComplexCollectionProperty: SchemaAttributeConvertible {
-    
+
     var allTriggers: Any {
         wrappedValue.allTriggers
     }
-    
+
     var schemaAttribute: Any {
         let fields = wrappedValue.properties.map {
             Field(name: $0.label, type: $0.type)
         }
         return SchemaAttribute(label: label, type: .collection(type: .complex(layout: fields)), validate: AnyValidator([wrappedValue.propertiesValidator, wrappedValue.groupValidation]))
     }
-    
+
 }

@@ -58,21 +58,21 @@
 
 @_functionBuilder
 public struct ValidatorBuilder<Root> {
-    
+
     public func buildBlock() -> AnyValidator<Root> { [] }
 
     public func makeValidator(@ValidatorBuilder _ content: () -> [AnyValidator<Root>]) -> AnyValidator<Root> {
         AnyValidator(content())
     }
-    
+
     public static func buildBlock<V0: ValidatorProtocol>(_ v0: V0) -> AnyValidator<Root> where V0.Root == Root {
         return AnyValidator([AnyValidator(v0)])
     }
-    
+
     public static func buildBlock<V0: ValidatorProtocol, V1: ValidatorProtocol>(_ v0: V0, _ v1: V1) -> AnyValidator<Root> where V0.Root == Root, V1.Root == Root {
         return AnyValidator([AnyValidator(v0), AnyValidator(v1)])
     }
-    
+
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -84,7 +84,7 @@ public struct ValidatorBuilder<Root> {
     {
         return AnyValidator([AnyValidator(v0), AnyValidator(v1), AnyValidator(v2)])
     }
-    
+
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -98,7 +98,7 @@ public struct ValidatorBuilder<Root> {
     {
         return AnyValidator([AnyValidator(v0), AnyValidator(v1), AnyValidator(v2), AnyValidator(v3)])
     }
-    
+
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -120,7 +120,7 @@ public struct ValidatorBuilder<Root> {
             AnyValidator(v4)
         ])
     }
-    
+
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -145,7 +145,7 @@ public struct ValidatorBuilder<Root> {
             AnyValidator(v5)
         ])
     }
-    
+
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -173,7 +173,7 @@ public struct ValidatorBuilder<Root> {
             AnyValidator(v6)
         ])
     }
-    
+
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -204,7 +204,7 @@ public struct ValidatorBuilder<Root> {
             AnyValidator(v7)
         ])
     }
-    
+
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -238,7 +238,7 @@ public struct ValidatorBuilder<Root> {
             AnyValidator(v8)
         ])
     }
-    
+
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -275,7 +275,7 @@ public struct ValidatorBuilder<Root> {
             AnyValidator(v9)
         ])
     }
-    
+
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -315,7 +315,7 @@ public struct ValidatorBuilder<Root> {
             AnyValidator(v10)
         ])
     }
-    
+
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -358,5 +358,5 @@ public struct ValidatorBuilder<Root> {
             AnyValidator(v11)
         ])
     }
-    
+
 }

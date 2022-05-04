@@ -60,7 +60,7 @@ import Foundation
 import swift_helpers
 
 public struct ErrorBag<Root> {
-    
+
     private var sortedCollection = SortedCollection(compare: { (lhs: AttributeError<Root>, rhs: AttributeError<Root>) -> ComparisonResult in
         if lhs.path.isSame(as: rhs.path) {
             return .orderedSame
@@ -70,29 +70,29 @@ public struct ErrorBag<Root> {
         }
         return .orderedDescending
     })
-    
+
     public var allErrors: [AttributeError<Root>] {
         return Array(sortedCollection)
     }
-    
+
     public init() {}
-    
+
     public mutating func empty() {
         self.sortedCollection.empty()
     }
-    
+
     public func errors(includingDescendantsForPath path: AnyPath<Root>) -> [AttributeError<Root>] {
         return Array(sortedCollection[index(includingDescendantsForPath: path)])
     }
-    
+
     public func errors<Path: ReadOnlyPathProtocol>(includingDescendantsForPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
         return self.errors(includingDescendantsForPath: AnyPath(path))
     }
-    
+
     public func errors<Path: PathProtocol>(includingDescendantsForPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
         return self.errors(includingDescendantsForPath: AnyPath(path))
     }
-    
+
     public func errors(forPath path: AnyPath<Root>) -> [AttributeError<Root>] {
         func isAttributeType(_ type: Any.Type) -> Bool {
             return type == Attribute.self || type == BlockAttribute.self || type == LineAttribute.self
@@ -109,47 +109,47 @@ public struct ErrorBag<Root> {
         // Treat all subpaths of the attribute type as the same when fetching the errors.
         return self.errors(includingDescendantsForPath: path)
     }
-    
+
     public func errors<Path: ReadOnlyPathProtocol>(forPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
         return self.errors(forPath: AnyPath(path))
     }
-    
+
     public func errors<Path: PathProtocol>(forPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
         return self.errors(forPath: AnyPath(path))
     }
-    
+
     public mutating func remove(includingDescendantsForPath path: AnyPath<Root>) {
         sortedCollection.removeSubrange(self.index(includingDescendantsForPath: path))
     }
-    
+
     public mutating func remove<Path: ReadOnlyPathProtocol>(includingDescendantsForPath path: Path) where Path.Root == Root {
         self.remove(includingDescendantsForPath: AnyPath(path))
     }
-    
+
     public mutating func remove<Path: PathProtocol>(includingDescendantsForPath path: Path) where Path.Root == Root {
         self.remove(includingDescendantsForPath: AnyPath(path))
     }
-    
+
     public mutating func remove(forPath path: AnyPath<Root>) {
         sortedCollection.removeAll(AttributeError(message: "", path: path))
     }
-    
+
     public mutating func remove<Path: ReadOnlyPathProtocol>(forPath path: Path) where Path.Root == Root {
         self.remove(forPath: AnyPath(path))
     }
-    
+
     public mutating func remove<Path: PathProtocol>(forPath path: Path) where Path.Root == Root {
         self.remove(forPath: AnyPath(path))
     }
-    
+
     public mutating func insert(_ error: AttributeError<Root>) {
         self.sortedCollection.insert(error)
     }
-    
+
     private func index(includingDescendantsForPath path: AnyPath<Root>) -> Range<Int> {
         let elements = self.sortedCollection.right(ofAndIncluding: AttributeError(message: "", path: path))
         let index = elements.firstIndex { !path.isParent(of: $0.path) } ?? elements.endIndex
         return elements.startIndex..<index
     }
-    
+
 }

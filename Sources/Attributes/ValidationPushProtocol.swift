@@ -57,13 +57,13 @@
  */
 
 public protocol ValidationPushProtocol: ReadOnlyPathContainer {
-    
+
     associatedtype Root
     associatedtype Value
     associatedtype PushValidator: PathValidator
-    
+
     func push(_ f: @escaping (Root, Value) throws -> Void) -> PushValidator
-    
+
 }
 
 extension ValidationPushProtocol {
@@ -143,7 +143,7 @@ extension ValidationPushProtocol {
 
 
 extension ValidationPushProtocol where Value: Equatable {
-    
+
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence, S2: Sequence>(_ p: P, transform: @escaping (S) -> S2) -> PushValidator where P.Root == Root, P.Value == S, S2.Element == Value {
         return push { (root, value) in
             let collection = transform(root[keyPath: p.keyPath])
@@ -152,7 +152,7 @@ extension ValidationPushProtocol where Value: Equatable {
             }
         }
     }
-    
+
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P) -> PushValidator where P.Root == Root, P.Value == S, S.Element == Value {
         return push { (root, value) in
             let collection = root[keyPath: p.keyPath]
@@ -161,11 +161,11 @@ extension ValidationPushProtocol where Value: Equatable {
             }
         }
     }
-    
+
 }
 
 extension ValidationPushProtocol where Value: Hashable {
-    
+
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P, transform: @escaping (S) -> Set<Value>) -> PushValidator where P.Root == Root, P.Value == S {
         return push {
             let set = transform($0[keyPath: p.keyPath])
@@ -174,7 +174,7 @@ extension ValidationPushProtocol where Value: Hashable {
             }
         }
     }
-    
+
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P) -> PushValidator where P.Root == Root, P.Value == S, S.Element == Value {
         return push {
             let set = Set($0[keyPath: p.keyPath])
@@ -183,7 +183,7 @@ extension ValidationPushProtocol where Value: Hashable {
             }
         }
     }
-    
+
     public func `in`<P: ReadOnlyPathProtocol>(_ p: P) -> PushValidator where P.Root == Root, P.Value == Set<Value> {
         return push {
             let set = $0[keyPath: p.keyPath]
@@ -192,7 +192,7 @@ extension ValidationPushProtocol where Value: Hashable {
             }
         }
     }
-    
+
     public func `in`(_ set: Set<Value>) -> PushValidator {
         return push {
             if !set.contains($1) {
@@ -200,11 +200,11 @@ extension ValidationPushProtocol where Value: Hashable {
             }
         }
     }
-    
+
 }
 
 extension ValidationPushProtocol where Value: Equatable {
-    
+
     public func equals(_ value: Value) -> PushValidator {
         return push {
             if $1 != value {
@@ -212,7 +212,7 @@ extension ValidationPushProtocol where Value: Equatable {
             }
         }
     }
-    
+
     public func notEquals(_ value: Value) -> PushValidator {
         return push {
             if $1 == value {
@@ -220,23 +220,23 @@ extension ValidationPushProtocol where Value: Equatable {
             }
         }
     }
-    
+
 }
 
 extension ValidationPushProtocol where Value == Bool {
-    
+
     public func equalsFalse() -> PushValidator {
         return self.equals(false)
     }
-    
+
     public func equalsTrue() -> PushValidator {
         return self.equals(true)
     }
-    
+
 }
 
 extension ValidationPushProtocol where Value: Comparable {
-    
+
     public func between(min: Value, max: Value) -> PushValidator {
         return push {
             if $1 < min || $1 > max {
@@ -244,7 +244,7 @@ extension ValidationPushProtocol where Value: Comparable {
             }
         }
     }
-    
+
     public func lessThan(_ value: Value) -> PushValidator {
         return push {
             if $1 >= value {
@@ -252,7 +252,7 @@ extension ValidationPushProtocol where Value: Comparable {
             }
         }
     }
-    
+
     public func lessThanEqual(_ value: Value) -> PushValidator {
         return push {
             if $1 > value {
@@ -260,7 +260,7 @@ extension ValidationPushProtocol where Value: Comparable {
             }
         }
     }
-    
+
     public func greaterThan(_ value: Value) -> PushValidator {
         return push {
             if $1 <= value {
@@ -268,7 +268,7 @@ extension ValidationPushProtocol where Value: Comparable {
             }
         }
     }
-    
+
     public func greaterThanEqual(_ value: Value) -> PushValidator {
         return push {
             if $1 < value {
@@ -276,11 +276,11 @@ extension ValidationPushProtocol where Value: Comparable {
             }
         }
     }
-    
+
 }
 
 extension ValidationPushProtocol where Value: Collection {
-    
+
     public func empty() -> PushValidator {
         return push {
             if !$1.isEmpty {
@@ -288,7 +288,7 @@ extension ValidationPushProtocol where Value: Collection {
             }
         }
     }
-    
+
     public func notEmpty() -> PushValidator {
         return push {
             if $1.isEmpty {
@@ -296,7 +296,7 @@ extension ValidationPushProtocol where Value: Collection {
             }
         }
     }
-    
+
     public func length(_ length: Int) -> PushValidator {
         if length == 0 {
             return empty()
@@ -307,7 +307,7 @@ extension ValidationPushProtocol where Value: Collection {
             }
         }
     }
-    
+
     public func minLength(_ length: Int) -> PushValidator {
         if length == 1 {
             return notEmpty()
@@ -318,7 +318,7 @@ extension ValidationPushProtocol where Value: Collection {
             }
         }
     }
-    
+
     public func maxLength(_ length: Int) -> PushValidator {
         if length == 0 {
             return empty()
@@ -329,11 +329,11 @@ extension ValidationPushProtocol where Value: Collection {
             }
         }
     }
-    
+
 }
 
 extension ValidationPushProtocol where Value: Sequence {
-    
+
     public func unique<S: Sequence>(_ transform: @escaping (Value) -> S) -> PushValidator where S.Element: Hashable {
         return push { (_, value) in
             var set = Set<S.Element>()
@@ -348,11 +348,11 @@ extension ValidationPushProtocol where Value: Sequence {
             }
         }
     }
-    
+
 }
 
 extension ValidationPushProtocol where Value: Sequence, Value.Element: Hashable {
-    
+
     public func unique() -> PushValidator {
         return push { (_, value) in
             var set = Set<Value.Element>()
@@ -367,11 +367,11 @@ extension ValidationPushProtocol where Value: Sequence, Value.Element: Hashable 
             }
         }
     }
-    
+
 }
 
 extension ValidationPushProtocol where Value: StringProtocol {
-    
+
     public func alpha() -> PushValidator {
         return push {
             if nil != $1.first(where: { !$0.isLetter }) {
@@ -379,7 +379,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-    
+
     public func alphadash() -> PushValidator {
         return push {
             if nil != $1.first(where: { !$0.isLetter && !$0.isNumber && $0 != "_" && $0 != "-" }) {
@@ -387,7 +387,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-    
+
     public func alphafirst() -> PushValidator {
         return push {
             guard let firstChar = $1.first else {
@@ -398,7 +398,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-    
+
     public func alphanumeric() -> PushValidator {
         return push {
             if nil != $1.first(where: { !$0.isLetter && !$0.isNumber }) {
@@ -406,7 +406,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-    
+
     public func alphaunderscore() -> PushValidator {
         return push {
             if nil != $1.first(where: { !$0.isLetter && !$0.isNumber && $0 != "_" }) {
@@ -414,7 +414,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-    
+
     public func alphaunderscorefirst() -> PushValidator {
         return push {
             guard let firstChar = $1.first else {
@@ -425,7 +425,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-    
+
     public func blacklist(_ list: Set<String>) -> PushValidator {
         return push { (_, val) in
             if list.contains(String(val)) {
@@ -433,7 +433,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-    
+
     public func numeric() -> PushValidator {
         return push {
             if nil != $1.first(where: { !$0.isNumber }) {
@@ -441,7 +441,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-    
+
     public func whitelist(_ list: Set<String>) -> PushValidator {
         return push { (_, val) in
             if !list.contains(String(val)) {
@@ -449,7 +449,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-    
+
     public func greyList(_ list: Set<String>) -> PushValidator {
         return push { (_, val) in
             guard let _ = list.first(where: { val.contains($0) }) else {
@@ -457,6 +457,6 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-    
+
 }
 

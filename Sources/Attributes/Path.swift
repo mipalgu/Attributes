@@ -58,135 +58,135 @@
 
 @dynamicMemberLookup
 public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
-    
+
     public var ancestors: [AnyPath<Root>]
-    
+
     public var keyPath: KeyPath<Root, Value>
-    
+
     private let _isNil: (Root) -> Bool
-    
+
     public init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>], isNil: @escaping (Root) -> Bool) {
         self.ancestors = ancestors.reversed().drop { $0.partialKeyPath == keyPath }.reversed()
         self.keyPath = keyPath
         self._isNil = { root in ancestors.last?.isNil(root) ?? false || isNil(root) }
     }
-    
+
     public init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) {
         self.init(keyPath: keyPath, ancestors: ancestors, isNil: { _ in false })
     }
-    
+
     public init<T>(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) where Value == Optional<T> {
         self.init(keyPath: keyPath, ancestors: ancestors, isNil: { root in root[keyPath: keyPath] == nil })
     }
-    
+
     public init(_ type: Value.Type) where Root == Value {
         self.init(keyPath: \.self, ancestors: [])
     }
-    
+
     public subscript<AppendedValue>(dynamicMember member: KeyPath<Value, AppendedValue>) -> ReadOnlyPath<Root, AppendedValue> {
         return ReadOnlyPath<Root, AppendedValue>(keyPath: keyPath.appending(path: member), ancestors: fullPath)
     }
-    
+
     public func isNil(_ root: Root) -> Bool {
         return self._isNil(root)
     }
-    
+
 }
 
 extension ReadOnlyPath {
-    
+
     public static func ==(lhs: ReadOnlyPath<Root, Value>, rhs: ReadOnlyPath<Root, Value>) -> Bool {
         return lhs.ancestors == rhs.ancestors && lhs.keyPath == rhs.keyPath
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(self.ancestors)
         hasher.combine(self.keyPath)
     }
-    
+
 }
 
 @dynamicMemberLookup
 public struct Path<Root, Value>: PathProtocol {
-    
+
     public var ancestors: [AnyPath<Root>]
-    
+
     public var path: WritableKeyPath<Root, Value>
-    
+
     private let _isNil: (Root) -> Bool
-    
+
     init(path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>], isNil: @escaping (Root) -> Bool) {
         self.path = path
         self.ancestors = ancestors.reversed().drop { $0.partialKeyPath == path }.reversed()
         self._isNil = { root in ancestors.last?.isNil(root) ?? false || isNil(root) }
     }
-    
+
     public init(path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>]) {
         self.init(path: path, ancestors: ancestors, isNil: { _ in false })
     }
-    
+
     public init<T>(path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>]) where Value == Optional<T> {
         self.init(path: path, ancestors: ancestors, isNil: { root in root[keyPath: path] == nil })
     }
-    
+
     public init(_ type: Value.Type) where Root == Value {
         self.init(path: \.self, ancestors: [])
     }
-    
+
     public var readOnly: ReadOnlyPath<Root, Value> {
         return ReadOnlyPath(keyPath: self.path as KeyPath<Root, Value>, ancestors: self.ancestors)
     }
-    
+
     public subscript<AppendedValue>(dynamicMember member: KeyPath<Value, AppendedValue>) -> ReadOnlyPath<Root, AppendedValue> {
         return ReadOnlyPath<Root, AppendedValue>(keyPath: path.appending(path: member), ancestors: fullPath)
     }
-    
+
     public subscript<AppendedValue>(dynamicMember member: WritableKeyPath<Value, AppendedValue>) -> Path<Root, AppendedValue> {
         return Path<Root, AppendedValue>(path: path.appending(path: member), ancestors: fullPath)
     }
-    
+
     public func appending<NewValue>(path: Path<Value, NewValue>) -> Path<Root, NewValue> {
         path.changeRoot(path: self)
     }
-    
+
     public func changeRoot<Prefix: PathProtocol>(path: Prefix) -> Path<Prefix.Root, Value> where Prefix.Value == Root {
         let ancestors = path.ancestors + self.ancestors.map {
             $0.changeRoot(path: path.readOnly)
         }
         return Path<Prefix.Root, Value>(path: path.path.appending(path: self.path), ancestors: ancestors)
     }
-    
+
     public func isNil(_ root: Root) -> Bool {
         return self._isNil(root)
     }
-    
+
 }
 
 extension Path {
-    
+
     public static func ==(lhs: Path<Root, Value>, rhs: Path<Root, Value>) -> Bool {
         return lhs.ancestors == rhs.ancestors && lhs.keyPath == rhs.keyPath
     }
-    
+
     public func hash(into hasher: inout Hasher) {
         hasher.combine(self.ancestors)
         hasher.combine(self.keyPath)
     }
-    
+
 }
 
 extension Path {
-    
+
     public func validate(@ValidatorBuilder<Root> builder: (ValidationPath<Path<Root, Value>>) -> AnyValidator<Root>) -> AnyValidator<Root> {
         return builder(ValidationPath(path: Path(path: self.path, ancestors: self.fullPath)))
     }
-    
+
 }
 
 extension Path {
-    
+
     public func trigger(@TriggerBuilder<Root> builder: (WhenChanged<Path<Root, Value>, IdentityTrigger<Root>>) -> [AnyTrigger<Root>]) -> AnyTrigger<Root> {
         return AnyTrigger(builder(WhenChanged(Path(path: self.path, ancestors: self.fullPath))))
     }
-    
+
 }

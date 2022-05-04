@@ -59,14 +59,14 @@
 import XMI
 
 public enum LineAttributeType: Hashable {
-    
+
     case bool
     case integer
     case float
     case expression(language: Language)
     case enumerated(validValues: Set<String>)
     case line
-    
+
     public var defaultValue: LineAttribute {
         switch self {
         case .bool:
@@ -83,11 +83,11 @@ public enum LineAttributeType: Hashable {
             return .line("")
         }
     }
-    
+
 }
 
 extension LineAttributeType: Codable {
-    
+
     public init(from decoder: Decoder) throws {
         if let _ = try? BoolAttributeType(from: decoder) {
             self = .bool
@@ -120,7 +120,7 @@ extension LineAttributeType: Codable {
             )
         )
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         switch self {
         case .bool:
@@ -137,25 +137,25 @@ extension LineAttributeType: Codable {
             try LineAttributeType().encode(to: encoder)
         }
     }
-    
+
     private struct BoolAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "BoolAttributeType" }
         
     }
-    
+
     private struct IntegerAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "IntegerAttributeType" }
         
     }
-    
+
     private struct FloatAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "FloatAttributeType" }
         
     }
-    
+
     private struct ExpressionAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "ExpressionAttributeType" }
@@ -163,7 +163,7 @@ extension LineAttributeType: Codable {
         var language: Language
         
     }
-    
+
     private struct EnumAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "EnumAttributeType" }
@@ -171,17 +171,17 @@ extension LineAttributeType: Codable {
         var validValues: Set<String>
         
     }
-    
+
     private struct LineAttributeType: Hashable, Codable, XMIConvertible {
         
         var xmiName: String? { "LineAttributeType" }
         
     }
-    
+
 }
 
 extension LineAttributeType: XMIConvertible {
-    
+
     public var xmiName: String? {
         switch self {
         case .bool:
@@ -198,5 +198,5 @@ extension LineAttributeType: XMIConvertible {
             return LineAttributeType().xmiName
         }
     }
-    
+
 }

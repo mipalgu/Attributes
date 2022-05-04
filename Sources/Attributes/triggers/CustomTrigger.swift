@@ -57,31 +57,31 @@
  */
 
 public struct CustomTrigger<Path: ReadOnlyPathProtocol>: TriggerProtocol {
-    
+
     public typealias Root = Path.Root
-    
+
     public var path: AnyPath<Root> {
         AnyPath(actualPath)
     }
-    
+
     private let actualPath: Path
-    
+
     private let trigger: (inout Root) -> Result<Bool, AttributeError<Root>>
-    
+
     public init(path: Path, trigger: @escaping (inout Root) -> Result<Bool, AttributeError<Root>>) {
         self.actualPath = path
         self.trigger = trigger
     }
-    
+
     public func performTrigger(_ root: inout Root, for path: AnyPath<Root>) -> Result<Bool, AttributeError<Root>> {
         if !isTriggerForPath(path, in: root) {
             return .success(false)
         }
         return trigger(&root)
     }
-    
+
     public func isTriggerForPath(_ path: AnyPath<Root>, in root: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }
-    
+
 }

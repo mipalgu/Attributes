@@ -57,28 +57,28 @@
  */
 
 public struct Validator<P: ReadOnlyPathProtocol>: _PathValidator {
-    
+
     public typealias PathType = P
-    
+
     public let path: PathType
-    
+
     internal let _validate: (PathType.Root, PathType.Value) throws -> Void
-    
+
     public init(path: PathType) {
         self.init(path) { (_, _) in }
     }
-    
+
     internal init(_ path: PathType, _validate: @escaping (PathType.Root, PathType.Value) throws -> Void) {
         self.path = path
         self._validate = _validate
     }
-    
+
     public func performValidation(_ root: PathType.Root) throws {
         _ = try self._validate(root, root[keyPath: self.path.keyPath])
     }
-    
+
     public func validate(@ValidatorBuilder<PathType.Root> builder: (Self) -> [AnyValidator<PathType.Root>]) -> AnyValidator<PathType.Root> {
         return AnyValidator(builder(self))
     }
-    
+
 }

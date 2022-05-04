@@ -60,39 +60,39 @@
 public struct ValidationPath<P: ReadOnlyPathProtocol>: _ValidationPath {
 
     public typealias PathType = P
-    
+
     public let path: PathType
-    
+
     internal let _validate: (PathType.Root, PathType.Value) throws -> Void
-    
+
     public init(path: PathType) {
         self.init(path) { (_, _) in }
     }
-    
+
     internal init(_ path: PathType, _validate: @escaping (PathType.Root, PathType.Value) throws -> Void) {
         self.path = path
         self._validate = _validate
     }
-    
+
     public func validate(@ValidatorBuilder<PathType.Root> builder: (Self) -> AnyValidator<PathType.Root>) -> AnyValidator<PathType.Root> {
         return builder(self)
     }
-    
+
     public subscript<AppendedValue>(dynamicMember member: KeyPath<P.Value, AppendedValue>) -> ValidationPath<ReadOnlyPath<P.Root, AppendedValue>> {
         return ValidationPath<ReadOnlyPath<P.Root, AppendedValue>>(path: ReadOnlyPath<Root, AppendedValue>(keyPath: path.keyPath.appending(path: member), ancestors: path.fullPath))
     }
-    
+
 }
 
 
 extension ValidationPath where Value: Nilable {
-    
+
     public func required() -> RequiredValidator<P> {
         return RequiredValidator(path: self.path)
     }
-    
+
     public func optional() -> OptionalValidator<P> {
         return OptionalValidator(path: self.path)
     }
-    
+
 }

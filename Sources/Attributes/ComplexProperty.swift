@@ -57,42 +57,42 @@
  */
 
 protocol SchemaAttributeConvertible {
-    
+
     var allTriggers: Any { get }
-    
+
     var schemaAttribute: Any { get }
-    
+
 }
 
 @propertyWrapper
 public struct ComplexProperty<Base: ComplexProtocol> {
-    
+
     public var projectedValue: ComplexProperty<Base> {
         self
     }
-    
+
     public var wrappedValue: Base
-    
+
     public var label: String
-    
+
     public init(base: Base, label: String) {
         self.wrappedValue = base
         self.label = label
     }
-    
+
 }
 
 extension ComplexProperty: SchemaAttributeConvertible {
-    
+
     var allTriggers: Any {
         wrappedValue.allTriggers
     }
-    
+
     var schemaAttribute: Any {
         let fields = wrappedValue.properties.map {
             Field(name: $0.label, type: $0.type)
         }
         return SchemaAttribute(label: label, type: .complex(layout: fields), validate: AnyValidator([wrappedValue.propertiesValidator, wrappedValue.groupValidation]))
     }
-    
+
 }

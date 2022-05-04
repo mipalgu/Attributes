@@ -57,16 +57,16 @@
  */
 
 public struct ForEach<SearchPath: SearchablePath, Trigger: TriggerProtocol>: TriggerProtocol where Trigger.Root == SearchPath.Root {
-    
+
     private let path: SearchPath
-    
+
     private let builder: (Path<SearchPath.Root, SearchPath.Value>) -> Trigger
-    
+
     public init(_ path: SearchPath, @TriggerBuilder<SearchPath.Root> each builder: @escaping (Path<SearchPath.Root, SearchPath.Value>) -> Trigger) {
         self.path = path
         self.builder = builder
     }
-    
+
     public func performTrigger(_ root: inout SearchPath.Root, for path: AnyPath<SearchPath.Root>) -> Result<Bool, AttributeError<SearchPath.Root>> {
         var changed = false
         for subpath in self.path.paths(in: root) {
@@ -82,15 +82,15 @@ public struct ForEach<SearchPath: SearchablePath, Trigger: TriggerProtocol>: Tri
         }
         return .success(changed)
     }
-    
+
     public func isTriggerForPath(_ path: AnyPath<SearchPath.Root>, in root: SearchPath.Root) -> Bool {
         self.path.isAncestorOrSame(of: path, in: root)
     }
-    
+
 }
 
 extension ForEach where Trigger == WhenChanged<Path<SearchPath.Root, SearchPath.Value>, IdentityTrigger<SearchPath.Root>> {
-    
+
     public func when<NewTrigger: TriggerProtocol>(
         _ condition: @escaping (Root) -> Bool,
         @TriggerBuilder<Root> then builder: @escaping (Trigger) -> NewTrigger
@@ -102,13 +102,13 @@ extension ForEach where Trigger == WhenChanged<Path<SearchPath.Root, SearchPath.
             )
         }
     }
-    
+
     public func sync<TargetPath: SearchablePath>(target: TargetPath) -> ForEach<SearchPath, SyncTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>> where TargetPath.Root == Root, TargetPath.Value == SearchPath.Value {
         ForEach<SearchPath, SyncTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>>(path) {
             SyncTrigger(source: $0, target: target)
         }
     }
-    
+
     public func sync<TargetPath: SearchablePath>(target: TargetPath, transform: @escaping (SearchPath.Value, TargetPath.Value) -> TargetPath.Value) -> ForEach<SearchPath, SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>> where TargetPath.Root == Root {
         ForEach<SearchPath, SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>>(path) {
             SyncWithTransformTrigger(source: $0, target: target, transform: transform)
@@ -126,5 +126,5 @@ extension ForEach where Trigger == WhenChanged<Path<SearchPath.Root, SearchPath.
             MakeUnavailableTrigger(field: field, source: $0, fields: fields)
         }
     }
-    
+
 }
