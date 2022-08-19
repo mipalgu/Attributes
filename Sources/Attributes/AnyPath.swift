@@ -200,6 +200,7 @@ public struct AnyPath<Root> {
 
 }
 
+/// Equatable conformance.
 extension AnyPath: Equatable {
 
     public static func == <Root>(lhs: AnyPath<Root>, rhs: AnyPath<Root>) -> Bool {
@@ -208,6 +209,7 @@ extension AnyPath: Equatable {
 
 }
 
+/// Hashable conformance.
 extension AnyPath: Hashable {
 
     public func hash(into hasher: inout Hasher) {
@@ -217,6 +219,7 @@ extension AnyPath: Hashable {
 
 }
 
+/// CustomStringConvertible conformance.
 extension AnyPath: CustomStringConvertible {
 
     public var description: String {
