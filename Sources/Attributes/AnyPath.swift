@@ -264,9 +264,12 @@ public struct AnyPath<Root> {
         else {
             return nil
         }
+        let ancestors = self.ancestors + path.ancestors.map {
+            $0.changeRoot(path: ReadOnlyPath(keyPath: keyPath, ancestors: self.ancestors))
+        }
         return AnyPath(
             newPartialKeyPath,
-            ancestors: [],
+            ancestors: ancestors,
             targetType: Any.self,
             isOptional: path.isOptional,
             isNil: { path.isNil($0[keyPath: keyPath]) },

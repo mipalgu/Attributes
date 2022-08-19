@@ -169,6 +169,7 @@ final class AnyPathTests: XCTestCase {
         let newPath = path.appending(child)
         XCTAssertEqual(path.value(point) as? Point, point)
         XCTAssertEqual(newPath?.value(point) as? Int, point.x)
+        XCTAssertEqual(newPath?.ancestors, [AnyPath(Path(Point.self))])
     }
 
     /// Test changeRoot function.
