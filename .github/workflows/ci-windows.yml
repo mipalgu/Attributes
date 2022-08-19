@@ -1,0 +1,45 @@
+name: Windows Latest Swift CI
+
+on:
+  push:
+    branches: [development, main]
+  pull_request:
+    branches: [development, main]
+
+jobs:
+
+  exec-windows-ci:
+    runs-on: windows-latest
+
+    steps:
+      - uses: compnerd/gha-setup-swift@main
+        with:
+            branch: swift-5.6.2-release
+            tag: 5.6.2-RELEASE
+
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.WORKFLOWS_SSH_PRIVATE_KEY }} 
+
+      #- name: Install guunits
+      #  uses: mipalgu/install-guunits@main
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Debug Build
+        shell: pwsh
+        run: swift build -c debug
+
+      - name: Release build
+        shell: pwsh
+        run: swift build -c release
+
+      - name: Debug Test
+        shell: pwsh
+        run: swift test
+
+      - name: Release Test
+        shell: pwsh
+        run: swift test -c release
