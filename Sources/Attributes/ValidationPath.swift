@@ -56,43 +56,80 @@
  *
  */
 
+/// Path to a value containing validation rules.
 @dynamicMemberLookup
 public struct ValidationPath<P: ReadOnlyPathProtocol>: _ValidationPath {
 
+    /// PathType is a ReadOnlyPathProtocol instance.
     public typealias PathType = P
 
+    /// The underlying path used in this object.
     public let path: PathType
 
+    // swiftlint:disable identifier_name
+
+    /// A validate method used to valid a given object and value.
     internal let _validate: (PathType.Root, PathType.Value) throws -> Void
 
+    // swiftlint:enable identifier_name
+
+    /// Initialise this object from a path. The validation function in this
+    /// initialiser always passes.
+    /// - Parameter path: The path to the value being validated.
     public init(path: PathType) {
-        self.init(path) { (_, _) in }
+        self.init(path) { _, _ in }
     }
 
+    // swiftlint:disable identifier_name
+
+    /// Initialise this object from a path and validation function.
+    /// - Parameters:
+    ///   - path: The path pointing to the value to validate.
+    ///   - _validate: A validation function used to validate the value.
     internal init(_ path: PathType, _validate: @escaping (PathType.Root, PathType.Value) throws -> Void) {
         self.path = path
         self._validate = _validate
     }
 
-    public func validate(@ValidatorBuilder<PathType.Root> builder: (Self) -> AnyValidator<PathType.Root>) -> AnyValidator<PathType.Root> {
-        return builder(self)
+    // swiftlint:enable identifier_name
+
+    /// Create a validator that validates the value pointed to by path.
+    /// - Parameter builder: The builder used to construct the validator.
+    /// - Returns: A type-erased validator.
+    public func validate(
+        @ValidatorBuilder<PathType.Root> builder: (Self) -> AnyValidator<PathType.Root>
+    ) -> AnyValidator<PathType.Root> {
+        builder(self)
     }
 
-    public subscript<AppendedValue>(dynamicMember member: KeyPath<P.Value, AppendedValue>) -> ValidationPath<ReadOnlyPath<P.Root, AppendedValue>> {
-        return ValidationPath<ReadOnlyPath<P.Root, AppendedValue>>(path: ReadOnlyPath<Root, AppendedValue>(keyPath: path.keyPath.appending(path: member), ancestors: path.fullPath))
+    /// Append a path to this ValidationPath.
+    /// - Parameter dynamicMember: The path to append to this path.
+    /// - Returns: A new ValidationPath with dynamicMember appended.
+    public subscript<AppendedValue>(
+        dynamicMember member: KeyPath<P.Value, AppendedValue>
+    ) -> ValidationPath<ReadOnlyPath<P.Root, AppendedValue>> {
+        ValidationPath<ReadOnlyPath<P.Root, AppendedValue>>(
+            path: ReadOnlyPath<Root, AppendedValue>(
+                keyPath: path.keyPath.appending(path: member), ancestors: path.fullPath
+            )
+        )
     }
 
 }
 
-
+/// Extra methods when Value conforms to Nilable.
 extension ValidationPath where Value: Nilable {
 
+    /// Create a required validator for the value.
+    /// - Returns: The required validator.
     public func required() -> RequiredValidator<P> {
-        return RequiredValidator(path: self.path)
+        RequiredValidator(path: self.path)
     }
 
+    /// Create an OptionalValidator for the value.
+    /// - Returns: The OptionalValidator.
     public func optional() -> OptionalValidator<P> {
-        return OptionalValidator(path: self.path)
+        OptionalValidator(path: self.path)
     }
 
 }
