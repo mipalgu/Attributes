@@ -72,12 +72,14 @@ final class ReadOnlyPathTests: XCTestCase {
         var pointCalled: OptionalPoint?
         let isNil: (OptionalPoint) -> Bool = { timesCalled += 1; pointCalled = $0; return true }
         let keyPath = \OptionalPoint.x
-        let path = ReadOnlyPath(keyPath: keyPath, ancestors: [], isNil: isNil)
+        let path = ReadOnlyPath(
+            keyPath: keyPath, ancestors: [AnyPath(Path(OptionalPoint.self))], isNil: isNil
+        )
         XCTAssertTrue(path.isNil(optionalPoint))
         XCTAssertEqual(timesCalled, 1)
         XCTAssertEqual(pointCalled, optionalPoint)
         XCTAssertEqual(keyPath, path.keyPath)
-        XCTAssertTrue(path.ancestors.isEmpty)
+        XCTAssertEqual(path.ancestors, [AnyPath(Path(OptionalPoint.self))])
         let typePath = ReadOnlyPath(Point.self)
         let ancestors = [AnyPath(typePath)]
         let newPath = ReadOnlyPath<Point, Int>(keyPath: \.x, ancestors: ancestors)
@@ -88,19 +90,19 @@ final class ReadOnlyPathTests: XCTestCase {
     /// Test init that points to a non-optional value.
     func testNonOptionalInit() {
         let keyPath = \Point.x
-        let path = ReadOnlyPath(keyPath: keyPath, ancestors: [])
+        let path = ReadOnlyPath(keyPath: keyPath, ancestors: [AnyPath(Path(Point.self))])
         XCTAssertEqual(path.keyPath, keyPath)
         XCTAssertFalse(path.isNil(point))
-        XCTAssertTrue(path.ancestors.isEmpty)
+        XCTAssertEqual(path.ancestors, [AnyPath(Path(Point.self))])
     }
 
     /// Test init that is used for optional values.
     func testOptionalInit() {
         let keyPath = \OptionalPoint.x
-        let path = ReadOnlyPath(keyPath: keyPath, ancestors: [])
+        let path = ReadOnlyPath(keyPath: keyPath, ancestors: [AnyPath(Path(OptionalPoint.self))])
         XCTAssertTrue(path.isNil(optionalPoint))
         XCTAssertEqual(path.keyPath, keyPath)
-        XCTAssertTrue(path.ancestors.isEmpty)
+        XCTAssertEqual(path.ancestors, [AnyPath(Path(OptionalPoint.self))])
     }
 
     /// Test type initialiser.
