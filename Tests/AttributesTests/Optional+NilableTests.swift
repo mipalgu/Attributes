@@ -75,4 +75,12 @@ final class OptionalNilableTests: XCTestCase {
         XCTAssertEqual(value.wrappedValue, 5)
     }
 
+    /// Test wrapped value setter.
+    func testWrappedValueSetter() {
+        var val: Int? = 5
+        XCTAssertEqual(val.wrappedValue, 5)
+        val.wrappedValue = 10
+        XCTAssertEqual(val.wrappedValue, 10)
+    }
+
 }
