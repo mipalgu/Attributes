@@ -56,41 +56,67 @@
  *
  */
 
+/// Struct for checking whether paths point to values containing errors.
 public struct AttributeError<Root>: Error {
 
+    /// The error message for this error.
     public let message: String
 
+    /// The value this error corresponds too.
     public let path: AnyPath<Root>
 
+    /// Initialise this struct from a error message and an AnyPath.
+    /// - Parameters:
+    ///   - message: The error message.
+    ///   - path: The value this error belongs too.
     public init(message: String, path: AnyPath<Root>) {
         self.message = message
         self.path = path
     }
 
+    /// Initialise this object from a ReadOnlyPath.
+    /// - Parameters:
+    ///   - message: The error message for this error.
+    ///   - path: The value this error belongs too.
     public init<P: ReadOnlyPathProtocol>(message: String, path: P) where P.Root == Root {
         self.init(message: message, path: AnyPath(path))
     }
 
+    /// Initialise this object from a Path.
+    /// - Parameters:
+    ///   - message: The error message for this error.
+    ///   - path: The value this error belongs too.
     public init<P: PathProtocol>(message: String, path: P) where P.Root == Root {
         self.init(message: message, path: AnyPath(path))
     }
 
+    /// Check whether an Error belongs to a Path.
+    /// - Parameter path: The path to validate.
+    /// - Returns: Whether path points to a value containing this error.
     public func isError<P: PathProtocol>(forPath path: P) -> Bool where P.Root == Root {
         self.isError(forPath: AnyPath(path))
     }
 
+    /// Check whether an Error belongs to a ReadOnlyPath.
+    /// - Parameter path: The path to validate.
+    /// - Returns: Whether path points to a value containing this error.
     public func isError<P: ReadOnlyPathProtocol>(forPath path: P) -> Bool where P.Root == Root {
         self.isError(forPath: AnyPath(path))
     }
 
+    /// Check whether an Error belongs to an AnyPath.
+    /// - Parameter path: The path to validate.
+    /// - Returns: Whether path points to a value containing this error.
     public func isError(forPath path: AnyPath<Root>) -> Bool {
         self.path.isSame(as: path) || path.isParent(of: self.path)
     }
 
 }
 
+/// CustomStringConvertible conformance.
 extension AttributeError: CustomStringConvertible {
 
+    /// A description of this instance.
     public var description: String {
         "\(self.path): " + self.message
     }

@@ -72,12 +72,12 @@ final class PathTests: XCTestCase {
         var pointCalled: OptionalPoint?
         let isNil: (OptionalPoint) -> Bool = { timesCalled += 1; pointCalled = $0; return true }
         let keyPath: WritableKeyPath<OptionalPoint, Int?> = \OptionalPoint.x
-        let path = Path(path: keyPath, ancestors: [], isNil: isNil)
+        let path = Path(path: keyPath, ancestors: [AnyPath(Path(OptionalPoint.self))], isNil: isNil)
         XCTAssertTrue(path.isNil(optionalPoint))
         XCTAssertEqual(timesCalled, 1)
         XCTAssertEqual(pointCalled, optionalPoint)
         XCTAssertEqual(keyPath, path.keyPath)
-        XCTAssertTrue(path.ancestors.isEmpty)
+        XCTAssertEqual(path.ancestors, [AnyPath(Path(OptionalPoint.self))])
         let typePath = Path(Point.self)
         let ancestors = [AnyPath(typePath)]
         let newPath = Path<Point, Int>(path: \.x, ancestors: ancestors)
@@ -88,19 +88,19 @@ final class PathTests: XCTestCase {
     /// Test init that points to a non-optional value.
     func testNonOptionalInit() {
         let keyPath: WritableKeyPath<Point, Int> = \Point.x
-        let path = Path(path: keyPath, ancestors: [])
+        let path = Path(path: keyPath, ancestors: [AnyPath(Path(Point.self))])
         XCTAssertEqual(path.keyPath, keyPath)
         XCTAssertFalse(path.isNil(point))
-        XCTAssertTrue(path.ancestors.isEmpty)
+        XCTAssertEqual(path.ancestors, [AnyPath(Path(Point.self))])
     }
 
     /// Test init that is used for optional values.
     func testOptionalInit() {
         let keyPath = \OptionalPoint.x
-        let path = Path(path: keyPath, ancestors: [])
+        let path = Path(path: keyPath, ancestors: [AnyPath(Path(OptionalPoint.self))])
         XCTAssertTrue(path.isNil(optionalPoint))
         XCTAssertEqual(path.keyPath, keyPath)
-        XCTAssertTrue(path.ancestors.isEmpty)
+        XCTAssertEqual(path.ancestors, [AnyPath(Path(OptionalPoint.self))])
     }
 
     /// Test type initialiser.
@@ -108,6 +108,7 @@ final class PathTests: XCTestCase {
         let keyPath = \Point.self
         let path = Path(Point.self)
         XCTAssertEqual(path.keyPath, keyPath)
+        XCTAssertTrue(path.ancestors.isEmpty)
     }
 
     /// Test readOnly property.
@@ -115,6 +116,7 @@ final class PathTests: XCTestCase {
         let readPath = ReadOnlyPath(Point.self)
         let path = Path(Point.self)
         XCTAssertEqual(path.readOnly, readPath)
+        XCTAssertTrue(path.readOnly.ancestors.isEmpty)
     }
 
     /// Test appending methods and subscript operations.
@@ -122,8 +124,8 @@ final class PathTests: XCTestCase {
         let path = Path(Point.self)
         let keyPath: KeyPath<Point, Int> = \.x
         let writePath: WritableKeyPath<Point, Int> = \.x
-        let appendPath = Path(path: writePath, ancestors: [])
-        let expected = Path(path: \Point.self.x, ancestors: [AnyPath(path)])
+        let appendPath = Path(path: writePath, ancestors: [AnyPath(path)])
+        let expected = Path(path: \Point.x, ancestors: [AnyPath(path)])
         XCTAssertEqual(expected.readOnly, path[dynamicMember: keyPath])
         XCTAssertEqual(expected, path[dynamicMember: writePath])
         XCTAssertEqual(expected, path.appending(path: appendPath))

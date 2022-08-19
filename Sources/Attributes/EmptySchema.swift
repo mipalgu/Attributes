@@ -7,8 +7,10 @@
 
 import Foundation
 
+/// NullObject version of Schema.
 public struct EmptySchema<Root: Modifiable>: SchemaProtocol {
 
+    /// Default init.
     public init() {}
 
 }

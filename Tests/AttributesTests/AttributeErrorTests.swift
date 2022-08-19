@@ -1,4 +1,4 @@
-// ReadOnlyPathTests.swift 
+// AttributeErrorTests.swift 
 // Attributes 
 // 
 // Created by Morgan McColl.
@@ -57,76 +57,67 @@
 @testable import Attributes
 import XCTest
 
-/// Test class for ReadOnlyPath.
-final class ReadOnlyPathTests: XCTestCase {
+/// Test class for AttributeError.
+final class AttributeErrorTests: XCTestCase {
 
-    /// Test data.
-    let point = Point(x: 3, y: 4)
+    /// Test message.
+    let message = "Error!"
 
-    /// Optional test data.
-    let optionalPoint = OptionalPoint()
-
-    /// Test init that takes an isNil function.
-    func testInit() {
-        var timesCalled = 0
-        var pointCalled: OptionalPoint?
-        let isNil: (OptionalPoint) -> Bool = { timesCalled += 1; pointCalled = $0; return true }
-        let keyPath = \OptionalPoint.x
-        let path = ReadOnlyPath(
-            keyPath: keyPath, ancestors: [AnyPath(Path(OptionalPoint.self))], isNil: isNil
-        )
-        XCTAssertTrue(path.isNil(optionalPoint))
-        XCTAssertEqual(timesCalled, 1)
-        XCTAssertEqual(pointCalled, optionalPoint)
-        XCTAssertEqual(keyPath, path.keyPath)
-        XCTAssertEqual(path.ancestors, [AnyPath(Path(OptionalPoint.self))])
-        let typePath = ReadOnlyPath(Point.self)
-        let ancestors = [AnyPath(typePath)]
-        let newPath = ReadOnlyPath<Point, Int>(keyPath: \.x, ancestors: ancestors)
-        XCTAssertEqual(newPath.keyPath, \Point.x)
-        XCTAssertEqual(newPath.ancestors, ancestors)
+    /// Test member initialiser.
+    func testAnyPathInit() {
+        let path = AnyPath(Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))]))
+        let error = AttributeError(message: message, path: path)
+        XCTAssertEqual(error.message, message)
+        XCTAssertEqual(error.path, path)
     }
 
-    /// Test init that points to a non-optional value.
-    func testNonOptionalInit() {
-        let keyPath = \Point.x
-        let path = ReadOnlyPath(keyPath: keyPath, ancestors: [AnyPath(Path(Point.self))])
-        XCTAssertEqual(path.keyPath, keyPath)
-        XCTAssertFalse(path.isNil(point))
-        XCTAssertEqual(path.ancestors, [AnyPath(Path(Point.self))])
+    /// Test init that uses ReadOnlyPath's.
+    func testReadPathInit() {
+        let path = ReadOnlyPath(keyPath: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let anyPath = AnyPath(path)
+        let error = AttributeError(message: message, path: path)
+        XCTAssertEqual(error.message, message)
+        XCTAssertEqual(error.path, anyPath)
+        XCTAssertEqual(anyPath.ancestors, [AnyPath(Path(Point.self))])
     }
 
-    /// Test init that is used for optional values.
-    func testOptionalInit() {
-        let keyPath = \OptionalPoint.x
-        let path = ReadOnlyPath(keyPath: keyPath, ancestors: [AnyPath(Path(OptionalPoint.self))])
-        XCTAssertTrue(path.isNil(optionalPoint))
-        XCTAssertEqual(path.keyPath, keyPath)
-        XCTAssertEqual(path.ancestors, [AnyPath(Path(OptionalPoint.self))])
+    /// Test init that uses Path's.
+    func testPathInit() {
+        let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let anyPath = AnyPath(path)
+        let error = AttributeError(message: message, path: path)
+        XCTAssertEqual(error.message, message)
+        XCTAssertEqual(error.path, anyPath)
+        XCTAssertEqual(anyPath.ancestors, [AnyPath(Path(Point.self))])
     }
 
-    /// Test type initialiser.
-    func testTypeInit() {
-        let keyPath = \Point.self
-        let path = ReadOnlyPath(Point.self)
-        XCTAssertEqual(path.keyPath, keyPath)
-        XCTAssertTrue(path.ancestors.isEmpty)
+    /// Test isError function that takes a Path.
+    func testErrorPath() {
+        let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let error = AttributeError(message: message, path: path)
+        XCTAssertTrue(error.isError(forPath: path))
     }
 
-    /// Test appending subscript.
-    func testAppendSubscript() {
-        let path = ReadOnlyPath(Point.self)
-        let newPath = path[dynamicMember: \.x]
-        let expected = ReadOnlyPath<Point, Int>(keyPath: \.x, ancestors: [AnyPath(path)])
-        XCTAssertEqual(newPath, expected)
+    /// Test isError function that takes an AnyPath.
+    func testErrorAnyPath() {
+        let path = AnyPath(Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))]))
+        let error = AttributeError(message: message, path: path)
+        XCTAssertTrue(error.isError(forPath: path))
     }
 
-    /// Test == operation.
-    func testEquality() {
-        let path = ReadOnlyPath(Point.self)
-        let newPath = ReadOnlyPath<Point, Int>(keyPath: \.x, ancestors: [AnyPath(path)])
-        let otherPath = ReadOnlyPath<Point, Int>(keyPath: \.x, ancestors: [AnyPath(path)])
-        XCTAssertEqual(newPath, otherPath)
+    /// Test isError function that takes a ReadOnlyPath.
+    func testErrorReadOnlyPath() {
+        let path = ReadOnlyPath(keyPath: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let error = AttributeError(message: message, path: path)
+        XCTAssertTrue(error.isError(forPath: path))
+    }
+
+    /// Test description.
+    func testDescription() {
+        let path = AnyPath(Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))]))
+        let error = AttributeError(message: message, path: path)
+        let expected = "\(path): \(message)"
+        XCTAssertEqual(error.description, expected)
     }
 
 }

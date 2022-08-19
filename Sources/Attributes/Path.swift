@@ -127,7 +127,7 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
 }
 
 /// Equality and Hashable conformance.
-extension ReadOnlyPath: Equatable, Hashable {
+extension ReadOnlyPath {
 
     /// Equality operation. This operation performs value-based equality by checking the ancestors and
     /// the keyPath.
@@ -254,7 +254,7 @@ public struct Path<Root, Value>: PathProtocol {
 }
 
 /// Equatable and Hashable conformance.
-extension Path: Equatable, Hashable {
+extension Path {
 
     /// Perform and equality operation by using value-equality. This function compares the ancestors
     /// and keyPaths of the Path objects.
