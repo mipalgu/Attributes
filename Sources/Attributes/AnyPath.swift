@@ -56,7 +56,7 @@
  *
  */
 
-/// A Path that points to a type-erased quantity.
+/// A Path that points to a type-erased quantity within some Root type.
 public struct AnyPath<Root> {
 
     /// Other paths that contain this root.
@@ -71,6 +71,8 @@ public struct AnyPath<Root> {
     /// The type of the value pointed to by this AnyPath.
     public let targetType: Any.Type
 
+    // swiftlint:disable identifier_name
+
     /// A function for retrieving the value pointed to by this AnyPath.
     let _value: (Root) -> Any
 
@@ -82,6 +84,18 @@ public struct AnyPath<Root> {
     /// as this AnyPath.
     let _isSame: (PartialKeyPath<Root>) -> Bool
 
+    // swiftlint:enable identifier_name
+
+    /// Initialise object from a PartialKeyPath.
+    /// - Parameters:
+    ///   - path: The path to initialise this AnyPath from.
+    ///   - ancestors: The ancestors of this path.
+    ///   - targetType: The type pointed to by this path.
+    ///   - isOptional: Whether the value pointed to by this path is optional.
+    ///   - isNil: A function that determins whether an object containing the value pointed
+    ///            to by this path contains a nil value at this paths location.
+    ///   - isSame: A function for determining whether a PartialKeyPath is the same as this
+    ///             AnyPath.
     private init(
         _ path: PartialKeyPath<Root>,
         ancestors: [AnyPath<Root>],
@@ -99,6 +113,13 @@ public struct AnyPath<Root> {
         self._isSame = isSame
     }
 
+    /// Initialise this AnyPath from a ReadOnlyPathProtocol instance.
+    /// - Parameters:
+    ///   - path: The path to convert to an AnyPath.
+    ///   - isOptional: Wether the value pointed to by this path is optional.
+    ///   - isNil: A function used to determine if the value pointed to by this path is nil.
+    ///   - isSame: A function used to determine whether a PartialKeyPath is equivalent to
+    ///             this AnyPath.
     private init<P: ReadOnlyPathProtocol>(
         _ path: P,
         isOptional: Bool,
@@ -115,10 +136,15 @@ public struct AnyPath<Root> {
         )
     }
 
+    /// Initialise this AnyPath from a ReadOnlyPath where the value pointed to by the path cannot be
+    /// optional.
+    /// - Parameter path: The path to convert to an AnyPath.
     public init<P: ReadOnlyPathProtocol>(_ path: P) where P.Root == Root {
         self.init(path, isOptional: false, isNil: { path.isNil($0) }, isSame: { $0 == path.keyPath })
     }
 
+    /// Initialise this AnyPath from a value that is optional.
+    /// - Parameter path: The path to a value that may be nil.
     public init<P: ReadOnlyPathProtocol, V>(optional path: P) where P.Root == Root, P.Value == V? {
         self.init(
             path,
@@ -142,14 +168,23 @@ public struct AnyPath<Root> {
         self.isParent(of: AnyPath(path))
     }
 
+    /// Evaluated whether this AnyPath contains another AnyPath as an ancestor.
+    /// - Parameter path: The path to check.
+    /// - Returns: Whether path is an ancestor of self.
     public func isChild(of path: AnyPath<Root>) -> Bool {
         self.isChild(of: path.partialKeyPath)
     }
 
+    /// Evaluated whether this AnyPath contains another PartialKeyPath as an ancestor.
+    /// - Parameter path: The path to check.
+    /// - Returns: Whether path is an ancestor of self.
     public func isChild(of path: PartialKeyPath<Root>) -> Bool {
-        nil != self.ancestors.first(where: { $0.isSame(as: path) })
+        nil != self.ancestors.first { $0.isSame(as: path) }
     }
 
+    /// Evaluated whether this AnyPath contains another ReadOnlyPathProtocol as an ancestor.
+    /// - Parameter path: The path to check.
+    /// - Returns: Whether path is an ancestor of self.
     public func isChild<Path: ReadOnlyPathProtocol>(of path: Path) -> Bool where Path.Root == Root {
         self.isChild(of: path.keyPath)
     }
@@ -168,6 +203,9 @@ public struct AnyPath<Root> {
         self._value(root)
     }
 
+    /// Check whether the value pointed to by this path is nil in a given object.
+    /// - Parameter root: The object that contains the value.
+    /// - Returns: Whether the value is nil in root.
     public func isNil(_ root: Root) -> Bool {
         self._isNil(root)
     }
@@ -193,6 +231,9 @@ public struct AnyPath<Root> {
         self._isSame(path.keyPath)
     }
 
+    /// Changes the root of this AnyPath to a suitable ancestor.
+    /// - Parameter path: A path where the value is equal to the Root of this AnyPath.
+    /// - Returns: A new AnyPath from the root of path to the value of this AnyPath.
     public func changeRoot<Prefix: ReadOnlyPathProtocol>(path: Prefix)
         -> AnyPath<Prefix.Root> where Prefix.Value == Root {
         guard let newPath = (path.keyPath as PartialKeyPath<Prefix.Root>).appending(
@@ -212,6 +253,10 @@ public struct AnyPath<Root> {
         )
     }
 
+    /// Appends a path to this path creating a new AnyPath. This method acts as a pure function creating
+    /// a new AnyPath in the process.
+    /// - Parameter path: The path to append to self.
+    /// - Returns: A new AnyPath with the path appended or nil if the operation was unsuccessful.
     public func appending<Value>(_ path: AnyPath<Value>) -> AnyPath<Root>? {
         guard
             let keyPath = self.partialKeyPath as? KeyPath<Root, Value>,
