@@ -126,12 +126,21 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
 
 }
 
-extension ReadOnlyPath {
+/// Equality and Hashable conformance.
+extension ReadOnlyPath: Equatable, Hashable {
 
-    public static func ==(lhs: ReadOnlyPath<Root, Value>, rhs: ReadOnlyPath<Root, Value>) -> Bool {
+    /// Equality operation. This operation performs value-based equality by checking the ancestors and
+    /// the keyPath.
+    /// - Parameters:
+    ///   - lhs: The ReadOnlyPath at the left-hand side of the == operator.
+    ///   - rhs: The ReadOnlyPath at the right-hand side of the == operator.
+    /// - Returns: Whether lhs is equal to rhs.
+    public static func == (lhs: ReadOnlyPath<Root, Value>, rhs: ReadOnlyPath<Root, Value>) -> Bool {
         lhs.ancestors == rhs.ancestors && lhs.keyPath == rhs.keyPath
     }
 
+    /// Define which properties are to be included in the hash for this object.
+    /// - Parameter hasher: The hasher that creates the hash value for this object.
     public func hash(into hasher: inout Hasher) {
         hasher.combine(self.ancestors)
         hasher.combine(self.keyPath)
