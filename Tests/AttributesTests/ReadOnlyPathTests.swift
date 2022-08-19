@@ -113,6 +113,12 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertEqual(newPath, expected)
     }
 
-
+    /// Test == operation.
+    func testEquality() {
+        let path = ReadOnlyPath(Point.self)
+        let newPath = ReadOnlyPath<Point, Int>(keyPath: \.x, ancestors: [AnyPath(path)])
+        let otherPath = ReadOnlyPath<Point, Int>(keyPath: \.x, ancestors: [AnyPath(path)])
+        XCTAssertEqual(newPath, otherPath)
+    }
 
 }
