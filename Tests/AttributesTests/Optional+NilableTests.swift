@@ -81,6 +81,7 @@ final class OptionalNilableTests: XCTestCase {
         XCTAssertEqual(val.wrappedValue, 5)
         val.wrappedValue = 10
         XCTAssertEqual(val.wrappedValue, 10)
+        XCTAssertEqual(val, 10)
     }
 
 }
