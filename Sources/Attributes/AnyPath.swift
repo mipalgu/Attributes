@@ -145,7 +145,7 @@ public struct AnyPath<Root> {
 
     /// Initialise this AnyPath from a value that is optional.
     /// - Parameter path: The path to a value that may be nil.
-    public init<P: ReadOnlyPathProtocol, V>(optional path: P) where P.Root == Root, P.Value == V? {
+    public init<P: ReadOnlyPathProtocol>(optional path: P) where P.Root == Root, P.Value: Nilable {
         self.init(
             path,
             isOptional: true,

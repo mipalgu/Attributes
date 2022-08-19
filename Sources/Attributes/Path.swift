@@ -94,8 +94,8 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
     /// - Parameters:
     ///   - keyPath: The keyPath to initialise this object from.
     ///   - ancestors: The ancestors of this keyPath.
-    public init<T>(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) where Value == T? {
-        self.init(keyPath: keyPath, ancestors: ancestors) { root in root[keyPath: keyPath] == nil }
+    public init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) where Value: Nilable {
+        self.init(keyPath: keyPath, ancestors: ancestors) { root in root[keyPath: keyPath].isNil }
     }
 
     /// Initialise this object from a type. This path will use this type as the value and Root.
@@ -191,10 +191,10 @@ public struct Path<Root, Value>: PathProtocol {
     /// - Parameters:
     ///   - path: The path this object is initialised from.
     ///   - ancestors: The ancestors of path.
-    public init<T>(
+    public init(
         path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>]
-    ) where Value == T? {
-        self.init(path: path, ancestors: ancestors) { root in root[keyPath: path] == nil }
+    ) where Value: Nilable {
+        self.init(path: path, ancestors: ancestors) { root in root[keyPath: path].isNil }
     }
 
     /// Initialise self from the type of Value. This initialiser sets value as the Root and
