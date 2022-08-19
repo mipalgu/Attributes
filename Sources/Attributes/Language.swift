@@ -56,12 +56,22 @@
  *
  */
 
+/// Enum containing supported languages by Attributes.
 public enum Language: String, Hashable, Codable {
 
+    /// The C Programming Language.
     case c
+
+    /// The C++ Programming Language.
     case cxx
+
+    /// The Swift Programming Language.
     case swift
+
+    /// The VHDL Hardware Description Language.
     case vhdl
+
+    /// Other languages.
     case other
 
 }
