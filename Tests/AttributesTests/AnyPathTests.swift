@@ -158,6 +158,7 @@ final class AnyPathTests: XCTestCase {
         XCTAssertFalse(anyPath.isSame(as: AnyPath(newPath)))
         XCTAssertFalse(anyPath.isSame(as: AnyPath(newPath).partialKeyPath))
         XCTAssertFalse(anyPath.isSame(as: newPath))
+        XCTAssertEqual(anyPath.ancestors, newPath.ancestors)
     }
 
     /// Test appending method.
@@ -178,6 +179,7 @@ final class AnyPathTests: XCTestCase {
         let path = AnyPath(Path(path: \Point.self, ancestors: []))
         let newRootPath = ReadOnlyPath(keyPath: \Line.point0, ancestors: [parent])
         let newPath = path.changeRoot(path: newRootPath)
+        XCTAssertEqual(newPath.ancestors, [parent])
         let line = Line(point0: point, point1: Point(x: 5, y: 6))
         XCTAssertEqual(path.value(point) as? Point, point)
         XCTAssertEqual(newPath.value(line) as? Point, point)

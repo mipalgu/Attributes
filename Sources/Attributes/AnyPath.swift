@@ -243,7 +243,7 @@ public struct AnyPath<Root> {
         }
         return AnyPath<Prefix.Root>(
             newPath,
-            ancestors: self.ancestors.map { $0.changeRoot(path: path) },
+            ancestors: path.ancestors + self.ancestors.map { $0.changeRoot(path: path) },
             targetType: targetType,
             isOptional: isOptional,
             isNil: { root in
