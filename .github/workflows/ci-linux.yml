@@ -3,6 +3,8 @@ name: Ubuntu 20.04 Swift CI
 on:
   push:
     branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
 
 jobs:
 
