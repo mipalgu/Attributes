@@ -56,4 +56,5 @@
  *
  */
 
+/// A Code type which is a String by default.
 public typealias Code = String

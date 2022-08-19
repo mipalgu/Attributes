@@ -1,4 +1,4 @@
-// OptionalPoint.swift 
+// ValidatorTests.swift 
 // Attributes 
 // 
 // Created by Morgan McColl.
@@ -54,19 +54,57 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Foundation
+@testable import Attributes
+import XCTest
 
-/// Helper struct for providing test data. This struct is used to test for optional data.
-/// The struct represents a point using a 2-dimensional cartesian coordinate system.
-struct OptionalPoint: Equatable, Identifiable {
+/// Test class for Validator.
+final class ValidatorTests: XCTestCase {
 
-    /// The id of this point.
-    let id = UUID()
+    /// Test path for validation.
+    let path = ReadOnlyPath(keyPath: \Point.x, ancestors: [])
 
-    /// The x-coordinate.
-    var x: Int?
+    /// Test point.
+    let point = Point(x: 3, y: 4)
 
-    /// The y-coordinate.
-    var y: Int?
+    /// Test path init.
+    func testPathInit() {
+        let validator = Validator(path: path)
+        XCTAssertEqual(validator.path, path)
+    }
+
+    /// Test init used validation function.
+    func testInitWithValidation() {
+        var timesCalled = 0
+        var pointPassed: Point?
+        var valuePassed: Int?
+        let validate: (Point, Int) throws -> Void = {
+            timesCalled += 1
+            pointPassed = $0
+            valuePassed = $1
+        }
+        let validator = Validator(path, _validate: validate)
+        XCTAssertEqual(validator.path, path)
+        let result: ()? = try? validator.performValidation(point)
+        XCTAssertNotNil(result)
+        XCTAssertEqual(timesCalled, 1)
+        XCTAssertEqual(pointPassed, point)
+        XCTAssertEqual(valuePassed, point.x)
+    }
+
+    /// Test validate method.
+    func testValidate() {
+        var timesCalled = 0
+        var validatorGiven: Validator<ReadOnlyPath<Point, Int>>?
+        let builder: (Validator<ReadOnlyPath<Point, Int>>) -> [AnyValidator<Point>] = {
+            timesCalled += 1
+            validatorGiven = $0
+            return [AnyValidator($0)]
+        }
+        let validator = Validator(path: path)
+        let result = validator.validate(builder: builder)
+        XCTAssertEqual(timesCalled, 1)
+        XCTAssertEqual(validatorGiven?.path, validator.path)
+        XCTAssertNotNil(try? result.performValidation(point))
+    }
 
 }

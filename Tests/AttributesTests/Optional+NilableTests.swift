@@ -1,4 +1,4 @@
-// OptionalPoint.swift 
+// Optional+NilableTests.swift 
 // Attributes 
 // 
 // Created by Morgan McColl.
@@ -54,19 +54,25 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Foundation
+@testable import Attributes
+import XCTest
 
-/// Helper struct for providing test data. This struct is used to test for optional data.
-/// The struct represents a point using a 2-dimensional cartesian coordinate system.
-struct OptionalPoint: Equatable, Identifiable {
+/// Test class for Nilable conformance to Optional.
+final class OptionalNilableTests: XCTestCase {
 
-    /// The id of this point.
-    let id = UUID()
+    /// A value under test.
+    let value: Int? = 5
 
-    /// The x-coordinate.
-    var x: Int?
+    /// Test isNil property.
+    func testIsNil() {
+        XCTAssertFalse(value.isNil)
+        let nilVal: Int? = nil
+        XCTAssertTrue(nilVal.isNil)
+    }
 
-    /// The y-coordinate.
-    var y: Int?
+    /// Test wrapped value.
+    func testWrappedValue() {
+        XCTAssertEqual(value.wrappedValue, 5)
+    }
 
 }

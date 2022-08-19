@@ -1,4 +1,4 @@
-// OptionalPoint.swift 
+// LabelTests.swift 
 // Attributes 
 // 
 // Created by Morgan McColl.
@@ -54,19 +54,16 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Foundation
+@testable import Attributes
+import XCTest
 
-/// Helper struct for providing test data. This struct is used to test for optional data.
-/// The struct represents a point using a 2-dimensional cartesian coordinate system.
-struct OptionalPoint: Equatable, Identifiable {
+/// Test class for Label.
+final class LabelTests: XCTestCase {
 
-    /// The id of this point.
-    let id = UUID()
-
-    /// The x-coordinate.
-    var x: Int?
-
-    /// The y-coordinate.
-    var y: Int?
+    /// Test pretty function.
+    func testPretty() {
+        let label: Label = "hello_world"
+        XCTAssertEqual(label.pretty, "Hello World")
+    }
 
 }

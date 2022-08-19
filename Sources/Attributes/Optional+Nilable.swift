@@ -56,28 +56,39 @@
  *
  */
 
+/// Provide helper properties for Optional types.
 public protocol Nilable {
 
+    /// Nilable types will wrap a value.
     associatedtype Wrapped
 
+    /// Whether the Nilable type contains a wrapped value.
     var isNil: Bool { get }
 
+    /// Getter property for the wrapped value.
     var wrappedValue: Wrapped { get set }
 
 }
 
+/// Nilable conformance.
 extension Optional: Nilable {
 
+    /// Check for nil.
     public var isNil: Bool {
-        return self == nil
+        self == nil
     }
 
+    // swiftlint:disable force_unwrapping
+
+    /// Force-unwrap an Optional-value.
     public var wrappedValue: Wrapped {
         get {
-            return self!
+            self!
         } set {
             self = .some(newValue)
         }
     }
+
+    // swiftlint:enable force_unwrapping
 
 }

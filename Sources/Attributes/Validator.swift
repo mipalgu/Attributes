@@ -56,29 +56,57 @@
  *
  */
 
+/// Container for storing validation functions for values specified with a Path.
 public struct Validator<P: ReadOnlyPathProtocol>: _PathValidator {
 
+    /// PathType is an instance of ReadOnlyPathProtocol.
     public typealias PathType = P
 
+    /// The path to the value this validator acts on.
     public let path: PathType
 
+    // swiftlint:disable identifier_name
+
+    /// The function that performs the validation.
     internal let _validate: (PathType.Root, PathType.Value) throws -> Void
 
+    // swiftlint:enable identifier_name
+
+    /// Initialise this object from a Path. The validation function does nothing in this
+    /// initialiser.
+    /// - Parameter path: The path to the value that is validated by this validator.
     public init(path: PathType) {
-        self.init(path) { (_, _) in }
+        self.init(path) { _, _ in }
     }
 
+    // swiftlint:disable identifier_name
+
+    /// Initialise this object with an additional validation function.
+    /// - Parameters:
+    ///   - path: The path to the value that this Validator validates.
+    ///   - _validate: The validation function which performs that validation on the value pointed to
+    ///                by path.
     internal init(_ path: PathType, _validate: @escaping (PathType.Root, PathType.Value) throws -> Void) {
         self.path = path
         self._validate = _validate
     }
 
+    // swiftlint:enable identifier_name
+
+    /// Perform the validation of a value contained within a Root object.
+    /// - Parameter root: The root object containing the value pointed to by path. This
+    ///                   function validates the value using an internal validation function.
     public func performValidation(_ root: PathType.Root) throws {
         _ = try self._validate(root, root[keyPath: self.path.keyPath])
     }
 
-    public func validate(@ValidatorBuilder<PathType.Root> builder: (Self) -> [AnyValidator<PathType.Root>]) -> AnyValidator<PathType.Root> {
-        return AnyValidator(builder(self))
+    /// Creates a type-erased version of this Validator by using a builder function.
+    /// - Parameter builder: The function which creates the validation rules from this validator.
+    /// - Returns: A type-erased validator which performs the same validation as this validator.
+    public func validate(
+        @ValidatorBuilder<PathType.Root> builder: (Self) -> [AnyValidator<PathType.Root>]
+    ) -> AnyValidator<PathType.Root> {
+        AnyValidator(builder(self))
     }
 
 }

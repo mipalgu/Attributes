@@ -68,24 +68,26 @@ final class AnyPathTests: XCTestCase {
 
     /// Test path init.
     func testPathInit() {
-        let keyPath = Path(path: \Point.x, ancestors: [])
+        let ancestors = [AnyPath(Path(Point.self))]
+        let keyPath = Path(path: \Point.x, ancestors: ancestors)
         let anyPath = AnyPath(keyPath)
         XCTAssertFalse(anyPath._isNil(point))
         XCTAssertEqual(anyPath.value(point) as? Int, point.x)
         XCTAssertFalse(anyPath.isOptional)
-        XCTAssertTrue(anyPath.ancestors.isEmpty)
+        XCTAssertEqual(anyPath.ancestors, ancestors)
         let partialPath = anyPath.partialKeyPath
         XCTAssertEqual(point[keyPath: partialPath] as? Int, point.x)
     }
 
     /// Test optional path init.
     func testOptionalPathInit() {
-        let keyPath = Path(path: \OptionalPoint.x, ancestors: [])
+        let ancestors = [AnyPath(Path(OptionalPoint.self))]
+        let keyPath = Path(path: \OptionalPoint.x, ancestors: ancestors)
         let anyPath = AnyPath(optional: keyPath)
         XCTAssertTrue(anyPath._isNil(optionalPoint))
         XCTAssertEqual(anyPath.value(optionalPoint) as? Int?, optionalPoint.x)
         XCTAssertTrue(anyPath.isOptional)
-        XCTAssertTrue(anyPath.ancestors.isEmpty)
+        XCTAssertEqual(anyPath.ancestors, ancestors)
         let partialPath = anyPath.partialKeyPath
         XCTAssertEqual(optionalPoint[keyPath: partialPath] as? Int, optionalPoint.x)
     }
@@ -99,19 +101,20 @@ final class AnyPathTests: XCTestCase {
         XCTAssertTrue(parent.isParent(of: AnyPath(readChild)))
         XCTAssertTrue(parent.isParent(of: child))
         XCTAssertTrue(parent.isParent(of: readChild))
-        let newParent = AnyPath(Path(path: \Point.y, ancestors: []))
+        let newParent = AnyPath(Path(path: \Point.y, ancestors: [parent]))
         XCTAssertFalse(newParent.isParent(of: child))
         XCTAssertFalse(newParent.isParent(of: readChild))
         XCTAssertFalse(newParent.isParent(of: AnyPath(child)))
         XCTAssertFalse(newParent.isParent(of: AnyPath(readChild)))
+        XCTAssertEqual(newParent.ancestors, [parent])
     }
 
     /// Test isChild functions.
     func testIsChild() {
         let parent = AnyPath(Path(path: \Point.self, ancestors: []))
         let readParent = ReadOnlyPath(keyPath: \Point.self, ancestors: [])
-        let newParent = AnyPath(Path(path: \Point.y, ancestors: []))
-        let newReadParent = ReadOnlyPath(keyPath: \Point.y, ancestors: [])
+        let newParent = AnyPath(Path(path: \Point.y, ancestors: [parent]))
+        let newReadParent = ReadOnlyPath(keyPath: \Point.y, ancestors: [parent])
         let child = Path<Point, Int>(path: \.x, ancestors: [parent])
         XCTAssertTrue(AnyPath(child).isChild(of: parent))
         XCTAssertTrue(AnyPath(child).isChild(of: readParent))
@@ -123,27 +126,35 @@ final class AnyPathTests: XCTestCase {
 
     /// Test value functions.
     func testValue() {
-        let path = AnyPath(Path(path: \Point.y, ancestors: []))
+        let parent = AnyPath(Path(Point.self))
+        let optionalParent = AnyPath(Path(OptionalPoint.self))
+        let path = AnyPath(Path(path: \Point.y, ancestors: [parent]))
         XCTAssertTrue(path.hasValue(point))
         XCTAssertEqual(path.value(point) as? Int, point.y)
-        let optionalPath = AnyPath(optional: ReadOnlyPath(keyPath: \OptionalPoint.x, ancestors: []))
+        let optionalPath = AnyPath(
+            optional: ReadOnlyPath(keyPath: \OptionalPoint.x, ancestors: [optionalParent])
+        )
         XCTAssertFalse(optionalPath.hasValue(optionalPoint))
     }
 
     /// Test isNil.
     func testIsNil() {
-        let optionalPath = AnyPath(optional: ReadOnlyPath(keyPath: \OptionalPoint.x, ancestors: []))
+        let optionalParent = AnyPath(Path(OptionalPoint.self))
+        let optionalPath = AnyPath(
+            optional: ReadOnlyPath(keyPath: \OptionalPoint.x, ancestors: [optionalParent])
+        )
         XCTAssertTrue(optionalPath.isNil(optionalPoint))
     }
 
     /// Test isSame functions.
     func testIsSame() {
-        let readPath = ReadOnlyPath(keyPath: \Point.y, ancestors: [])
+        let parent = AnyPath(Path(Point.self))
+        let readPath = ReadOnlyPath(keyPath: \Point.y, ancestors: [parent])
         let anyPath = AnyPath(readPath)
         XCTAssertTrue(anyPath.isSame(as: AnyPath(readPath)))
         XCTAssertTrue(anyPath.isSame(as: anyPath.partialKeyPath))
         XCTAssertTrue(anyPath.isSame(as: readPath))
-        let newPath = ReadOnlyPath(keyPath: \Point.x, ancestors: [])
+        let newPath = ReadOnlyPath(keyPath: \Point.x, ancestors: [parent])
         XCTAssertFalse(anyPath.isSame(as: AnyPath(newPath)))
         XCTAssertFalse(anyPath.isSame(as: AnyPath(newPath).partialKeyPath))
         XCTAssertFalse(anyPath.isSame(as: newPath))
@@ -152,7 +163,9 @@ final class AnyPathTests: XCTestCase {
     /// Test appending method.
     func testAppending() {
         let path = AnyPath(Path(path: \Point.self, ancestors: []))
-        let child = AnyPath(Path(path: \.x, ancestors: [AnyPath(Path(path: \Point.self, ancestors: []))]))
+        let child = AnyPath(
+            Path(path: \.x, ancestors: [AnyPath(Path(path: \Point.self, ancestors: []))])
+        )
         let newPath = path.appending(child)
         XCTAssertEqual(path.value(point) as? Point, point)
         XCTAssertEqual(newPath?.value(point) as? Int, point.x)
@@ -160,8 +173,9 @@ final class AnyPathTests: XCTestCase {
 
     /// Test changeRoot function.
     func testChangeRoot() {
+        let parent = AnyPath(Path(Line.self))
         let path = AnyPath(Path(path: \Point.self, ancestors: []))
-        let newRootPath = ReadOnlyPath(keyPath: \Line.point0, ancestors: [])
+        let newRootPath = ReadOnlyPath(keyPath: \Line.point0, ancestors: [parent])
         let newPath = path.changeRoot(path: newRootPath)
         let line = Line(point0: point, point1: Point(x: 5, y: 6))
         XCTAssertEqual(path.value(point) as? Point, point)

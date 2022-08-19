@@ -56,4 +56,5 @@
  *
  */
 
+/// Expression is a String by default.
 public typealias Expression = String
