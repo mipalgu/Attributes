@@ -56,39 +56,72 @@
  *
  */
 
+/// Path for pointing to members that are read-only.
 @dynamicMemberLookup
 public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
 
+    /// The ancestors of this path.
     public var ancestors: [AnyPath<Root>]
 
+    /// A keyPath equivalent type of this ReadOnlyPath.
     public var keyPath: KeyPath<Root, Value>
 
+    /// A function for discerning whether the value pointed to by this path is nil
+    /// for a given Root object.
     private let _isNil: (Root) -> Bool
 
+    /// Initialise this path from a keyPath and a custom isNil function for discerning whether
+    /// the value is nil
+    /// - Parameters:
+    ///   - keyPath: The keyPath to construct this path from.
+    ///   - ancestors: The ancestors of the keyPath.
+    ///   - isNil: An isNil function for checking for nil values.
     public init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>], isNil: @escaping (Root) -> Bool) {
         self.ancestors = ancestors.reversed().drop { $0.partialKeyPath == keyPath }.reversed()
         self.keyPath = keyPath
         self._isNil = { root in ancestors.last?.isNil(root) ?? false || isNil(root) }
     }
 
+    /// Initialise this path from a keyPath that does not point to an Optional value.
+    /// - Parameters:
+    ///   - keyPath: The keyPath that represents a values location within a Root.
+    ///   - ancestors: The ancestors of the keyPath.
     public init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) {
-        self.init(keyPath: keyPath, ancestors: ancestors, isNil: { _ in false })
+        self.init(keyPath: keyPath, ancestors: ancestors) { _ in false }
     }
 
-    public init<T>(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) where Value == Optional<T> {
-        self.init(keyPath: keyPath, ancestors: ancestors, isNil: { root in root[keyPath: keyPath] == nil })
+    /// Initialise this path from a keyPath that points to an Optional value.
+    /// - Parameters:
+    ///   - keyPath: The keyPath to initialise this object from.
+    ///   - ancestors: The ancestors of this keyPath.
+    public init<T>(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) where Value == T? {
+        self.init(keyPath: keyPath, ancestors: ancestors) { root in root[keyPath: keyPath] == nil }
     }
 
+    /// Initialise this object from a type. This path will use this type as the value and Root.
+    /// - Parameter type: The type to initialise this object from.
     public init(_ type: Value.Type) where Root == Value {
         self.init(keyPath: \.self, ancestors: [])
     }
 
-    public subscript<AppendedValue>(dynamicMember member: KeyPath<Value, AppendedValue>) -> ReadOnlyPath<Root, AppendedValue> {
-        return ReadOnlyPath<Root, AppendedValue>(keyPath: keyPath.appending(path: member), ancestors: fullPath)
+    /// Check whether the value pointed to by this path is nil in a given root object.
+    /// - Parameter root: The root that contains the value.
+    /// - Returns: Whether value is nil in root.
+    public func isNil(_ root: Root) -> Bool {
+        self._isNil(root)
     }
 
-    public func isNil(_ root: Root) -> Bool {
-        return self._isNil(root)
+    /// Append a path to this ReadOnlyPath. This operation is enacted as a pure
+    /// function without mutating the original path.
+    /// - Parameter dynamicMember: The path to append to this keyPath
+    /// - Returns: A new keypath with the original Root pointing to a new Value
+    ///            specified by dynamicMember. 
+    public subscript<AppendedValue>(
+        dynamicMember member: KeyPath<Value, AppendedValue>
+    ) -> ReadOnlyPath<Root, AppendedValue> {
+        ReadOnlyPath<Root, AppendedValue>(
+            keyPath: keyPath.appending(path: member), ancestors: fullPath
+        )
     }
 
 }
@@ -96,7 +129,7 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
 extension ReadOnlyPath {
 
     public static func ==(lhs: ReadOnlyPath<Root, Value>, rhs: ReadOnlyPath<Root, Value>) -> Bool {
-        return lhs.ancestors == rhs.ancestors && lhs.keyPath == rhs.keyPath
+        lhs.ancestors == rhs.ancestors && lhs.keyPath == rhs.keyPath
     }
 
     public func hash(into hasher: inout Hasher) {
