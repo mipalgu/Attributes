@@ -69,7 +69,7 @@ public protocol Nilable {
 extension Optional: Nilable {
 
     public var isNil: Bool {
-        return self == nil
+        self == nil
     }
 
     public var wrappedValue: Wrapped {

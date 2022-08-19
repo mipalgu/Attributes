@@ -308,7 +308,7 @@ extension AnyPath: CustomStringConvertible {
     /// A string describing the instance of AnyPath.
     public var description: String {
         (self.ancestors.map { String(describing: $0.partialKeyPath) } +
-            [String(describing: self.partialKeyPath)]).joined(separator: ", ")
+            [String(describing: self.partialKeyPath)]).joined(separator: " -> ")
     }
 
 }

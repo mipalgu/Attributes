@@ -120,21 +120,25 @@ final class PathTests: XCTestCase {
     /// Test appending methods and subscript operations.
     func testAppending() {
         let path = Path(Point.self)
-        // let keyPath: KeyPath<Point, Int> = \.x
+        let keyPath: KeyPath<Point, Int> = \.x
         let writePath: WritableKeyPath<Point, Int> = \.x
         let appendPath = Path(path: writePath, ancestors: [])
-        let expected = Path(path: \Point.self.x, ancestors: [])
-        // XCTAssertEqual(expected, path[dynamicMember: keyPath])
+        let expected = Path(path: \Point.self.x, ancestors: [AnyPath(path)])
+        XCTAssertEqual(expected.readOnly, path[dynamicMember: keyPath])
         XCTAssertEqual(expected, path[dynamicMember: writePath])
         XCTAssertEqual(expected, path.appending(path: appendPath))
     }
 
     /// Test changeRoot method.
     func testChangeRoot() {
-        let path = Path(path: \Point.x, ancestors: [])
-        let linePath = Path(path: \Line.point0, ancestors: [])
+        let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let linePath = Path(path: \Line.point0, ancestors: [AnyPath(Path(Line.self))])
         let newPath = path.changeRoot(path: linePath)
-        XCTAssertEqual(newPath, Path(path: \Line.point0.x, ancestors: []))
+        let expected = Path(path: \Line.point0.x, ancestors: [
+            AnyPath(Path(Line.self)),
+            AnyPath(Path(path: \Line.point0, ancestors: [AnyPath(Path(Line.self))]))
+        ])
+        XCTAssertEqual(newPath, expected)
     }
 
     /// Test == operator.

@@ -218,7 +218,7 @@ public struct Path<Root, Value>: PathProtocol {
     public func changeRoot<Prefix: PathProtocol>(
         path: Prefix
     ) -> Path<Prefix.Root, Value> where Prefix.Value == Root {
-        let ancestors = path.ancestors + self.ancestors.map {
+        let ancestors = path.fullPath + self.ancestors.dropFirst().map {
             $0.changeRoot(path: path.readOnly)
         }
         return Path<Prefix.Root, Value>(path: path.path.appending(path: self.path), ancestors: ancestors)
