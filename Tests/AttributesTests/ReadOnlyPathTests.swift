@@ -78,6 +78,11 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertEqual(pointCalled, optionalPoint)
         XCTAssertEqual(keyPath, path.keyPath)
         XCTAssertTrue(path.ancestors.isEmpty)
+        let typePath = ReadOnlyPath(Point.self)
+        let ancestors = [AnyPath(typePath)]
+        let newPath = ReadOnlyPath<Point, Int>(keyPath: \.x, ancestors: ancestors)
+        XCTAssertEqual(newPath.keyPath, \Point.x)
+        XCTAssertEqual(newPath.ancestors, ancestors)
     }
 
     /// Test init that points to a non-optional value.
