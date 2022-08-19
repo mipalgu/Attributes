@@ -96,6 +96,8 @@ final class AttributeErrorTests: XCTestCase {
         let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
         let error = AttributeError(message: message, path: path)
         XCTAssertTrue(error.isError(forPath: path))
+        XCTAssertTrue(error.isError(forPath: Path(Point.self)))
+        XCTAssertFalse(error.isError(forPath: Path(path: \Point.y, ancestors: [AnyPath(Path(Point.self))])))
     }
 
     /// Test isError function that takes an AnyPath.
@@ -103,6 +105,10 @@ final class AttributeErrorTests: XCTestCase {
         let path = AnyPath(Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))]))
         let error = AttributeError(message: message, path: path)
         XCTAssertTrue(error.isError(forPath: path))
+        XCTAssertTrue(error.isError(forPath: AnyPath(Path(Point.self))))
+        XCTAssertFalse(
+            error.isError(forPath: AnyPath(Path(path: \Point.y, ancestors: [AnyPath(Path(Point.self))])))
+        )
     }
 
     /// Test isError function that takes a ReadOnlyPath.
@@ -110,6 +116,51 @@ final class AttributeErrorTests: XCTestCase {
         let path = ReadOnlyPath(keyPath: \Point.x, ancestors: [AnyPath(Path(Point.self))])
         let error = AttributeError(message: message, path: path)
         XCTAssertTrue(error.isError(forPath: path))
+        XCTAssertTrue(error.isError(forPath: ReadOnlyPath(Point.self)))
+        XCTAssertFalse(
+            error.isError(
+                forPath: ReadOnlyPath(keyPath: \Point.y, ancestors: [AnyPath(ReadOnlyPath(Point.self))])
+            )
+        )
+    }
+
+    /// Test isError function that takes a Path.
+    func testErrorParentPath() {
+        let path = Path(path: \Point.self, ancestors: [])
+        let error = AttributeError(message: message, path: path)
+        XCTAssertTrue(error.isError(forPath: path))
+        XCTAssertFalse(error.isError(forPath: Path(path: \Point.y, ancestors: [AnyPath(Path(Point.self))])))
+        XCTAssertFalse(error.isError(forPath: Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])))
+    }
+
+    /// Test isError function that takes an AnyPath.
+    func testErrorParentAnyPath() {
+        let path = AnyPath(Path(path: \Point.self, ancestors: []))
+        let error = AttributeError(message: message, path: path)
+        XCTAssertTrue(error.isError(forPath: path))
+        XCTAssertFalse(
+            error.isError(forPath: AnyPath(Path(path: \Point.y, ancestors: [AnyPath(Path(Point.self))])))
+        )
+        XCTAssertFalse(
+            error.isError(forPath: AnyPath(Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])))
+        )
+    }
+
+    /// Test isError function that takes a ReadOnlyPath.
+    func testErrorParentReadOnlyPath() {
+        let path = ReadOnlyPath(keyPath: \Point.self, ancestors: [])
+        let error = AttributeError(message: message, path: path)
+        XCTAssertTrue(error.isError(forPath: path))
+        XCTAssertFalse(
+            error.isError(
+                forPath: ReadOnlyPath(keyPath: \Point.y, ancestors: [AnyPath(ReadOnlyPath(Point.self))])
+            )
+        )
+        XCTAssertFalse(
+            error.isError(
+                forPath: ReadOnlyPath(keyPath: \Point.x, ancestors: [AnyPath(ReadOnlyPath(Point.self))])
+            )
+        )
     }
 
     /// Test description.
