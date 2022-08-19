@@ -77,8 +77,10 @@ public struct Validator<P: ReadOnlyPathProtocol>: _PathValidator {
         _ = try self._validate(root, root[keyPath: self.path.keyPath])
     }
 
-    public func validate(@ValidatorBuilder<PathType.Root> builder: (Self) -> [AnyValidator<PathType.Root>]) -> AnyValidator<PathType.Root> {
-        return AnyValidator(builder(self))
+    public func validate(
+        @ValidatorBuilder<PathType.Root> builder: (Self) -> [AnyValidator<PathType.Root>]
+    ) -> AnyValidator<PathType.Root> {
+        AnyValidator(builder(self))
     }
 
 }
