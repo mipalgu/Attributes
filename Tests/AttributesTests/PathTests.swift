@@ -108,6 +108,7 @@ final class PathTests: XCTestCase {
         let keyPath = \Point.self
         let path = Path(Point.self)
         XCTAssertEqual(path.keyPath, keyPath)
+        XCTAssertTrue(path.ancestors.isEmpty)
     }
 
     /// Test readOnly property.
@@ -115,6 +116,7 @@ final class PathTests: XCTestCase {
         let readPath = ReadOnlyPath(Point.self)
         let path = Path(Point.self)
         XCTAssertEqual(path.readOnly, readPath)
+        XCTAssertTrue(path.readOnly.ancestors.isEmpty)
     }
 
     /// Test appending methods and subscript operations.
