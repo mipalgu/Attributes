@@ -2,9 +2,9 @@ name: Windows Latest Swift CI
 
 on:
   push:
-    branches: [development, main]
+    branches: [develop, main]
   pull_request:
-    branches: [development, main]
+    branches: [develop, main]
 
 jobs:
 
