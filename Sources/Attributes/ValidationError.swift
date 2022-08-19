@@ -56,4 +56,5 @@
  *
  */
 
+/// ValidationError is an error that occurs when validating.
 public typealias ValidationError<Root> = AttributeError<Root>
