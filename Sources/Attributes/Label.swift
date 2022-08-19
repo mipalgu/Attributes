@@ -58,10 +58,13 @@
 
 import Foundation
 
+/// Label is a String by default.
 public typealias Label = String
 
+/// Add extra functions to Label.
 extension Label {
 
+    /// Make the `pretty` version of Label.
     public var pretty: String {
         let str = self.replacingOccurrences(of: "_", with: " ")
         let words = str.components(separatedBy: " ")
@@ -70,7 +73,8 @@ extension Label {
                 return ""
             }
             return first.uppercased() + String($0.dropFirst())
-        }.joined(separator: " ")
+        }
+        .joined(separator: " ")
     }
 
 }
