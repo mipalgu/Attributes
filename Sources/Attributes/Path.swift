@@ -278,6 +278,11 @@ extension Path: Equatable, Hashable {
 /// Add validate function to Path.
 extension Path {
 
+    /// Creates a type-erased validator that performs a validation on the value pointed to by
+    /// this path.
+    /// - Parameter builder: A function that creates the type-erased validator.
+    /// - Returns: A type-erased validator which performs a validation function on a value pointed
+    ///            to by self.
     public func validate(
         @ValidatorBuilder<Root> builder: (
             ValidationPath<Path<Root, Value>>
@@ -291,6 +296,10 @@ extension Path {
 /// Add trigger function to Path.
 extension Path {
 
+    /// Creates a trigger that is enacted when self is changed.
+    /// - Parameter builder: A function that creates the trigger.
+    /// - Returns: A type-erased trigger that performs an action when the value
+    ///            pointed to by self is changed.
     public func trigger(
         @TriggerBuilder<Root> builder: (
             WhenChanged<Path<Root, Value>, IdentityTrigger<Root>>
