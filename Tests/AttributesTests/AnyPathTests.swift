@@ -149,4 +149,23 @@ final class AnyPathTests: XCTestCase {
         XCTAssertFalse(anyPath.isSame(as: newPath))
     }
 
+    /// Test appending method.
+    func testAppending() {
+        let path = AnyPath(Path(path: \Point.self, ancestors: []))
+        let child = AnyPath(Path(path: \.x, ancestors: [AnyPath(Path(path: \Point.self, ancestors: []))]))
+        let newPath = path.appending(child)
+        XCTAssertEqual(path.value(point) as? Point, point)
+        XCTAssertEqual(newPath?.value(point) as? Int, point.x)
+    }
+
+    /// Test changeRoot function.
+    func testChangeRoot() {
+        let path = AnyPath(Path(path: \Point.self, ancestors: []))
+        let newRootPath = ReadOnlyPath(keyPath: \Line.point0, ancestors: [])
+        let newPath = path.changeRoot(path: newRootPath)
+        let line = Line(point0: point, point1: Point(x: 5, y: 6))
+        XCTAssertEqual(path.value(point) as? Point, point)
+        XCTAssertEqual(newPath.value(line) as? Point, point)
+    }
+
 }
