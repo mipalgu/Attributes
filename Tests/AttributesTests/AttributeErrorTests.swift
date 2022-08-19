@@ -57,10 +57,67 @@
 @testable import Attributes
 import XCTest
 
+/// Test class for AttributeError.
 final class AttributeErrorTests: XCTestCase {
 
+    /// Test message.
     let message = "Error!"
 
-    let path = AnyPath(Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))]))
+    /// Test member initialiser.
+    func testAnyPathInit() {
+        let path = AnyPath(Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))]))
+        let error = AttributeError(message: message, path: path)
+        XCTAssertEqual(error.message, message)
+        XCTAssertEqual(error.path, path)
+    }
+
+    /// Test init that uses ReadOnlyPath's.
+    func testReadPathInit() {
+        let path = ReadOnlyPath(keyPath: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let anyPath = AnyPath(path)
+        let error = AttributeError(message: message, path: path)
+        XCTAssertEqual(error.message, message)
+        XCTAssertEqual(error.path, anyPath)
+        XCTAssertEqual(anyPath.ancestors, [AnyPath(Path(Point.self))])
+    }
+
+    /// Test init that uses Path's.
+    func testPathInit() {
+        let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let anyPath = AnyPath(path)
+        let error = AttributeError(message: message, path: path)
+        XCTAssertEqual(error.message, message)
+        XCTAssertEqual(error.path, anyPath)
+        XCTAssertEqual(anyPath.ancestors, [AnyPath(Path(Point.self))])
+    }
+
+    /// Test isError function that takes a Path.
+    func testErrorPath() {
+        let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let error = AttributeError(message: message, path: path)
+        XCTAssertTrue(error.isError(forPath: path))
+    }
+
+    /// Test isError function that takes an AnyPath.
+    func testErrorAnyPath() {
+        let path = AnyPath(Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))]))
+        let error = AttributeError(message: message, path: path)
+        XCTAssertTrue(error.isError(forPath: path))
+    }
+
+    /// Test isError function that takes a ReadOnlyPath.
+    func testErrorReadOnlyPath() {
+        let path = ReadOnlyPath(keyPath: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let error = AttributeError(message: message, path: path)
+        XCTAssertTrue(error.isError(forPath: path))
+    }
+
+    /// Test description.
+    func testDescription() {
+        let path = AnyPath(Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))]))
+        let error = AttributeError(message: message, path: path)
+        let expected = "\(path): \(message)"
+        XCTAssertEqual(error.description, expected)
+    }
 
 }
