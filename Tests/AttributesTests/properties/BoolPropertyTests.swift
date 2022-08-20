@@ -88,9 +88,22 @@ final class BoolPropertyTests: XCTestCase, PropertyTestable {
         let property = BoolProperty(label: label, validation: builder)
         XCTAssertEqual(property.wrappedValue, schema)
         XCTAssertEqual(property.projectedValue.wrappedValue, schema)
-        let property2 = BoolProperty(wrappedValue: schema)
-        XCTAssertEqual(property2.wrappedValue, schema)
-        XCTAssertEqual(property2.projectedValue.wrappedValue, schema)
+    }
+
+    /// Test init without builder.
+    func testInitWithoutBuilder() {
+        let property = BoolProperty(label: label)
+        XCTAssertEqual(property.wrappedValue.label, schema.label)
+        XCTAssertEqual(property.wrappedValue.type, schema.type)
+        XCTAssertEqual(property.projectedValue.wrappedValue.label, schema.label)
+        XCTAssertEqual(property.projectedValue.wrappedValue.type, schema.type)
+    }
+
+    /// Test init from wrapped value.
+    func testWrappedValueInit() {
+        let property = BoolProperty(wrappedValue: schema)
+        XCTAssertEqual(property.wrappedValue, schema)
+        XCTAssertEqual(property.projectedValue.wrappedValue, schema)
     }
 
 }

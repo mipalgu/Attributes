@@ -88,9 +88,22 @@ final class CodePropertyTests: XCTestCase, PropertyTestable {
         let property = CodeProperty(label: label, language: .c, validation: builder)
         XCTAssertEqual(property.wrappedValue, schema)
         XCTAssertEqual(property.projectedValue.wrappedValue, schema)
-        let property2 = CodeProperty(wrappedValue: schema)
-        XCTAssertEqual(property2.wrappedValue, schema)
-        XCTAssertEqual(property2.projectedValue.wrappedValue, schema)
+    }
+
+    /// Test init without builder.
+    func testInitWithoutBuilder() {
+        let property = CodeProperty(label: label, language: .c)
+        XCTAssertEqual(property.wrappedValue.label, schema.label)
+        XCTAssertEqual(property.wrappedValue.type, schema.type)
+        XCTAssertEqual(property.projectedValue.wrappedValue.label, schema.label)
+        XCTAssertEqual(property.projectedValue.wrappedValue.type, schema.type)
+    }
+
+    /// Test init from wrapped value.
+    func testWrappedValueInit() {
+        let property = CodeProperty(wrappedValue: schema)
+        XCTAssertEqual(property.wrappedValue, schema)
+        XCTAssertEqual(property.projectedValue.wrappedValue, schema)
     }
 
 }
