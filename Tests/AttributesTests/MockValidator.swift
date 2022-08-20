@@ -84,7 +84,7 @@ struct MockValidator<P: ReadOnlyPathProtocol>: PathValidator, Equatable {
     }
 
     /// Not implemented.
-    func push(_ f: @escaping (P.Root, P.Value) throws -> Void) -> IdentifiableValidator<P> {
+    func push(_ f: @escaping (P.Root, P.Value) throws -> Void) -> MockValidator<P> {
         fatalError("Not implemented")
     }
 
