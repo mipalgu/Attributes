@@ -56,7 +56,7 @@
 
 /// A struct used for creating test data. This struct represents a line
 /// between 2 points in a cartesian coordinate system.
-struct Line: Equatable {
+struct Line: Equatable, Hashable {
 
     /// The base point. This is where the line begins.
     var point0: Point
