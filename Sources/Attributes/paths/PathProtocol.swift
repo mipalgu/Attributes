@@ -56,52 +56,82 @@
  *
  */
 
+/// Path to a value that can only be read and never mutated.
 public protocol ReadOnlyPathProtocol: Hashable {
 
+    /// The Root type containing the value.
     associatedtype Root
+
+    /// The type of the value.
     associatedtype Value
 
+    /// An array to all members starting at root and finishing just before the value.
     var ancestors: [AnyPath<Root>] { get }
 
+    /// A KeyPath equivalent type of this path.
     var keyPath: KeyPath<Root, Value> { get }
 
+    /// Determines if the value pointed to by this path is nil inside a given object.
+    /// - Parameter root: The object containing the value.
+    /// - Returns: Whether the value in root is nil.
     func isNil(_ root: Root) -> Bool
 
 }
 
+/// fullPath computed property.
 extension ReadOnlyPathProtocol {
 
+    /// An array of all paths between the root object and the value
+    /// pointed to by this path inclusive.
     public var fullPath: [AnyPath<Root>] {
-        return self.ancestors + [AnyPath(self)]
+        self.ancestors + [AnyPath(self)]
     }
 
 }
 
+/// Path to a value that can only be read and written to.
 public protocol PathProtocol: ReadOnlyPathProtocol {
 
+    /// The Root type containing the value.
     associatedtype Root
+
+    /// The type of the value.
     associatedtype Value
 
+    /// A read-only equivalent type of this path.
     var readOnly: ReadOnlyPath<Root, Value> { get }
 
+    /// An equivalent WriteableKeyPath of this type.
     var path: WritableKeyPath<Root, Value> { get }
 
+    /// Creates a new Path that points to the same value but with a different root.
+    /// - Parameter path: A path pointing from the new Root to this paths Root. This path
+    ///                   is prepended to self.
+    /// - Returns:  The new path containing the new Root but pointing to the same value.
     func changeRoot<Prefix: PathProtocol>(path: Prefix) -> Path<Prefix.Root, Value> where Prefix.Value == Root
 
 }
 
+/// KeyPath computed property.
 extension PathProtocol {
 
+    /// Creates an equivalent KeyPath of this path.
     public var keyPath: KeyPath<Root, Value> {
-        return self.path as KeyPath<Root, Value>
+        self.path as KeyPath<Root, Value>
     }
 
 }
 
+/// Equality conformance.
 extension PathProtocol {
 
+    /// Checks whether 2 Paths are the same.
+    /// - Parameters:
+    ///   - lhs: The Path on the left-hand side of the == operator.
+    ///   - rhs: The Path on the right-hand side of the == operator.
+    /// - Returns: Whether lhs is equal to rhs,
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.path == rhs.path
+        lhs.path == rhs.path
     }
 
 }
