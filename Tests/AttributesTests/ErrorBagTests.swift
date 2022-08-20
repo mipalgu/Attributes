@@ -155,6 +155,90 @@ final class ErrorBagTests: XCTestCase {
         XCTAssertEqual(Set(pathErrors), Set(expected))
     }
 
+    /// Test remove for Path.
+    func testRemoveForPath() {
+        let path = Path(Point.self)
+        errors.forEach {
+            bag.insert($0)
+        }
+        XCTAssertEqual(Set(bag.allErrors), Set(errors))
+        XCTAssertEqual(bag.allErrors.count, errors.count)
+        bag.remove(forPath: path)
+        let expected = xErrors + yErrors
+        XCTAssertEqual(expected.count, bag.allErrors.count)
+        XCTAssertEqual(Set(expected), Set(bag.allErrors))
+    }
+
+    /// Test remove for AnyPath.
+    func testRemoveForAnyPath() {
+        let path = AnyPath(Path(Point.self))
+        errors.forEach {
+            bag.insert($0)
+        }
+        XCTAssertEqual(Set(bag.allErrors), Set(errors))
+        XCTAssertEqual(bag.allErrors.count, errors.count)
+        bag.remove(forPath: path)
+        let expected = xErrors + yErrors
+        XCTAssertEqual(expected.count, bag.allErrors.count)
+        XCTAssertEqual(Set(expected), Set(bag.allErrors))
+    }
+
+    /// Test remove for ReadOnlyPath.
+    func testRemoveForReadOnlyPath() {
+        let path = Path(Point.self).readOnly
+        errors.forEach {
+            bag.insert($0)
+        }
+        XCTAssertEqual(Set(bag.allErrors), Set(errors))
+        XCTAssertEqual(bag.allErrors.count, errors.count)
+        bag.remove(forPath: path)
+        let expected = xErrors + yErrors
+        XCTAssertEqual(expected.count, bag.allErrors.count)
+        XCTAssertEqual(Set(expected), Set(bag.allErrors))
+    }
+
+    /// Test remove including dependencies for Path.
+    func testRemoveIncludingDependenciesForPath() {
+        let path = Path(Point.self)
+        errors.forEach {
+            bag.insert($0)
+        }
+        XCTAssertEqual(Set(bag.allErrors), Set(errors))
+        XCTAssertEqual(bag.allErrors.count, errors.count)
+        bag.remove(includingDescendantsForPath: path)
+        let expected: [AttributeError<Point>] = []
+        XCTAssertEqual(expected.count, bag.allErrors.count)
+        XCTAssertEqual(Set(expected), Set(bag.allErrors))
+    }
+
+    /// Test remove including dependencies for AnyPath.
+    func testRemoveIncludingDependenciesForAnyPath() {
+        let path = AnyPath(Path(Point.self))
+        errors.forEach {
+            bag.insert($0)
+        }
+        XCTAssertEqual(Set(bag.allErrors), Set(errors))
+        XCTAssertEqual(bag.allErrors.count, errors.count)
+        bag.remove(includingDescendantsForPath: path)
+        let expected: [AttributeError<Point>] = []
+        XCTAssertEqual(expected.count, bag.allErrors.count)
+        XCTAssertEqual(Set(expected), Set(bag.allErrors))
+    }
+
+    /// Test remove including dependencies for ReadOnlyPath.
+    func testRemoveIncludingDependenciesForReadOnlyPath() {
+        let path = Path(Point.self).readOnly
+        errors.forEach {
+            bag.insert($0)
+        }
+        XCTAssertEqual(Set(bag.allErrors), Set(errors))
+        XCTAssertEqual(bag.allErrors.count, errors.count)
+        bag.remove(includingDescendantsForPath: path)
+        let expected: [AttributeError<Point>] = []
+        XCTAssertEqual(expected.count, bag.allErrors.count)
+        XCTAssertEqual(Set(expected), Set(bag.allErrors))
+    }
+
 }
 
 /// Equatable and Hashable conformance for AttributeError.
