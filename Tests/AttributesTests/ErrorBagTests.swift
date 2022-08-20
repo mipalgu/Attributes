@@ -133,6 +133,16 @@ final class ErrorBagTests: XCTestCase {
         XCTAssertEqual(Set(pathErrors), Set(expected))
     }
 
+    // func testErrorForPathWithAttributes() {
+    //     let parentPath = AnyPath(Path(TestParent.self))
+    //     let containerPath = AnyPath(Path(path: \TestParent.container, ancestors: [parentPath]))
+    //     let linePath = AnyPath(Path(path: \TestParent.container.line, ancestors: [parentPath, containerPath]))
+    //     var bag = ErrorBag<TestParent>()
+    //     bag.insert(AttributeError(message: "Error0", path: parentPath))
+    //     bag.insert(AttributeError(message: "Error1", path: containerPath))
+    //     bag.insert(AttributeError(message: "Error2", path: linePath))
+    // }
+
     /// Test retrieve errors including descendents for the path.
     func testErrorIncludingDescendents() {
         let path = Path(Point.self)
@@ -253,6 +263,22 @@ final class ErrorBagTests: XCTestCase {
         let expected = [AttributeError(message: "Errror0", path: linePath)]
         XCTAssertEqual(bag.allErrors, expected)
     }
+
+}
+
+/// Helper struct for testing Attribute data.
+private struct AttributeTestContainer: Equatable, Hashable {
+
+    /// A line attribute.
+    var line: LineAttribute
+
+}
+
+/// A parent struct for testing ErrorBag.
+private struct TestParent: Equatable, Hashable {
+
+    /// A container property.
+    var container: BlockAttribute
 
 }
 
