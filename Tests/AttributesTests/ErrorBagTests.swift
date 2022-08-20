@@ -135,7 +135,7 @@ final class ErrorBagTests: XCTestCase {
 
     /// Test retrieve errors including descendents for the path.
     func testErrorIncludingDescendents() {
-        let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let path = Path(Point.self)
         let anyPath = AnyPath(path)
         let readOnlyPath = path.readOnly
         errors.forEach {
@@ -150,7 +150,7 @@ final class ErrorBagTests: XCTestCase {
         XCTAssertEqual(pathErrors.count, readOnlyErrors.count)
         XCTAssertEqual(Set(pathErrors), Set(anyPathErrors))
         XCTAssertEqual(Set(pathErrors), Set(readOnlyErrors))
-        let expected = xErrors + pointErrors
+        let expected = errors
         XCTAssertEqual(pathErrors.count, expected.count)
         XCTAssertEqual(Set(pathErrors), Set(expected))
     }
