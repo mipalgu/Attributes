@@ -58,8 +58,13 @@
 
 import Foundation
 
+/// Add move function.
 extension Array {
 
+    /// Move the values located at a set of indeces to a new index collectively.
+    /// - Parameters:
+    ///   - source: The indexes containing the elements to be moved.
+    ///   - destination: The starting index of the new elements.
     public mutating func move(fromOffsets source: IndexSet, toOffset destination: Int) {
         let original = self
         let descending = source.sorted(by: >)
