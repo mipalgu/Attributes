@@ -88,9 +88,17 @@ struct MockValidator<P: ReadOnlyPathProtocol>: PathValidator, Equatable {
         fatalError("Not implemented")
     }
 
-    /// Not implemented.
+    /// Throw Id.
     func performValidation(_ root: P.Root) throws {
-        fatalError("Not implemented")
+        throw MockError.id(id: id)
     }
+
+}
+
+/// Error containing the ID of the Mock.
+enum MockError: Error {
+
+    /// The ID of this Mock.
+    case id(id: UUID)
 
 }
