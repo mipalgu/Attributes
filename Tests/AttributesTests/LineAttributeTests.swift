@@ -137,4 +137,15 @@ final class LineAttributeTests: XCTestCase {
         XCTAssertEqual(LineAttribute.line("test").xmiName, "LineAttribute")
     }
 
+    /// Test for persistent and unique ID.
+    func testIDIsUnique() {
+        var ids: Set<Int> = []
+        attributes.forEach {
+            let id = $0.id
+            XCTAssertFalse(ids.contains(id))
+            ids.insert(id)
+            XCTAssertEqual($0.id, id)
+        }
+    }
+
 }
