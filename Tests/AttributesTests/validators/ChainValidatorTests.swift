@@ -148,8 +148,19 @@ final class ChainValidatorTests: XCTestCase {
                 XCTFail("Failed to cast error to correct type.")
                 return
             }
+            let linePath = AnyPath(Path(OptionalLine.self))
+            let pointPath = AnyPath(Path(path: \OptionalLine.point0, ancestors: [linePath]))
+            let wrappedPath = AnyPath(
+                Path(path: \OptionalLine.point0.wrappedValue, ancestors: [linePath, pointPath])
+            )
+            let fullPath = AnyPath(
+                Path(
+                    path: \OptionalLine.point0.wrappedValue.x,
+                    ancestors: [linePath, pointPath, wrappedPath]
+                )
+            )
             XCTAssertEqual(error.message, "Required")
-            XCTAssertEqual(error.path, AnyPath(chainPath))
+            XCTAssertEqual(error.path, fullPath)
         }
     }
 
