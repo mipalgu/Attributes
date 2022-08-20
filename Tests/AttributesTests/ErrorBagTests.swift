@@ -130,6 +130,26 @@ final class ErrorBagTests: XCTestCase {
         XCTAssertEqual(Set(pathErrors), Set(expected))
     }
 
+    /// Test retrieve errors including descendents for the path.
+    func testErrorIncludingDescendents() {
+        let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let anyPath = AnyPath(path)
+        let readOnlyPath = path.readOnly
+        errors.forEach {
+            bag.insert($0)
+        }
+        XCTAssertEqual(Set(bag.allErrors), Set(errors))
+        XCTAssertEqual(bag.allErrors.count, errors.count)
+        let pathErrors = bag.errors(includingDescendantsForPath: path)
+        let anyPathErrors = bag.errors(includingDescendantsForPath: anyPath)
+        let readOnlyErrors = bag.errors(includingDescendantsForPath: readOnlyPath)
+        XCTAssertEqual(pathErrors.count, anyPathErrors.count)
+        XCTAssertEqual(pathErrors.count, readOnlyErrors.count)
+        let expected = xErrors + pointErrors
+        XCTAssertEqual(pathErrors.count, expected.count)
+        XCTAssertEqual(Set(pathErrors), Set(expected))
+    }
+
 }
 
 /// Equatable and Hashable conformance for AttributeError.

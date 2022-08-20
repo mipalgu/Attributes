@@ -95,12 +95,12 @@ public struct ErrorBag<Root> {
 
     public func errors(forPath path: AnyPath<Root>) -> [AttributeError<Root>] {
         func isAttributeType(_ type: Any.Type) -> Bool {
-            return type == Attribute.self || type == BlockAttribute.self || type == LineAttribute.self
+            type == Attribute.self || type == BlockAttribute.self || type == LineAttribute.self
         }
         // Do we have an ancestor who is an attribute type?
-        let ancestorIndex = path.ancestors.lastIndex(where: { isAttributeType($0.targetType) })
+        let ancestorIndex = path.ancestors.lastIndex { isAttributeType($0.targetType) }
         // Is path an attribute type or does it have an ancestor which is an attribute type?
-        guard isAttributeType(path.targetType) || nil != ancestorIndex else {
+        guard isAttributeType(path.targetType) || ancestorIndex != nil else {
             let range = sortedCollection.range(of: AttributeError(message: "", path: path))
             return Array(self.sortedCollection[range])
         }
@@ -110,12 +110,16 @@ public struct ErrorBag<Root> {
         return self.errors(includingDescendantsForPath: path)
     }
 
-    public func errors<Path: ReadOnlyPathProtocol>(forPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
-        return self.errors(forPath: AnyPath(path))
+    public func errors<Path: ReadOnlyPathProtocol>(
+        forPath path: Path
+    ) -> [AttributeError<Root>] where Path.Root == Root {
+        self.errors(forPath: AnyPath(path))
     }
 
-    public func errors<Path: PathProtocol>(forPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
-        return self.errors(forPath: AnyPath(path))
+    public func errors<Path: PathProtocol>(
+        forPath path: Path
+    ) -> [AttributeError<Root>] where Path.Root == Root {
+        self.errors(forPath: AnyPath(path))
     }
 
     public mutating func remove(includingDescendantsForPath path: AnyPath<Root>) {
