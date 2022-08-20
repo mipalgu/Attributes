@@ -104,6 +104,8 @@ public struct RequiredValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
     /// Perform the validation on a value. This function will check the precense of nil before enacting the
     /// validation function stored in `_validate`. A nil value will through a validation error.
     /// - Parameter root: The root object containing the value to be validated.
+    /// - Throws: Throws a ValidationError when the value is nil.
+    /// - Throws: Throws an Error when the validation is unsusccessful.
     public func performValidation(_ root: PathType.Root) throws {
         let value = root[keyPath: self.path.keyPath]
         if value.isNil {

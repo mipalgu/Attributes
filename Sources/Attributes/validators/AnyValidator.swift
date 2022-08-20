@@ -106,6 +106,7 @@ public struct AnyValidator<Root>: ValidatorProtocol {
     /// Perform a validation of a root value. This function uses the underlying validation rules specified
     /// in the initialiser.
     /// - Parameter root: The value to validate.
+    /// - Throws: Throws an Error when the validation is unsusccessful.
     public func performValidation(_ root: Root) throws {
         try self._validate(root)
     }

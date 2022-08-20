@@ -107,6 +107,7 @@ public struct OptionalValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
     /// function checks the presence of a nil value and returns early in that case.
     /// Nil values are considered to be automatically validated.
     /// - Parameter root: The root object containing the value to validate.
+    /// - Throws: Throws an Error when the validation is unsusccessful.
     public func performValidation(_ root: PathType.Root) throws {
         let value = root[keyPath: self.path.keyPath]
         guard !value.isNil else {
