@@ -89,18 +89,6 @@ public enum LineAttributeType: Hashable {
 extension LineAttributeType: Codable {
 
     public init(from decoder: Decoder) throws {
-        if let _ = try? BoolAttributeType(from: decoder) {
-            self = .bool
-            return
-        }
-        if let _ = try? IntegerAttributeType(from: decoder) {
-            self = .integer
-            return
-        }
-        if let _ = try? FloatAttributeType(from: decoder) {
-            self = .float
-            return
-        }
         if let expression = try? ExpressionAttributeType(from: decoder) {
             self = .expression(language: expression.language)
             return
@@ -109,32 +97,47 @@ extension LineAttributeType: Codable {
             self = .enumerated(validValues: enumerated.validValues)
             return
         }
-        if let _ = try? LineAttributeType(from: decoder) {
-            self = .line
-            return
-        }
-        throw DecodingError.dataCorrupted(
-            DecodingError.Context(
-                codingPath: decoder.codingPath,
-                debugDescription: "Unsupported type"
+        guard let name = try? String(from: decoder) else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Unsupported type"
+                )
             )
-        )
+        }
+        switch name {
+        case BoolAttributeType().xmiName:
+            self = .bool
+        case IntegerAttributeType().xmiName:
+            self = .integer
+        case FloatAttributeType().xmiName:
+            self = .float
+        case LineAttributeType().xmiName:
+            self = .line
+        default:
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Unsupported type"
+                )
+            )
+        }
     }
 
     public func encode(to encoder: Encoder) throws {
         switch self {
         case .bool:
-            try BoolAttributeType().encode(to: encoder)
+            try BoolAttributeType().xmiName.encode(to: encoder)
         case .integer:
-            try IntegerAttributeType().encode(to: encoder)
+            try IntegerAttributeType().xmiName.encode(to: encoder)
         case .float:
-            try FloatAttributeType().encode(to: encoder)
+            try FloatAttributeType().xmiName.encode(to: encoder)
         case .expression(let language):
             try ExpressionAttributeType(language: language).encode(to: encoder)
         case .enumerated(let value):
             try EnumAttributeType(validValues: value).encode(to: encoder)
         case .line:
-            try LineAttributeType().encode(to: encoder)
+            try LineAttributeType().xmiName.encode(to: encoder)
         }
     }
 
