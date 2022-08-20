@@ -67,7 +67,7 @@ final class BoolPropertyTests: XCTestCase, PropertyTestable {
     let type = AttributeType.bool
 
     /// Path to bool.
-    var path: Path<Attribute, Bool> {
+    var path: Path<Attribute, PropertyType> {
         Path(path: \Attribute.boolValue, ancestors: [AnyPath(Path(Attribute.self))])
     }
 
