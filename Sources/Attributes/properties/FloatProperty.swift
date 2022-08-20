@@ -56,22 +56,32 @@
  *
  */
 
+/// A Float Property.
 @propertyWrapper
 public struct FloatProperty {
 
+    /// A self property.
     public var projectedValue: FloatProperty {
         self
     }
 
+    /// The underlying SchemaAttribute.
     public var wrappedValue: SchemaAttribute
 
+    /// Create the Property from a SchemaAttribute.
+    /// - Parameter wrappedValue: The attribute.
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }
 
+    /// Create the property from a label and builder function.
+    /// - Parameters:
+    ///   - label: The label of this property.
+    ///   - builder: A function that creates the validator.
     public init(
         label: String,
-        @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, Double>>) -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
+        @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, Double>>)
+            -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).lineAttribute.floatValue
         let validationPath = ValidationPath(path: path)
