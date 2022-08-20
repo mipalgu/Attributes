@@ -56,12 +56,19 @@
  *
  */
 
+/// A struct for holding a *Field*, which is an AttributeType and a label.
 public struct Field: Hashable, Codable {
 
+    /// The label of the Attribute.
     public var name: Label
 
+    /// The Attribute type.
     public var type: AttributeType
 
+    /// Standard initialiser.
+    /// - Parameters:
+    ///   - name: The label.
+    ///   - type: The attribute type.
     public init(name: Label, type: AttributeType) {
         self.name = name
         self.type = type
@@ -69,8 +76,12 @@ public struct Field: Hashable, Codable {
 
 }
 
+/// Add dictionary literal initialisation for Arrays containing Fields.
 extension Array: ExpressibleByDictionaryLiteral where Element == Field {
 
+    /// Create an array from a dictionary literal of tuples containing the
+    /// field name and field type.
+    /// - Parameter elements: The tuples containing the data.
     public init(dictionaryLiteral elements: (String, AttributeType)...) {
         self = elements.map { Field(name: $0, type: $1) }
     }
