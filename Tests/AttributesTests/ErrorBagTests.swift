@@ -133,15 +133,15 @@ final class ErrorBagTests: XCTestCase {
         XCTAssertEqual(Set(pathErrors), Set(expected))
     }
 
-    // func testErrorForPathWithAttributes() {
-    //     let parentPath = AnyPath(Path(TestParent.self))
-    //     let containerPath = AnyPath(Path(path: \TestParent.container, ancestors: [parentPath]))
-    //     let linePath = AnyPath(Path(path: \TestParent.container.line, ancestors: [parentPath, containerPath]))
-    //     var bag = ErrorBag<TestParent>()
-    //     bag.insert(AttributeError(message: "Error0", path: parentPath))
-    //     bag.insert(AttributeError(message: "Error1", path: containerPath))
-    //     bag.insert(AttributeError(message: "Error2", path: linePath))
-    // }
+// func testErrorForPathWithAttributes() {
+//     let parentPath = AnyPath(Path(TestParent.self))
+//     let containerPath = AnyPath(Path(path: \TestParent.container, ancestors: [parentPath]))
+//     let linePath = AnyPath(Path(path: \TestParent.container.line, ancestors: [parentPath, containerPath]))
+//     var bag = ErrorBag<TestParent>()
+//     bag.insert(AttributeError(message: "Error0", path: parentPath))
+//     bag.insert(AttributeError(message: "Error1", path: containerPath))
+//     bag.insert(AttributeError(message: "Error2", path: linePath))
+// }
 
     /// Test retrieve errors including descendents for the path.
     func testErrorIncludingDescendents() {
