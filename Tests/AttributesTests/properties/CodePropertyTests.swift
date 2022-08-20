@@ -57,6 +57,7 @@
 @testable import Attributes
 import XCTest
 
+/// Test class for CodeProperty.
 final class CodePropertyTests: XCTestCase, PropertyTestable {
 
     /// Testing Strings.
