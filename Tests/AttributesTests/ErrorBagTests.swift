@@ -104,8 +104,9 @@ final class ErrorBagTests: XCTestCase {
     /// Test the empty function clears the bag.
     func testEmpty() {
         XCTAssertTrue(bag.allErrors.isEmpty)
-        bag.insert(AttributeError(message: "Hello", path: AnyPath(Path(Point.self))))
-        XCTAssertEqual(bag.allErrors.count, 1)
+        let error = AttributeError(message: "Hello", path: AnyPath(Path(Point.self)))
+        bag.insert(error)
+        XCTAssertEqual(bag.allErrors, [error])
         bag.empty()
         XCTAssertTrue(bag.allErrors.isEmpty)
     }
