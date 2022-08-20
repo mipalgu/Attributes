@@ -72,7 +72,7 @@ public struct ErrorBag<Root> {
     })
 
     public var allErrors: [AttributeError<Root>] {
-        return Array(sortedCollection)
+        Array(sortedCollection)
     }
 
     public init() {}
