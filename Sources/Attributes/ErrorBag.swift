@@ -61,7 +61,8 @@ import swift_helpers
 
 public struct ErrorBag<Root> {
 
-    private var sortedCollection = SortedCollection(compare: { (lhs: AttributeError<Root>, rhs: AttributeError<Root>) -> ComparisonResult in
+    private var sortedCollection = SortedCollection { (lhs: AttributeError<Root>, rhs: AttributeError<Root>)
+        -> ComparisonResult in
         if lhs.path.isSame(as: rhs.path) {
             return .orderedSame
         }
@@ -69,7 +70,7 @@ public struct ErrorBag<Root> {
             return .orderedAscending
         }
         return .orderedDescending
-    })
+    }
 
     public var allErrors: [AttributeError<Root>] {
         Array(sortedCollection)
@@ -134,11 +135,15 @@ public struct ErrorBag<Root> {
         }
     }
 
-    public mutating func remove<Path: ReadOnlyPathProtocol>(includingDescendantsForPath path: Path) where Path.Root == Root {
+    public mutating func remove<Path: ReadOnlyPathProtocol>(
+        includingDescendantsForPath path: Path
+    ) where Path.Root == Root {
         self.remove(includingDescendantsForPath: AnyPath(path))
     }
 
-    public mutating func remove<Path: PathProtocol>(includingDescendantsForPath path: Path) where Path.Root == Root {
+    public mutating func remove<Path: PathProtocol>(
+        includingDescendantsForPath path: Path
+    ) where Path.Root == Root {
         self.remove(includingDescendantsForPath: AnyPath(path))
     }
 
