@@ -56,51 +56,83 @@
  *
  */
 
+/// A type-erased validator.
 public struct AnyValidator<Root>: ValidatorProtocol {
 
+    /// The validate function that is performed by this validator.
     private let _validate: (Root) throws -> Void
 
+    /// Initialise this validator with a validate function.
+    /// - Parameter validate: The function to use when validating a value.
     public init(validate: @escaping (Root) throws -> Void) {
         self._validate = validate
     }
 
+    /// Initialise this validator with another validator. This validator will act
+    /// in the same way as the given validator but as a type-erased version.
+    /// - Parameter validator: A validator to use with this validator.
     public init<V: ValidatorProtocol>(_ validator: V) where V.Root == Root {
         self._validate = { try validator.performValidation($0) }
     }
 
+    /// Initialise this validator with another AnyValidator. This is equivalent to a copy
+    /// constructor.
+    /// - Parameter validator: The equivalent validator to self.
     public init(_ validator: AnyValidator<Root>) {
         self = validator
     }
 
+    /// Initialise this validator with a builder. This initialiser will use the output from
+    /// the builder to initialise self.
+    /// - Parameter builder: The function used to construct an array of AnyValidators.
     public init(@ValidatorBuilder<Root> builder: () -> [AnyValidator<Root>]) {
         self.init(builder())
     }
 
+    /// Initialise this validator from an array of AnyValidator's. This validator will use
+    /// each validators performValidation function when validating values.
+    /// - Parameter validators: An array of AnyValidators to initialise from.
     public init<S: Sequence>(_ validators: S) where S.Element == AnyValidator<Root> {
         self._validate = { root in try validators.forEach { try $0.performValidation(root) } }
     }
 
+    /// Initialise this AnyValidator from an array of generic Validators. This init is similar to the
+    /// AnyValidator Sequence init, except it uses typed versions of a Validator.
+    /// - Parameter validators: The validators to use by this validator.
     public init<S: Sequence, V: ValidatorProtocol>(_ validators: S) where S.Element == V, V.Root == Root {
         self._validate = { root in try validators.forEach { try $0.performValidation(root) } }
     }
 
+    /// Perform a validation of a root value. This function uses the underlying validation rules specified
+    /// in the initialiser.
+    /// - Parameter root: The value to validate.
     public func performValidation(_ root: Root) throws {
-        return try self._validate(root)
+        try self._validate(root)
     }
 
+    /// Changes the Root of the validate function to allow for different parameters to be passed to
+    /// performValidation. This method acts as a pure function returning a new AnyValidator with the
+    /// new Root.
+    /// - Parameter path: A path pointing from the new Root to the Root of this AnyValidator.
+    /// - Returns: A new validator with a validate method that enacts the same validation rules but
+    ///            uses a new Root.
     public func toNewRoot<NewPath: ReadOnlyPathProtocol>(path: NewPath)
         -> AnyValidator<NewPath.Root> where NewPath.Value == Root {
-        AnyValidator<NewPath.Root>(validate: {
+        AnyValidator<NewPath.Root> {
             try performValidation($0[keyPath: path.keyPath])
-        })
+        }
     }
 
 }
 
+/// ExpressibleByArrayLiteral conformance.
 extension AnyValidator: ExpressibleByArrayLiteral {
 
+    /// The elements of the array will be AnyValidators.
     public typealias ArrayLiteralElement = AnyValidator<Root>
 
+    /// Initialise this AnyValidator from a variadic parameter list of other AnyValidator's.
+    /// - Parameter validators: The validators to use in this validator.
     public init(arrayLiteral validators: ArrayLiteralElement...) {
         self._validate = { root in try validators.forEach { try $0.performValidation(root) } }
     }
