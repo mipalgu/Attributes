@@ -56,12 +56,17 @@
  *
  */
 
+/// A trigger that performs no function.
 public struct IdentityTrigger<Root>: TriggerProtocol {
 
+    /// A mock trigger function. Always successeds.
+    /// - Returns: Success.
     public func performTrigger(_: inout Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Root>> {
         .success(false)
     }
 
+    /// The trigger is always valid for a Path with the same root.
+    /// - Returns: true.
     public func isTriggerForPath(_: AnyPath<Root>, in _: Root) -> Bool {
         true
     }
