@@ -56,7 +56,7 @@
 
 /// Helper struct for providing test data. This struct provides a point in 2 dimensions
 /// using a cartesian coordinate system.
-struct Point: Equatable {
+struct Point: Hashable {
 
     /// The x-coordinate.
     var x: Int
