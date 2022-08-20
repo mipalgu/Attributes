@@ -148,4 +148,29 @@ final class LineAttributeTests: XCTestCase {
         }
     }
 
+    /// Test setter on value properties.
+    func testSetters() {
+        var boolVal = LineAttribute.bool(true)
+        boolVal.boolValue = false
+        XCTAssertFalse(boolVal.boolValue)
+        var enumerated = LineAttribute.enumerated("1", validValues: validValues)
+        enumerated.enumeratedValue = "2"
+        XCTAssertEqual(enumerated.enumeratedValue, "2")
+        XCTAssertEqual(enumerated.enumeratedValidValues, ["1", "2"])
+        enumerated.enumeratedValidValues = ["2"]
+        XCTAssertEqual(enumerated.enumeratedValidValues, ["2"])
+        var expression = LineAttribute.expression("x", language: .c)
+        expression.expressionValue = "y"
+        XCTAssertEqual(expression.expressionValue, "y")
+        var float = LineAttribute.float(5.5)
+        float.floatValue = 1.3
+        XCTAssertEqual(float.floatValue, 1.3)
+        var integer = LineAttribute.integer(10)
+        integer.integerValue = 12
+        XCTAssertEqual(integer.integerValue, 12)
+        var line = LineAttribute.line("test")
+        line.lineValue = "newTest"
+        XCTAssertEqual(line.lineValue, "newTest")
+    }
+
 }
