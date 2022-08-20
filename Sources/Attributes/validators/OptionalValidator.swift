@@ -57,44 +57,83 @@
  *
  */
 
+/// Validator that performs validation only when the value is not nil. A nil value does not throw
+/// any errors during a validation. For a validator that throws errors for nil values, see
+/// `RequiredValidator`
+/// - SeeAlso: `RequiredValidator`
 public struct OptionalValidator<P: ReadOnlyPathProtocol>: PathValidator where P.Value: Nilable {
 
+    /// The Root of the validator.
     public typealias Root = P.Root
 
+    /// The type of the value contained in root.
     public typealias Value = P.Value.Wrapped
 
+    /// The type of the path pointing to value from root.
     public typealias PathType = P
 
+    /// The path that points to the value to be validated.
     public let path: PathType
 
+    // swiftlint:disable identifier_name
+
+    /// The validation function which performs the validation.
     internal let _validate: (Root, Value) throws -> Void
 
+    // swiftlint:enable identifier_name
+
+    /// Initialise this validator with a Path. This init creates a null-validation function
+    /// All values will pass validation without error using this init.
+    /// - Parameter path: The path containing the location of the value to validate.
     public init(path: PathType) {
-        self.init(path) { (_, _) in }
+        self.init(path) { _, _ in }
     }
 
+    // swiftlint:disable identifier_name
+
+    /// Instantiate this validator with a Path and validation function. This initialiser
+    /// sets up the validator to perform some validation function on a specified value.
+    /// - Parameters:
+    ///   - path: The path pointing to the location of the value to validate.
+    ///   - _validate: The function used to validate the value.
     internal init(_ path: PathType, _validate: @escaping (Root, Value) throws -> Void) {
         self.path = path
         self._validate = _validate
     }
 
+    // swiftlint:enable identifier_name
+
+    /// Perform a validation on a root type containing the value located at path. This
+    /// function checks the presence of a nil value and returns early in that case.
+    /// Nil values are considered to be automatically validated.
+    /// - Parameter root: The root object containing the value to validate.
     public func performValidation(_ root: PathType.Root) throws {
         let value = root[keyPath: self.path.keyPath]
-        if value.isNil {
+        guard !value.isNil else {
             return
         }
         _ = try self._validate(root, value.wrappedValue)
     }
 
+    /// Create a new validator that performs an additional validation function in conjunction
+    /// with the validation function stored in self.
+    /// - Parameter f: The additional validation function.
+    /// - Returns: A new validator that performs the validation function in self and the validation
+    ///            function given in the parameters of this function call.
     public func push(_ f: @escaping (Root, Value) throws -> Void) -> OptionalValidator<P> {
-        return OptionalValidator(self.path) {
+        OptionalValidator(self.path) {
             try self._validate($0, $1)
             try f($0, $1)
         }
     }
 
-    public func validate(@ValidatorBuilder<PathType.Root> builder: (Self) -> [AnyValidator<PathType.Root>]) -> AnyValidator<PathType.Root> {
-        return AnyValidator(builder(self))
+    /// Create a type-erased version of this validator.
+    /// - Parameter builder: The builder used to create the type-erased version.
+    /// - Returns: A type-erased version of self.
+    public func validate(
+        @ValidatorBuilder<PathType.Root> builder: (Self) -> [AnyValidator<PathType.Root>]
+    ) -> AnyValidator<PathType.Root> {
+        AnyValidator(builder(self))
     }
 
 }
