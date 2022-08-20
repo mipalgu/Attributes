@@ -239,6 +239,21 @@ final class ErrorBagTests: XCTestCase {
         XCTAssertEqual(Set(expected), Set(bag.allErrors))
     }
 
+    /// Test remove including dependencies remaining parents.
+    func testRemoveIncludingDependencies() {
+        let path = Path(path: \Line.point0, ancestors: [AnyPath(Path(Line.self))])
+        var bag = ErrorBag<Line>()
+        let linePath = AnyPath(Path(Line.self))
+        let pointPath = AnyPath(Path(path: \Line.point0, ancestors: [linePath]))
+        let coordinatePath = AnyPath(Path(path: \Line.point0.x, ancestors: [linePath, pointPath]))
+        bag.insert(AttributeError(message: "Errror0", path: linePath))
+        bag.insert(AttributeError(message: "Errror1", path: pointPath))
+        bag.insert(AttributeError(message: "Errror2", path: coordinatePath))
+        bag.remove(includingDescendantsForPath: path)
+        let expected = [AttributeError(message: "Errror0", path: linePath)]
+        XCTAssertEqual(bag.allErrors, expected)
+    }
+
 }
 
 /// Equatable and Hashable conformance for AttributeError.
