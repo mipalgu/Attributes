@@ -65,7 +65,7 @@ final class LineAttributeTests: XCTestCase {
         .bool(true),
         .enumerated("1", validValues: ["1", "2"]),
         .expression("x", language: .c),
-        .float(5.0),
+        .float(5.5),
         .integer(5),
         .line("test")
     ]
@@ -113,6 +113,8 @@ final class LineAttributeTests: XCTestCase {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
         attributes.forEach {
+            print("Coding \($0)")
+            fflush(stdout)
             guard let data = try? encoder.encode($0) else {
                 XCTFail("Failed to encode data for \($0)")
                 return
