@@ -1,4 +1,4 @@
-// Point.swift 
+// OptionalLine.swift 
 // Attributes 
 // 
 // Created by Morgan McColl.
@@ -54,14 +54,15 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Helper struct for providing test data. This struct provides a point in 2 dimensions
-/// using a cartesian coordinate system.
-struct Point: Equatable, Hashable {
+/// A struct used for creating test data. This struct represents a line
+/// between 2 points in a cartesian coordinate system where those points
+/// can be optional.
+struct OptionalLine: Equatable, Hashable {
 
-    /// The x-coordinate.
-    var x: Int
+    /// The base point. This is where the line begins.
+    var point0: OptionalPoint?
 
-    /// The y-coordinate.
-    var y: Int
+    /// The end point. This is where the line terminates.
+    var point1: OptionalPoint?
 
 }

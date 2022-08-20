@@ -58,7 +58,7 @@ import Foundation
 
 /// Helper struct for providing test data. This struct is used to test for optional data.
 /// The struct represents a point using a 2-dimensional cartesian coordinate system.
-struct OptionalPoint: Equatable, Identifiable {
+struct OptionalPoint: Equatable, Hashable, Identifiable {
 
     /// The id of this point.
     let id = UUID()
