@@ -81,16 +81,23 @@ public struct ErrorBag<Root> {
         self.sortedCollection.empty()
     }
 
-    public func errors(includingDescendantsForPath path: AnyPath<Root>) -> [AttributeError<Root>] {
-        return Array(sortedCollection[index(includingDescendantsForPath: path)])
+    public func errors(
+        includingDescendantsForPath path: AnyPath<Root>
+    ) -> [AttributeError<Root>] {
+        let indexes = index(includingDescendantsForPath: path)
+        return Array(sortedCollection.enumerated().filter { indexes.contains($0.0) }.map(\.1))
     }
 
-    public func errors<Path: ReadOnlyPathProtocol>(includingDescendantsForPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
-        return self.errors(includingDescendantsForPath: AnyPath(path))
+    public func errors<Path: ReadOnlyPathProtocol>(
+        includingDescendantsForPath path: Path
+    ) -> [AttributeError<Root>] where Path.Root == Root {
+        self.errors(includingDescendantsForPath: AnyPath(path))
     }
 
-    public func errors<Path: PathProtocol>(includingDescendantsForPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
-        return self.errors(includingDescendantsForPath: AnyPath(path))
+    public func errors<Path: PathProtocol>(
+        includingDescendantsForPath path: Path
+    ) -> [AttributeError<Root>] where Path.Root == Root {
+        self.errors(includingDescendantsForPath: AnyPath(path))
     }
 
     public func errors(forPath path: AnyPath<Root>) -> [AttributeError<Root>] {
@@ -101,8 +108,7 @@ public struct ErrorBag<Root> {
         let ancestorIndex = path.ancestors.lastIndex { isAttributeType($0.targetType) }
         // Is path an attribute type or does it have an ancestor which is an attribute type?
         guard isAttributeType(path.targetType) || ancestorIndex != nil else {
-            let range = sortedCollection.range(of: AttributeError(message: "", path: path))
-            return Array(self.sortedCollection[range])
+            return sortedCollection.filter { $0.path == path }
         }
         // Operate with the path that is the attribute type.
         let path = isAttributeType(path.targetType) ? path : path.ancestors[ancestorIndex!]
@@ -123,7 +129,9 @@ public struct ErrorBag<Root> {
     }
 
     public mutating func remove(includingDescendantsForPath path: AnyPath<Root>) {
-        sortedCollection.removeSubrange(self.index(includingDescendantsForPath: path))
+        self.index(includingDescendantsForPath: path).sorted().reversed().forEach {
+            _ = sortedCollection.remove(at: $0)
+        }
     }
 
     public mutating func remove<Path: ReadOnlyPathProtocol>(includingDescendantsForPath path: Path) where Path.Root == Root {
@@ -150,10 +158,13 @@ public struct ErrorBag<Root> {
         self.sortedCollection.insert(error)
     }
 
-    private func index(includingDescendantsForPath path: AnyPath<Root>) -> Range<Int> {
-        let elements = self.sortedCollection.right(ofAndIncluding: AttributeError(message: "", path: path))
-        let index = elements.firstIndex { !path.isParent(of: $0.path) } ?? elements.endIndex
-        return elements.startIndex..<index
+    private func index(includingDescendantsForPath path: AnyPath<Root>) -> IndexSet {
+        IndexSet(
+            self.sortedCollection
+                .enumerated()
+                .filter { path.isParent(of: $1.path) || path == $1.path }
+                .map(\.0)
+        )
     }
 
 }
