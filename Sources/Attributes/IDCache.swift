@@ -56,12 +56,18 @@
  *
  */
 
-struct AttributeIDCache {
+/// Cache storing ID's for Attributes.
+enum AttributeIDCache {
 
-    static private var latest: Int = 0
+    /// The latest id retrieved.
+    private static var latest: Int = 0
 
-    static private var ids: [Attribute: Int] = [:]
+    /// The id cache.
+    private static var ids: [Attribute: Int] = [:]
 
+    /// Retrieve an ID for a value.
+    /// - Parameter value: The value to retrieve an ID for.
+    /// - Returns: The ID of the value.
     static func id(for value: Attribute) -> Int {
         if let id = Self.ids[value] {
             return id
@@ -74,12 +80,18 @@ struct AttributeIDCache {
 
 }
 
-struct LineAttributeIDCache {
+/// Cache storing ID's for LineAttributes.
+enum LineAttributeIDCache {
 
-    static private var latest: Int = 0
+    /// The latest id retrieved.
+    private static var latest: Int = 0
 
-    static private var ids: [LineAttribute: Int] = [:]
+    /// The id cache.
+    private static var ids: [LineAttribute: Int] = [:]
 
+    /// Retrieve an ID for a value.
+    /// - Parameter value: The value to retrieve an ID for.
+    /// - Returns: The ID of the value.
     static func id(for value: LineAttribute) -> Int {
         if let id = Self.ids[value] {
             return id
@@ -92,12 +104,18 @@ struct LineAttributeIDCache {
 
 }
 
-struct BlockAttributeIDCache {
+/// Cache storing ID's for BlockAttributes.
+enum BlockAttributeIDCache {
 
-    static private var latest: Int = 0
+    /// The latest id retrieved.
+    private static var latest: Int = 0
 
-    static private var ids: [BlockAttribute: Int] = [:]
+    /// The id cache.
+    private static var ids: [BlockAttribute: Int] = [:]
 
+    /// Retrieve an ID for a value.
+    /// - Parameter value: The value to retrieve an ID for.
+    /// - Returns: The ID of the value.
     static func id(for value: BlockAttribute) -> Int {
         if let id = Self.ids[value] {
             return id
