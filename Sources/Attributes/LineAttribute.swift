@@ -58,19 +58,34 @@
 
 import XMI
 
+/// A LineAttribute is an Attribute that is represented without any relation
+/// to other Attributes.
 public enum LineAttribute: Hashable, Identifiable {
 
+    /// A boolean attribute.
+    case bool(Bool)
+
+    /// An integer attribute.
+    case integer(Int)
+
+    /// A double-precision floating point attribute.
+    case float(Double)
+
+    /// An expression in some language.
+    case expression(Expression, language: Language)
+
+    /// An enumerated value drawn from a set of valid values.
+    case enumerated(String, validValues: Set<String>)
+
+    /// A single-lined text value.
+    case line(String)
+
+    /// The id of the attribute.
     public var id: Int {
         LineAttributeIDCache.id(for: self)
     }
 
-    case bool(Bool)
-    case integer(Int)
-    case float(Double)
-    case expression(Expression, language: Language)
-    case enumerated(String, validValues: Set<String>)
-    case line(String)
-
+    /// The equivalent LineAttributeType for self.
     public var type: LineAttributeType {
         switch self {
         case .bool:
@@ -88,13 +103,17 @@ public enum LineAttribute: Hashable, Identifiable {
         }
     }
 
+    /// The Bool value of self.
+    /// - Warning: This creates a runtime error when self != .bool.
     public var boolValue: Bool {
         get {
             switch self {
             case .bool(let value):
                 return value
             default:
-                fatalError("Attempting to fetch a bool value on a line attribute which is not a bool attribute")
+                fatalError(
+                    "Attempting to fetch a bool value on a line attribute which is not a bool attribute"
+                )
             }
         }
         set {
@@ -107,13 +126,20 @@ public enum LineAttribute: Hashable, Identifiable {
         }
     }
 
+    /// The integer value of self.
+    /// - Warning: This creates a runtime error when self != .integer.
     public var integerValue: Int {
         get {
             switch self {
             case .integer(let value):
                 return value
             default:
-                fatalError("Attempting to fetch an integer value on a line attribute which is not an integer attribute")
+                fatalError(
+                    """
+                    Attempting to fetch an integer value on a line attribute which is
+                    not an integer attribute
+                    """
+                )
             }
         }
         set {
@@ -121,18 +147,24 @@ public enum LineAttribute: Hashable, Identifiable {
             case .integer:
                 self = .integer(newValue)
             default:
-                fatalError("Attempting to set an integer value on a line attribute which is not an integer attribute")
+                fatalError(
+                    "Attempting to set an integer value on a line attribute which is not an integer attribute"
+                )
             }
         }
     }
 
+    /// The Double value of self.
+    /// - Warning: This creates a runtime error when self != .float.
     public var floatValue: Double {
         get {
             switch self {
             case .float(let value):
                 return value
             default:
-                fatalError("Attempting to fetch a float value on a line attribute which is not a float attribute")
+                fatalError(
+                    "Attempting to fetch a float value on a line attribute which is not a float attribute"
+                )
             }
         }
         set {
@@ -140,18 +172,27 @@ public enum LineAttribute: Hashable, Identifiable {
             case .float:
                 self = .float(newValue)
             default:
-                fatalError("Attempting to set a float value on a line attribute which is not a float attribute")
+                fatalError(
+                    "Attempting to set a float value on a line attribute which is not a float attribute"
+                )
             }
         }
     }
 
+    /// The Expression value of self.
+    /// - Warning: This creates a runtime error when self != .expression.
     public var expressionValue: Expression {
         get {
             switch self {
             case .expression(let value, _):
                 return value
             default:
-                fatalError("Attempting to fetch an expression value on a line attribute which is not an expression attribute")
+                fatalError(
+                    """
+                    Attempting to fetch an expression value on a line attribute which is
+                    not an expression attribute
+                    """
+                )
             }
         }
         set {
@@ -159,18 +200,30 @@ public enum LineAttribute: Hashable, Identifiable {
             case .expression(_, let language):
                 self = .expression(newValue, language: language)
             default:
-                fatalError("Attempting to set an expression value on a line attribute which is not an expression attribute")
+                fatalError(
+                    """
+                    Attempting to set an expression value on a line attribute which is
+                    not an expression attribute
+                    """
+                )
             }
         }
     }
 
+    /// The Enumerated String value of self.
+    /// - Warning: This creates a runtime error when self != .enumerated.
     public var enumeratedValue: String {
         get {
             switch self {
             case .enumerated(let value, _):
                 return value
             default:
-                fatalError("Attempting to fetch an enumerated value on a line attribute which is not an enumerated attribute")
+                fatalError(
+                    """
+                    Attempting to fetch an enumerated value on a line attribute which
+                    is not an enumerated attribute
+                    """
+                )
             }
         }
         set {
@@ -178,18 +231,30 @@ public enum LineAttribute: Hashable, Identifiable {
             case .enumerated(_, let validValues):
                 self = .enumerated(newValue, validValues: validValues)
             default:
-                fatalError("Attempting to set an enumerated value on a line attribute which is not an enumerated attribute")
+                fatalError(
+                    """
+                    Attempting to set an enumerated value on a line attribute which is
+                    not an enumerated attribute
+                    """
+                )
             }
         }
     }
 
+    /// The Enumerated valid values Set<String> value of self.
+    /// - Warning: This creates a runtime error when self != .enumerated.
     public var enumeratedValidValues: Set<String> {
         get {
             switch self {
             case .enumerated(_, let validValues):
                 return validValues
             default:
-                fatalError("Attempting to fetch an enumerated valid value on a line attribute which is not an enumerated attribute")
+                fatalError(
+                    """
+                    Attempting to fetch an enumerated valid value on a line attribute which is
+                    not an enumerated attribute
+                    """
+                )
             }
         }
         set {
@@ -197,18 +262,27 @@ public enum LineAttribute: Hashable, Identifiable {
             case .enumerated(let value, _):
                 self = .enumerated(value, validValues: newValue)
             default:
-                fatalError("Attempting to set an enumerated valid value on a line attribute which is not an enumerated attribute")
+                fatalError(
+                    """
+                    Attempting to set an enumerated valid value on a line attribute which is
+                    not an enumerated attribute
+                    """
+                )
             }
         }
     }
 
+    /// The String value of self.
+    /// - Warning: This creates a runtime error when self != .line.
     public var lineValue: String {
         get {
             switch self {
             case .line(let value):
                 return value
             default:
-                fatalError("Attempting to fetch a line value on a line attribute which is not a line attribute")
+                fatalError(
+                    "Attempting to fetch a line value on a line attribute which is not a line attribute"
+                )
             }
         }
         set {
@@ -216,11 +290,14 @@ public enum LineAttribute: Hashable, Identifiable {
             case .line:
                 self = .line(newValue)
             default:
-                fatalError("Attempting to set a line value on a line attribute which is not a line attribute")
+                fatalError(
+                    "Attempting to set a line value on a line attribute which is not a line attribute"
+                )
             }
         }
     }
 
+    /// A string representation of self.
     public var strValue: String {
         switch self {
         case .bool(let value):
@@ -238,6 +315,11 @@ public enum LineAttribute: Hashable, Identifiable {
         }
     }
 
+    /// Initialise a LineAttribute from a LineAttributeType and a string representation of
+    /// the value
+    /// - Parameters:
+    ///   - type: The type of the attribute.
+    ///   - value: The value of the attribute.
     public init?(type: LineAttributeType, value: String) {
         switch type {
         case .bool:
@@ -269,158 +351,10 @@ public enum LineAttribute: Hashable, Identifiable {
 
 }
 
-extension LineAttribute: Codable {
-
-    public init(from decoder: Decoder) throws {
-        if let bool = try? BoolAttribute(from: decoder) {
-            self = .bool(bool.value)
-            return
-        }
-        if let integer = try? IntegerAttribute(from: decoder) {
-            self = .integer(integer.value)
-            return
-        }
-        if let float = try? FloatAttribute(from: decoder) {
-            self = .float(float.value)
-            return
-        }
-        if let expression = try? ExpressionAttribute(from: decoder) {
-            self = .expression(expression.value, language: expression.language)
-            return
-        }
-        if let enumerated = try? EnumAttribute(from: decoder) {
-            self = .enumerated(enumerated.value, validValues: enumerated.cases)
-            return
-        }
-        if let line = try? LineAttribute(from: decoder) {
-            self = .line(line.value)
-            return
-        }
-        throw DecodingError.dataCorrupted(
-            DecodingError.Context(
-                codingPath: decoder.codingPath,
-                debugDescription: "Unsupported value"
-            )
-        )
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        switch self {
-        case .bool(let value):
-            try BoolAttribute(value).encode(to: encoder)
-        case .integer(let value):
-            try IntegerAttribute(value).encode(to: encoder)
-        case .float(let value):
-            try FloatAttribute(value).encode(to: encoder)
-        case .expression(let value, let language):
-            try ExpressionAttribute(value: value, language: language).encode(to: encoder)
-        case .enumerated(let value, let cases):
-            try EnumAttribute(cases: cases, value: value).encode(to: encoder)
-        case .line(let value):
-            try LineAttribute(value).encode(to: encoder)
-        }
-    }
-
-    private struct BoolAttribute: Hashable, Codable {
-
-        var value: Bool
-
-        init(_ value: Bool) {
-            self.value = value
-        }
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.singleValueContainer()
-            self.value = try container.decode(Bool.self)
-        }
-
-        func encode(to encoder: Encoder) throws {
-            var container = encoder.singleValueContainer()
-            try container.encode(self.value)
-        }
-
-    }
-
-    private struct IntegerAttribute: Hashable, Codable {
-
-        var value: Int
-
-        init(_ value: Int) {
-            self.value = value
-        }
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.singleValueContainer()
-            self.value = try container.decode(Int.self)
-        }
-
-        func encode(to encoder: Encoder) throws {
-            var container = encoder.singleValueContainer()
-            try container.encode(self.value)
-        }
-
-    }
-
-    private struct FloatAttribute: Hashable, Codable {
-
-        var value: Double
-
-        init(_ value: Double) {
-            self.value = value
-        }
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.singleValueContainer()
-            self.value = try container.decode(Double.self)
-        }
-
-        func encode(to encoder: Encoder) throws {
-            var container = encoder.singleValueContainer()
-            try container.encode(self.value)
-        }
-
-    }
-
-    private struct ExpressionAttribute: Hashable, Codable {
-
-        var value: Expression
-
-        var language: Language
-
-    }
-
-    private struct EnumAttribute: Hashable, Codable {
-
-        var cases: Set<String>
-
-        var value: String
-
-    }
-
-    private struct LineAttribute: Hashable, Codable {
-
-        var value: String
-
-        init(_ value: String) {
-            self.value = value
-        }
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.singleValueContainer()
-            self.value = try container.decode(String.self)
-        }
-
-        func encode(to encoder: Encoder) throws {
-            var container = encoder.singleValueContainer()
-            try container.encode(self.value)
-        }
-
-    }
-
-}
-
+/// XMIConvertible conformance.
 extension LineAttribute: XMIConvertible {
 
+    /// The XMI name of this attribute.
     public var xmiName: String? {
         switch self {
         case .bool:
