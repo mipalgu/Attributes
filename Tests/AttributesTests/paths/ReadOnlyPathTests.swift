@@ -129,4 +129,12 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertEqual(newPath, otherPath)
     }
 
+    /// Test fullPath.
+    func testFullPath() {
+        let path = ReadOnlyPath(Point.self)
+        let newPath = ReadOnlyPath<Point, Int>(keyPath: \.x, ancestors: [AnyPath(path)])
+        let fullPath = newPath.ancestors + [AnyPath(newPath)]
+        XCTAssertEqual(newPath.fullPath, fullPath)
+    }
+
 }

@@ -152,4 +152,11 @@ final class PathTests: XCTestCase {
         XCTAssertEqual(newPath, path2)
     }
 
+    /// Test fullPath.
+    func testFullPath() {
+        let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let fullPath = path.ancestors + [AnyPath(path)]
+        XCTAssertEqual(path.fullPath, fullPath)
+    }
+
 }
