@@ -56,7 +56,7 @@
  *
  */
 
-/// A validator that requires values to be present for a validation rule.
+/// A validator that requires values to be present (not nil) for a validation rule.
 public struct RequiredValidator<P: ReadOnlyPathProtocol>: PathValidator where P.Value: Nilable {
 
     /// The type of the object containing the value to be validated.
