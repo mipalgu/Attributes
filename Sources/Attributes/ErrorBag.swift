@@ -59,8 +59,10 @@
 import Foundation
 import swift_helpers
 
+/// A data container for holding errors specific to a set of related Paths.
 public struct ErrorBag<Root> {
 
+    /// The underlying collection type storing the data.
     private var sortedCollection = SortedCollection { (lhs: AttributeError<Root>, rhs: AttributeError<Root>)
         -> ComparisonResult in
         if lhs.path.isSame(as: rhs.path) {
@@ -72,16 +74,22 @@ public struct ErrorBag<Root> {
         return .orderedDescending
     }
 
+    /// All of the errors stored in this container.
     public var allErrors: [AttributeError<Root>] {
         Array(sortedCollection)
     }
 
+    /// Default init. Creates an empty container.
     public init() {}
 
+    /// Empties the container.
     public mutating func empty() {
         self.sortedCollection.empty()
     }
 
+    /// Finds the errors for a path and all the children of path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path and paths children.
     public func errors(
         includingDescendantsForPath path: AnyPath<Root>
     ) -> [AttributeError<Root>] {
@@ -89,19 +97,31 @@ public struct ErrorBag<Root> {
         return Array(sortedCollection.enumerated().filter { indexes.contains($0.0) }.map(\.1))
     }
 
+    /// Finds the errors for a path and all the children of path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path and paths children.
     public func errors<Path: ReadOnlyPathProtocol>(
         includingDescendantsForPath path: Path
     ) -> [AttributeError<Root>] where Path.Root == Root {
         self.errors(includingDescendantsForPath: AnyPath(path))
     }
 
+    /// Finds the errors for a path and all the children of path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path and paths children.
     public func errors<Path: PathProtocol>(
         includingDescendantsForPath path: Path
     ) -> [AttributeError<Root>] where Path.Root == Root {
         self.errors(includingDescendantsForPath: AnyPath(path))
     }
 
+    /// Finds the errors for a path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path.
     public func errors(forPath path: AnyPath<Root>) -> [AttributeError<Root>] {
+        /// Check if a type is an attribute.
+        /// - Parameter type: The type to check.
+        /// - Returns: Whether type is an Attribute.
         func isAttributeType(_ type: Any.Type) -> Bool {
             type == Attribute.self || type == BlockAttribute.self || type == LineAttribute.self
         }
@@ -112,57 +132,81 @@ public struct ErrorBag<Root> {
             return sortedCollection.filter { $0.path == path }
         }
         // Operate with the path that is the attribute type.
+        // swiftlint:disable:next force_unwrapping
         let path = isAttributeType(path.targetType) ? path : path.ancestors[ancestorIndex!]
         // Treat all subpaths of the attribute type as the same when fetching the errors.
         return self.errors(includingDescendantsForPath: path)
     }
 
+    /// Finds the errors for a path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path.
     public func errors<Path: ReadOnlyPathProtocol>(
         forPath path: Path
     ) -> [AttributeError<Root>] where Path.Root == Root {
         self.errors(forPath: AnyPath(path))
     }
 
+    /// Finds the errors for a path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path.
     public func errors<Path: PathProtocol>(
         forPath path: Path
     ) -> [AttributeError<Root>] where Path.Root == Root {
         self.errors(forPath: AnyPath(path))
     }
 
+    /// Remove the errors matching the path and any children of path.
+    /// - Parameter path: The path to remove errors from.
     public mutating func remove(includingDescendantsForPath path: AnyPath<Root>) {
         self.index(includingDescendantsForPath: path).sorted().reversed().forEach {
             _ = sortedCollection.remove(at: $0)
         }
     }
 
+    /// Remove the errors matching the path and any children of path.
+    /// - Parameter path: The path to remove errors from.
     public mutating func remove<Path: ReadOnlyPathProtocol>(
         includingDescendantsForPath path: Path
     ) where Path.Root == Root {
         self.remove(includingDescendantsForPath: AnyPath(path))
     }
 
+    /// Remove the errors matching the path and any children of path.
+    /// - Parameter path: The path to remove errors from.
     public mutating func remove<Path: PathProtocol>(
         includingDescendantsForPath path: Path
     ) where Path.Root == Root {
         self.remove(includingDescendantsForPath: AnyPath(path))
     }
 
+    /// Remove the errors matching the path.
+    /// - Parameter path: The path to remove errors from.
     public mutating func remove(forPath path: AnyPath<Root>) {
         sortedCollection.removeAll(AttributeError(message: "", path: path))
     }
 
+    /// Remove the errors matching the path.
+    /// - Parameter path: The path to remove errors from.
     public mutating func remove<Path: ReadOnlyPathProtocol>(forPath path: Path) where Path.Root == Root {
         self.remove(forPath: AnyPath(path))
     }
 
+    /// Remove the errors matching the path.
+    /// - Parameter path: The path to remove errors from.
     public mutating func remove<Path: PathProtocol>(forPath path: Path) where Path.Root == Root {
         self.remove(forPath: AnyPath(path))
     }
 
+    /// Insert a new error in the container.
+    /// - Parameter error: The error to insert.
     public mutating func insert(_ error: AttributeError<Root>) {
         self.sortedCollection.insert(error)
     }
 
+    /// Find the indexes of the error who share a path.
+    /// - Parameter path: The path to find errors for.
+    /// - Returns: A set containing the indexes of the errors matching the path.
     private func index(includingDescendantsForPath path: AnyPath<Root>) -> IndexSet {
         IndexSet(
             self.sortedCollection
