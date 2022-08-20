@@ -7,24 +7,39 @@
 
 import Foundation
 
-struct ChainValidator<Path: ReadOnlyPathProtocol, Validator: ValidatorProtocol>: ValidatorProtocol where Path.Value == Validator.Root {
+/// A validator for chaining together a Path to a Root and a validator that validates a value in that
+/// root. This validator allows additional validation of any children existing inside a paths value
+/// that are not pointed to by that path.
+struct ChainValidator<Path: ReadOnlyPathProtocol, Validator: ValidatorProtocol>: ValidatorProtocol where
+    Path.Value == Validator.Root {
 
+    /// The path to the root object being validated.
     var path: Path
 
+    /// A validator that validates a value in the root object.
     var validator: Validator
 
+    /// Create a ChainValidator with a path and validator. This init takes a path that points
+    /// to a root object that the validator then acts upon.
+    /// - Parameters:
+    ///   - path: A path to the root object of the validator.
+    ///   - validator: The validator that acts on the root object to validate some value.
     init(path: Path, validator: Validator) {
         self.path = path
         self.validator = validator
     }
 
+    /// Perform the validation of a root object pointed to by path.
+    /// - Parameter root: The parent object containing the object that is to be validated.
+    /// - Throws: Throws an AttributeError when the validation is unsusccessful.
     func performValidation(_ root: Path.Root) throws {
-      let value = root[keyPath: path.keyPath]
-      do {
-          try validator.performValidation(value)
-      } catch let e as AttributeError<Validator.Root> {
-          throw AttributeError(message: e.message, path: AnyPath(path).appending(e.path)!)
-      }
+        let value = root[keyPath: path.keyPath]
+        do {
+            try validator.performValidation(value)
+        } catch let e as AttributeError<Validator.Root> {
+            // swiftlint:disable:next force_unwrapping
+            throw AttributeError(message: e.message, path: AnyPath(path).appending(e.path)!)
+        }
     }
 
 }
