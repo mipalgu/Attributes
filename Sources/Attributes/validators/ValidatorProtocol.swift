@@ -56,10 +56,14 @@
  *
  */
 
+/// Protocol for defining a validation function that can be enacted on a Root object.
 public protocol ValidatorProtocol {
 
+    /// The Root object this validator acts upon.
     associatedtype Root
 
+    /// Perform the validation of the root object.
+    /// - Parameter root: The root object being validated.
     func performValidation(_ root: Root) throws
 
 }
