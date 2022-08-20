@@ -125,6 +125,8 @@ final class ErrorBagTests: XCTestCase {
         let readOnlyErrors = bag.errors(forPath: readOnlyPath)
         XCTAssertEqual(pathErrors.count, anyPathErrors.count)
         XCTAssertEqual(pathErrors.count, readOnlyErrors.count)
+        XCTAssertEqual(Set(pathErrors), Set(anyPathErrors))
+        XCTAssertEqual(Set(pathErrors), Set(readOnlyErrors))
         let expected = xErrors
         XCTAssertEqual(pathErrors.count, expected.count)
         XCTAssertEqual(Set(pathErrors), Set(expected))
@@ -145,6 +147,8 @@ final class ErrorBagTests: XCTestCase {
         let readOnlyErrors = bag.errors(includingDescendantsForPath: readOnlyPath)
         XCTAssertEqual(pathErrors.count, anyPathErrors.count)
         XCTAssertEqual(pathErrors.count, readOnlyErrors.count)
+        XCTAssertEqual(Set(pathErrors), Set(anyPathErrors))
+        XCTAssertEqual(Set(pathErrors), Set(readOnlyErrors))
         let expected = xErrors + pointErrors
         XCTAssertEqual(pathErrors.count, expected.count)
         XCTAssertEqual(Set(pathErrors), Set(expected))
