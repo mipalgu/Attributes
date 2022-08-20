@@ -95,8 +95,6 @@ final class LineAttributeTypeTests: XCTestCase {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
         types.forEach {
-            print("Coding \($0)")
-            fflush(stdout)
             guard let data = try? encoder.encode($0) else {
                 XCTFail("Failed to encode data for \($0)")
                 return
