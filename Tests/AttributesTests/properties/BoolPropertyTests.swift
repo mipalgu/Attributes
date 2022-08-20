@@ -88,6 +88,9 @@ final class BoolPropertyTests: XCTestCase, PropertyTestable {
         let property = BoolProperty(label: label, validation: builder)
         XCTAssertEqual(property.wrappedValue, schema)
         XCTAssertEqual(property.projectedValue.wrappedValue, schema)
+        let property2 = BoolProperty(wrappedValue: schema)
+        XCTAssertEqual(property2.wrappedValue, schema)
+        XCTAssertEqual(property2.projectedValue.wrappedValue, schema)
     }
 
 }
