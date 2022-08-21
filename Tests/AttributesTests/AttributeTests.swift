@@ -232,4 +232,28 @@ final class AttributeTests: XCTestCase {
         XCTAssertEqual(table.tableValue, [[.line("test")]])
     }
 
+    /// Test complex setters.
+    func testComplexSetters() {
+        var collection = Attribute.block(.collection([.bool(true), .bool(false)], display: nil, type: .bool))
+        collection.collectionValue = [.bool(false), .bool(false)]
+        XCTAssertEqual(collection.collectionValue, [.bool(false), .bool(false)])
+        var complex = Attribute.block(
+            .complex(["Name": .line("test")], layout: [Field(name: "Name", type: .line)])
+        )
+        complex.complexValue = ["Name": .line("new")]
+        XCTAssertEqual(complex.complexValue, ["Name": .line("new")])
+        complex.complexFields = [Field(name: "Name2", type: .line)]
+        XCTAssertEqual(complex.complexFields, [Field(name: "Name2", type: .line)])
+        var enumerableCollection = Attribute.block(.enumerableCollection(["1"], validValues: ["1", "2"]))
+        enumerableCollection.enumerableCollectionValue = ["2"]
+        XCTAssertEqual(enumerableCollection.enumerableCollectionValue, ["2"])
+        enumerableCollection.enumerableCollectionValidValues = ["2"]
+        XCTAssertEqual(enumerableCollection.enumerableCollectionValidValues, ["2"])
+        var table = Attribute.block(
+            .table([[.line("test")]], columns: [BlockAttributeType.TableColumn(name: "Name", type: .line)])
+        )
+        table.tableValue = [[.line("new")]]
+        XCTAssertEqual(table.tableValue, [[.line("new")]])
+    }
+
 }
