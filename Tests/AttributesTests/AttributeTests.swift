@@ -108,6 +108,23 @@ final class AttributeTests: XCTestCase {
         }
     }
 
+    /// A path from an Attribute to a LineAttribute.
+    var linePath: ReadOnlyPath<Attribute, LineAttribute> {
+        let attributePath = AnyPath(Path(Attribute.self))
+        let blockPath = AnyPath(Path(path: \Attribute.blockAttribute, ancestors: [attributePath]))
+        let collectionPath = AnyPath(
+            Path(path: \Attribute.blockAttribute.collectionValue, ancestors: [attributePath, blockPath])
+        )
+        let firstPath = AnyPath(Path(
+            path: \Attribute.blockAttribute.collectionValue[0],
+            ancestors: [attributePath, blockPath, collectionPath]
+        ))
+        return ReadOnlyPath(
+            keyPath: \Attribute.blockAttribute.collectionValue[0].lineAttribute,
+            ancestors: [attributePath, blockPath, collectionPath, firstPath]
+        )
+    }
+
     /// Test type property.
     func testTypes() {
         XCTAssertEqual(all.count, allTypes.count)
@@ -167,23 +184,6 @@ final class AttributeTests: XCTestCase {
         blockData.forEach {
             XCTAssertEqual($0.strValue, $1.strValue)
         }
-    }
-
-    /// A path from an Attribute to a LineAttribute.
-    var linePath: ReadOnlyPath<Attribute, LineAttribute> {
-        let attributePath = AnyPath(Path(Attribute.self))
-        let blockPath = AnyPath(Path(path: \Attribute.blockAttribute, ancestors: [attributePath]))
-        let collectionPath = AnyPath(
-            Path(path: \Attribute.blockAttribute.collectionValue, ancestors: [attributePath, blockPath])
-        )
-        let firstPath = AnyPath(Path(
-            path: \Attribute.blockAttribute.collectionValue[0],
-            ancestors: [attributePath, blockPath, collectionPath]
-        ))
-        return ReadOnlyPath(
-            keyPath: \Attribute.blockAttribute.collectionValue[0].lineAttribute,
-            ancestors: [attributePath, blockPath, collectionPath, firstPath]
-        )
     }
 
     /// Test getters for simple types.
