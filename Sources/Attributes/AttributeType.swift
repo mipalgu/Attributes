@@ -200,13 +200,14 @@ public enum AttributeType: Hashable {
 /// Codable conformance.
 extension AttributeType: Codable {
 
+    /// The Coding Keys for this Attribute Type.
     enum CodingKeys: CodingKey {
 
+        /// The type of the attribute (line or block).
         case type
 
-        case line
-
-        case block
+        /// The value of the attribute.
+        case value
 
     }
 
@@ -216,10 +217,10 @@ extension AttributeType: Codable {
         let type = try container.decode(Bool.self, forKey: .type)
         switch type {
         case true:
-            let lineAttributeType = try container.decode(LineAttributeType.self, forKey: .line)
+            let lineAttributeType = try container.decode(LineAttributeType.self, forKey: .value)
             self = .line(lineAttributeType)
         case false:
-            let blockAttributeType = try container.decode(BlockAttributeType.self, forKey: .block)
+            let blockAttributeType = try container.decode(BlockAttributeType.self, forKey: .value)
             self = .block(blockAttributeType)
         }
     }
@@ -230,10 +231,10 @@ extension AttributeType: Codable {
         switch self {
         case .line(let attributeType):
             try container.encode(true, forKey: .type)
-            try container.encode(attributeType, forKey: .line)
+            try container.encode(attributeType, forKey: .value)
         case .block(let attributeType):
             try container.encode(false, forKey: .type)
-            try container.encode(attributeType, forKey: .block)
+            try container.encode(attributeType, forKey: .value)
         }
     }
 
