@@ -57,6 +57,9 @@
 @testable import Attributes
 import XCTest
 
+// swiftlint:disable file_length
+// swiftlint:disable type_body_length
+
 /// Test class for Attribute.
 final class AttributeTests: XCTestCase {
 
@@ -184,6 +187,159 @@ final class AttributeTests: XCTestCase {
         blockData.forEach {
             XCTAssertEqual($0.strValue, $1.strValue)
         }
+    }
+
+    /// Test init from LineAttribute.
+    func testLineInit() {
+        lineAttributes.forEach {
+            XCTAssertEqual(Attribute(lineAttribute: $0), .line($0))
+        }
+    }
+
+    /// Test init from BlockAttribute.
+    func testBlockInit() {
+        blockAttributes.forEach {
+            XCTAssertEqual(Attribute(blockAttribute: $0), .block($0))
+        }
+    }
+
+    /// Test static functions.
+    func testStaticFunctions() {
+        XCTAssertEqual(Attribute.bool(true), .line(.bool(true)))
+        XCTAssertEqual(Attribute.code("x", language: .c), .block(.code("x", language: .c)))
+        XCTAssertEqual(
+            Attribute.complex(
+                ["Name": .line(.line("test"))], layout: [Field(name: "Name", type: .line(.line))]
+            ),
+            .block(
+                .complex(["Name": .line(.line("test"))], layout: [Field(name: "Name", type: .line(.line))])
+            )
+        )
+        XCTAssertEqual(
+            Attribute.enumerableCollection(["1"], validValues: ["1", "2"]),
+            .block(.enumerableCollection(["1"], validValues: ["1", "2"]))
+        )
+        XCTAssertEqual(
+            Attribute.enumerated("1", validValues: ["1", "2"]),
+            .line(.enumerated("1", validValues: ["1", "2"]))
+        )
+        XCTAssertEqual(Attribute.expression("x", language: .c), .line(.expression("x", language: .c)))
+        XCTAssertEqual(Attribute.float(1.0), .line(.float(1.0)))
+        XCTAssertEqual(Attribute.integer(5), .line(.integer(5)))
+        XCTAssertEqual(Attribute.line("test"), .line(.line("test")))
+        XCTAssertEqual(
+            Attribute.table([[.line("test")]], columns: [("Name", .line)]),
+            .block(
+                .table(
+                    [[.line("test")]],
+                    columns: [BlockAttributeType.TableColumn(name: "Name", type: .line)]
+                )
+            )
+        )
+        XCTAssertEqual(Attribute.text("test"), .block(.text("test")))
+    }
+
+    /// Test simple collection static functions.
+    func testSimpleCollectionStaticFunctions() {
+        XCTAssertEqual(
+            Attribute.collection(bools: [true, true]),
+            .block(.collection([.line(.bool(true)), .line(.bool(true))], display: nil, type: .bool))
+        )
+        XCTAssertEqual(
+            Attribute.collection(code: ["x"], language: .c),
+            .block(.collection([.block(.code("x", language: .c))], display: nil, type: .code(language: .c)))
+        )
+        XCTAssertEqual(
+            Attribute.collection(expressions: ["x"], language: .c),
+            .block(
+                .collection(
+                    [.line(.expression("x", language: .c))],
+                    display: nil,
+                    type: .expression(language: .c)
+                )
+            )
+        )
+        XCTAssertEqual(
+            Attribute.collection(floats: [1.0, 2.0]),
+            .block(.collection([.line(.float(1.0)), .line(.float(2.0))], display: nil, type: .float))
+        )
+        XCTAssertEqual(
+            Attribute.collection(integers: [1, 2]),
+            .block(.collection([.line(.integer(1)), .line(.integer(2))], display: nil, type: .integer))
+        )
+        XCTAssertEqual(
+            Attribute.collection(lines: ["x"]),
+            .block(.collection([.line(.line("x"))], display: nil, type: .line))
+        )
+        XCTAssertEqual(
+            Attribute.collection(text: ["test"]),
+            .block(.collection([.block(.text("test"))], display: nil, type: .block(.text)))
+        )
+        XCTAssertEqual(
+            Attribute.collection([.line(.line("test"))], type: .line(.line)),
+            .block(.collection([.line(.line("test"))], display: nil, type: .line(.line)))
+        )
+    }
+
+    /// Test complex collection static functions.
+    func testComplexCollectionStaticFunctions() {
+        let lineCollection = Attribute.block(.collection([.line("x")], display: nil, type: .line))
+        let collection = Attribute.block(
+            .collection([lineCollection], display: nil, type: .collection(type: .line))
+        )
+        let result = Attribute.collection(
+            collection: [[.line("x")]], type: .line
+        )
+        XCTAssertEqual(result, collection)
+        XCTAssertEqual(
+            Attribute.collection(
+                complex: [["Name": .line("text")]], layout: [Field(name: "Name", type: .line)]
+            ),
+            Attribute.block(
+                .collection(
+                    [.block(.complex(["Name": .line("text")], layout: [Field(name: "Name", type: .line)]))],
+                    display: nil,
+                    type: .complex(layout: [Field(name: "Name", type: .line)])
+                )
+            )
+        )
+        XCTAssertEqual(
+            Attribute.collection(enumerables: [["1"]], validValues: ["1", "2"]),
+            .block(
+                .collection(
+                    [.block(.enumerableCollection(["1"], validValues: ["1", "2"]))],
+                    display: nil,
+                    type: .enumerableCollection(validValues: ["1", "2"])
+                )
+            )
+        )
+        XCTAssertEqual(
+            Attribute.collection(enumerated: ["1"], validValues: ["1", "2"]),
+            .block(
+                .collection(
+                    [.line(.enumerated("1", validValues: ["1", "2"]))],
+                    display: nil,
+                    type: .enumerated(validValues: ["1", "2"])
+                )
+            )
+        )
+        XCTAssertEqual(
+            Attribute.collection(tables: [[[.line("test")]]], columns: [("Name", type: .line)]),
+            .block(
+                .collection(
+                    [
+                        .block(
+                            .table(
+                                [[.line("test")]],
+                                columns: [BlockAttributeType.TableColumn(name: "Name", type: .line)]
+                            )
+                        )
+                    ],
+                    display: nil,
+                    type: .table(columns: [("Name", .line)])
+                )
+            )
+        )
     }
 
     /// Test getters for simple types.
@@ -464,3 +620,6 @@ final class AttributeTests: XCTestCase {
     }
 
 }
+
+// swiftlint:enable type_body_length
+// swiftlint:enable file_length
