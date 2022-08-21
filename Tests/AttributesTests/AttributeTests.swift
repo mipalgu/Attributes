@@ -214,4 +214,22 @@ final class AttributeTests: XCTestCase {
         XCTAssertEqual(text.textValue, "new")
     }
 
+    /// Test complex getters.
+    func testComplexGetter() {
+        let collection = Attribute.block(.collection([.bool(true), .bool(false)], display: nil, type: .bool))
+        XCTAssertEqual(collection.collectionValue, [.bool(true), .bool(false)])
+        let complex = Attribute.block(
+            .complex(["Name": .line("test")], layout: [Field(name: "Name", type: .line)])
+        )
+        XCTAssertEqual(complex.complexFields, [Field(name: "Name", type: .line)])
+        XCTAssertEqual(complex.complexValue, ["Name": .line("test")])
+        let enumerableCollection = Attribute.block(.enumerableCollection(["1"], validValues: ["1", "2"]))
+        XCTAssertEqual(enumerableCollection.enumerableCollectionValue, ["1"])
+        XCTAssertEqual(enumerableCollection.enumerableCollectionValidValues, ["1", "2"])
+        let table = Attribute.block(
+            .table([[.line("test")]], columns: [BlockAttributeType.TableColumn(name: "Name", type: .line)])
+        )
+        XCTAssertEqual(table.tableValue, [[.line("test")]])
+    }
+
 }
