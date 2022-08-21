@@ -169,6 +169,7 @@ final class BlockAttributeTypeTests: XCTestCase {
                 XCTFail("Failed to encode data for \($0)")
                 return
             }
+            print("Encoded data: \(String(data: data, encoding: .utf8) ?? "Failed to get encoded data")")
             guard let obj = try? decoder.decode(BlockAttributeType.self, from: data) else {
                 XCTFail("Failed to decode data for \($0)")
                 return
