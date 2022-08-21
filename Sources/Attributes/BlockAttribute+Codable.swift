@@ -54,58 +54,20 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// Codable conformance.
 extension BlockAttribute: Codable {
 
+    /// The coding keys of this type.
     public enum CodingKeys: CodingKey {
+
+        /// The type of the attribute.
         case type
+
+        /// The value of the attribute.
         case value
     }
 
-    public init(from decoder: Decoder) throws {
-        if let code = try? CodeAttribute(from: decoder) {
-            self = .code(code.value, language: code.language)
-            return
-        }
-        if let text = try? TextAttribute(from: decoder) {
-            self = .text(text.value)
-            return
-        }
-        if let collection = try? CollectionAttribute(from: decoder) {
-            self = .collection(collection.values, display: nil, type: collection.type)
-        }
-        if let complex = try? ComplexAttribute(from: decoder) {
-            self = .complex(complex.values, layout: complex.layout)
-        }
-        if let enumCollection = try? EnumCollectionAttribute(from: decoder) {
-            self = .enumerableCollection(enumCollection.values, validValues: enumCollection.cases)
-        }
-        if let table = try? TableAttribute(from: decoder) {
-            self = .table(table.rows, columns: table.columns)
-        }
-        throw DecodingError.dataCorrupted(
-            DecodingError.Context(
-                codingPath: decoder.codingPath,
-                debugDescription: "Unsupported Value"
-            )
-        )
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        switch self {
-        case .code(let value, let language):
-            try CodeAttribute(value: value, language: language).encode(to: encoder)
-        case .text(let value):
-            try TextAttribute(value).encode(to: encoder)
-        case .collection(let values, _, let type):
-            try CollectionAttribute(type: type, values: values).encode(to: encoder)
-        case .complex(let values, let layout):
-            try ComplexAttribute(values: values, layout: layout).encode(to: encoder)
-        case .enumerableCollection(let values, let cases):
-            try EnumCollectionAttribute(cases: cases, values: values).encode(to: encoder)
-        case .table(let rows, columns: let columns):
-            try TableAttribute(rows: rows, columns: columns).encode(to: encoder)
-        }
-    }
+    // swiftlint:disable missing_docs
 
     private struct CodeAttribute: Hashable, Codable {
 
@@ -165,6 +127,56 @@ extension BlockAttribute: Codable {
 
         var columns: [BlockAttributeType.TableColumn]
 
+    }
+
+    // swiftlint:enable missing_docs
+
+    /// Decoder init.
+    public init(from decoder: Decoder) throws {
+        if let code = try? CodeAttribute(from: decoder) {
+            self = .code(code.value, language: code.language)
+            return
+        }
+        if let text = try? TextAttribute(from: decoder) {
+            self = .text(text.value)
+            return
+        }
+        if let collection = try? CollectionAttribute(from: decoder) {
+            self = .collection(collection.values, display: nil, type: collection.type)
+        }
+        if let complex = try? ComplexAttribute(from: decoder) {
+            self = .complex(complex.values, layout: complex.layout)
+        }
+        if let enumCollection = try? EnumCollectionAttribute(from: decoder) {
+            self = .enumerableCollection(enumCollection.values, validValues: enumCollection.cases)
+        }
+        if let table = try? TableAttribute(from: decoder) {
+            self = .table(table.rows, columns: table.columns)
+        }
+        throw DecodingError.dataCorrupted(
+            DecodingError.Context(
+                codingPath: decoder.codingPath,
+                debugDescription: "Unsupported Value"
+            )
+        )
+    }
+
+    /// Encode function.
+    public func encode(to encoder: Encoder) throws {
+        switch self {
+        case .code(let value, let language):
+            try CodeAttribute(value: value, language: language).encode(to: encoder)
+        case .text(let value):
+            try TextAttribute(value).encode(to: encoder)
+        case .collection(let values, _, let type):
+            try CollectionAttribute(type: type, values: values).encode(to: encoder)
+        case .complex(let values, let layout):
+            try ComplexAttribute(values: values, layout: layout).encode(to: encoder)
+        case .enumerableCollection(let values, let cases):
+            try EnumCollectionAttribute(cases: cases, values: values).encode(to: encoder)
+        case .table(let rows, columns: let columns):
+            try TableAttribute(rows: rows, columns: columns).encode(to: encoder)
+        }
     }
 
 }
