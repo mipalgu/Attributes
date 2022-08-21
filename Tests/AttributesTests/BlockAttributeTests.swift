@@ -383,4 +383,21 @@ final class BlockAttributeTests: XCTestCase {
         XCTAssertEqual(tableCollection.collectionTable, [[[.line("1")]], [[.line("1")]]])
     }
 
+    /// Test decode and encode functions.
+    func testDecodeEncode() {
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+        attributes.forEach {
+            guard let data = try? encoder.encode($0) else {
+                XCTFail("Failed to encode data for \($0)")
+                return
+            }
+            guard let obj = try? decoder.decode(BlockAttribute.self, from: data) else {
+                XCTFail("Failed to decode data for \($0)")
+                return
+            }
+            XCTAssertEqual(obj, $0)
+        }
+    }
+
 }
