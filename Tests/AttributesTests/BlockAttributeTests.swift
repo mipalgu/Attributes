@@ -180,6 +180,36 @@ final class BlockAttributeTests: XCTestCase {
         XCTAssertEqual(table.tableValue, [[.line("table")]])
     }
 
+    /// Test value setters.
+    func testValueSetters() {
+        var code = BlockAttribute.code("x", language: .c)
+        code.codeValue = "y"
+        XCTAssertEqual(code.codeValue, "y")
+        var text = BlockAttribute.text("test")
+        text.textValue = "new"
+        XCTAssertEqual(text.textValue, "new")
+        var collection = BlockAttribute.collection([.line("collection")], display: nil, type: .line)
+        collection.collectionValue = [.line("new")]
+        XCTAssertEqual(collection.collectionValue, [.line("new")])
+        var complex = BlockAttribute.complex(
+            ["Name": .line("complex")], layout: [Field(name: "Name", type: .line)]
+        )
+        complex.complexFields = [Field(name: "Name2", type: .line)]
+        XCTAssertEqual(complex.complexFields, [Field(name: "Name2", type: .line)])
+        complex.complexValue = ["Name2": .line("new")]
+        XCTAssertEqual(complex.complexValue, ["Name2": .line("new")])
+        var enumerableCollection = BlockAttribute.enumerableCollection(["1"], validValues: ["1", "2"])
+        enumerableCollection.enumerableCollectionValue = ["2"]
+        XCTAssertEqual(enumerableCollection.enumerableCollectionValue, ["2"])
+        enumerableCollection.enumerableCollectionValidValues = ["2"]
+        XCTAssertEqual(enumerableCollection.enumerableCollectionValidValues, ["2"])
+        var table = BlockAttribute.table(
+            [[.line("table")]], columns: [BlockAttributeType.TableColumn(name: "Name", type: .line)]
+        )
+        table.tableValue = [[.line("new")]]
+        XCTAssertEqual(table.tableValue, [[.line("new")]])
+    }
+
     /// Test simple collection getters.
     func testSimpleCollectionGetters() {
         let boolCollection = BlockAttribute.collection(
