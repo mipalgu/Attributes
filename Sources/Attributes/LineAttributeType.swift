@@ -57,16 +57,28 @@
  */
 
 import XMI
-
+/// All the possible types of a LineAttribute.
 public enum LineAttributeType: Hashable {
 
+    /// A Boolean type.
     case bool
+
+    /// An Integer type.
     case integer
+
+    /// A Double-Precision Floating Point type.
     case float
+
+    /// An Expression in some language.
     case expression(language: Language)
+
+    /// An enumerated value drawn from a set of valid values.
     case enumerated(validValues: Set<String>)
+
+    /// A small String of text.
     case line
 
+    /// The default value of an attribute type.
     public var defaultValue: LineAttribute {
         switch self {
         case .bool:
@@ -86,60 +98,10 @@ public enum LineAttributeType: Hashable {
 
 }
 
+/// Codable conformance.
 extension LineAttributeType: Codable {
 
-    public init(from decoder: Decoder) throws {
-        if let expression = try? ExpressionAttributeType(from: decoder) {
-            self = .expression(language: expression.language)
-            return
-        }
-        if let enumerated = try? EnumAttributeType(from: decoder) {
-            self = .enumerated(validValues: enumerated.validValues)
-            return
-        }
-        guard let name = try? String(from: decoder) else {
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: decoder.codingPath,
-                    debugDescription: "Unsupported type"
-                )
-            )
-        }
-        switch name {
-        case BoolAttributeType().xmiName:
-            self = .bool
-        case IntegerAttributeType().xmiName:
-            self = .integer
-        case FloatAttributeType().xmiName:
-            self = .float
-        case LineAttributeType().xmiName:
-            self = .line
-        default:
-            throw DecodingError.dataCorrupted(
-                DecodingError.Context(
-                    codingPath: decoder.codingPath,
-                    debugDescription: "Unsupported type"
-                )
-            )
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        switch self {
-        case .bool:
-            try BoolAttributeType().xmiName.encode(to: encoder)
-        case .integer:
-            try IntegerAttributeType().xmiName.encode(to: encoder)
-        case .float:
-            try FloatAttributeType().xmiName.encode(to: encoder)
-        case .expression(let language):
-            try ExpressionAttributeType(language: language).encode(to: encoder)
-        case .enumerated(let value):
-            try EnumAttributeType(validValues: value).encode(to: encoder)
-        case .line:
-            try LineAttributeType().xmiName.encode(to: encoder)
-        }
-    }
+    // swiftlint:disable missing_docs
 
     private struct BoolAttributeType: Hashable, Codable, XMIConvertible {
 
@@ -181,10 +143,71 @@ extension LineAttributeType: Codable {
 
     }
 
+    // swiftlint:enable missing_docs
+
+    /// Decoder initialiser.
+    /// - Parameter decoder: The decoder. 
+    public init(from decoder: Decoder) throws {
+        if let expression = try? ExpressionAttributeType(from: decoder) {
+            self = .expression(language: expression.language)
+            return
+        }
+        if let enumerated = try? EnumAttributeType(from: decoder) {
+            self = .enumerated(validValues: enumerated.validValues)
+            return
+        }
+        guard let name = try? String(from: decoder) else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Unsupported type"
+                )
+            )
+        }
+        switch name {
+        case BoolAttributeType().xmiName:
+            self = .bool
+        case IntegerAttributeType().xmiName:
+            self = .integer
+        case FloatAttributeType().xmiName:
+            self = .float
+        case LineAttributeType().xmiName:
+            self = .line
+        default:
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Unsupported type"
+                )
+            )
+        }
+    }
+
+    /// Encode self into data using an encoder.
+    /// - Parameter encoder: The encoder.
+    public func encode(to encoder: Encoder) throws {
+        switch self {
+        case .bool:
+            try BoolAttributeType().xmiName.encode(to: encoder)
+        case .integer:
+            try IntegerAttributeType().xmiName.encode(to: encoder)
+        case .float:
+            try FloatAttributeType().xmiName.encode(to: encoder)
+        case .expression(let language):
+            try ExpressionAttributeType(language: language).encode(to: encoder)
+        case .enumerated(let value):
+            try EnumAttributeType(validValues: value).encode(to: encoder)
+        case .line:
+            try LineAttributeType().xmiName.encode(to: encoder)
+        }
+    }
+
 }
 
+/// XMIConvertible conformance.
 extension LineAttributeType: XMIConvertible {
 
+    /// The XMI name of this attribute type.
     public var xmiName: String? {
         switch self {
         case .bool:
