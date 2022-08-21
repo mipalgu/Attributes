@@ -117,6 +117,23 @@ final class BlockAttributeTests: XCTestCase {
         Array(zip(attributes, xmiNames))
     }
 
+    /// A path from an Attribute to a LineAttribute.
+    var linePath: ReadOnlyPath<Attribute, LineAttribute> {
+        let attributePath = AnyPath(Path(Attribute.self))
+        let blockPath = AnyPath(Path(path: \Attribute.blockAttribute, ancestors: [attributePath]))
+        let collectionPath = AnyPath(
+            Path(path: \Attribute.blockAttribute.collectionValue, ancestors: [attributePath, blockPath])
+        )
+        let firstPath = AnyPath(Path(
+            path: \Attribute.blockAttribute.collectionValue[0],
+            ancestors: [attributePath, blockPath, collectionPath]
+        ))
+        return ReadOnlyPath(
+            keyPath: \Attribute.blockAttribute.collectionValue[0].lineAttribute,
+            ancestors: [attributePath, blockPath, collectionPath, firstPath]
+        )
+    }
+
     /// Test type computed property.
     func testType() {
         valueAndTypes.forEach {
@@ -139,6 +156,109 @@ final class BlockAttributeTests: XCTestCase {
             XCTAssertEqual($0.xmiName, $1)
         }
         XCTAssertEqual(valuesAndXMINames.count, attributes.count)
+    }
+
+    /// Test value getters.
+    func testValueGetters() {
+        let code = BlockAttribute.code("x", language: .c)
+        XCTAssertEqual(code.codeValue, "x")
+        let text = BlockAttribute.text("test")
+        XCTAssertEqual(text.textValue, "test")
+        let collection = BlockAttribute.collection([.line("collection")], display: nil, type: .line)
+        XCTAssertEqual(collection.collectionValue, [.line("collection")])
+        let complex = BlockAttribute.complex(
+            ["Name": .line("complex")], layout: [Field(name: "Name", type: .line)]
+        )
+        XCTAssertEqual(complex.complexFields, [Field(name: "Name", type: .line)])
+        XCTAssertEqual(complex.complexValue, ["Name": .line("complex")])
+        let enumerableCollection = BlockAttribute.enumerableCollection(["1"], validValues: ["1", "2"])
+        XCTAssertEqual(enumerableCollection.enumerableCollectionValue, ["1"])
+        XCTAssertEqual(enumerableCollection.enumerableCollectionValidValues, ["1", "2"])
+        let table = BlockAttribute.table(
+            [[.line("table")]], columns: [BlockAttributeType.TableColumn(name: "Name", type: .line)]
+        )
+        XCTAssertEqual(table.tableValue, [[.line("table")]])
+    }
+
+    /// Test simple collection getters.
+    func testSimpleCollectionGetters() {
+        let boolCollection = BlockAttribute.collection(
+            [.bool(true), .bool(false)], display: linePath, type: .bool
+        )
+        XCTAssertEqual(boolCollection.collectionBools, [true, false])
+        let integerCollection = BlockAttribute.collection(
+            [.integer(1), .integer(2)], display: linePath, type: .integer
+        )
+        XCTAssertEqual(integerCollection.collectionIntegers, [1, 2])
+        let floatCollection = BlockAttribute.collection(
+            [.float(10.0), .float(11.1)], display: linePath, type: .float
+        )
+        XCTAssertEqual(floatCollection.collectionFloats, [10.0, 11.1])
+        let expressionCollection = BlockAttribute.collection(
+            [.expression("x", language: .c), .expression("y", language: .c)],
+            display: linePath,
+            type: .expression(language: .cxx)
+        )
+        XCTAssertEqual(expressionCollection.collectionExpressions, ["x", "y"])
+        let lineCollection = BlockAttribute.collection(
+            [.line("a"), .line("b")], display: linePath, type: .line
+        )
+        XCTAssertEqual(lineCollection.collectionLines, ["a", "b"])
+        let codeCollection = BlockAttribute.collection(
+            [.code("X()", language: .cxx), .code("Y()", language: .cxx)],
+            display: linePath,
+            type: .code(language: .cxx)
+        )
+        XCTAssertEqual(codeCollection.collectionCode, ["X()", "Y()"])
+        let textCollection = BlockAttribute.collection(
+            [.text("a b c"), .text("d e f")], display: linePath, type: .text
+        )
+        XCTAssertEqual(textCollection.collectionText, ["a b c", "d e f"])
+        XCTAssertEqual(boolCollection.collectionDisplay, linePath)
+    }
+
+    /// Test complex collection getters.
+    func testComplexCollectionGetters() {
+        let enumeratedCollection = BlockAttribute.collection(
+            [.enumerated("1", validValues: ["1", "2"]), .enumerated("2", validValues: ["1", "2"])],
+            display: linePath,
+            type: .enumerated(validValues: ["1", "2"])
+        )
+        XCTAssertEqual(enumeratedCollection.collectionEnumerated, ["1", "2"])
+        let complexCollection = BlockAttribute.collection(
+            [
+                .complex(
+                    ["Name": .line("complex")],
+                    layout: [Field(name: "Name", type: .line)]
+                ),
+                .complex(
+                    ["Name2": .line("complex2")],
+                    layout: [Field(name: "Name", type: .line)]
+                )
+            ], display: linePath,
+            type: .complex(layout: [Field(name: "Name", type: .line)])
+        )
+        XCTAssertEqual(
+            complexCollection.collectionComplex, [["Name": .line("complex")], ["Name2": .line("complex2")]]
+        )
+        let enumCollCollection = BlockAttribute.collection(
+            [
+                .enumerableCollection(["1"], validValues: ["1", "2"]),
+                .enumerableCollection(["2"], validValues: ["1", "2"])
+            ],
+            display: linePath,
+            type: .enumerableCollection(validValues: ["1", "2"])
+        )
+        XCTAssertEqual(enumCollCollection.collectionEnumerableCollection, [["1"], ["2"]])
+        let tableCollection = BlockAttribute.collection(
+            [
+                .table([[.line("first")]], columns: [(name: "Name", type: .line)]),
+                .table([[.line("second")]], columns: [(name: "Name", type: .line)])
+            ],
+            display: linePath,
+            type: .table(columns: [(name: "Name", type: .line)])
+        )
+        XCTAssertEqual(tableCollection.collectionTable, [[[.line("first")]], [[.line("second")]]])
     }
 
 }
