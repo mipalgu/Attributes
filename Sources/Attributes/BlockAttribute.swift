@@ -1003,7 +1003,7 @@ extension BlockAttribute: XMIConvertible {
         case .complex:
             return "ComplexAttribute"
         case .enumerableCollection:
-            return "EnumerableAttribute"
+            return "EnumerableCollectionAttribute"
         case .table:
             return "TableAttribute"
         }
