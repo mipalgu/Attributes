@@ -200,31 +200,40 @@ public enum AttributeType: Hashable {
 /// Codable conformance.
 extension AttributeType: Codable {
 
+    enum CodingKeys: CodingKey {
+
+        case type
+
+        case line
+
+        case block
+
+    }
+
     /// Decoder init.
     public init(from decoder: Decoder) throws {
-        if let lineAttributeType = try? LineAttributeType(from: decoder) {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(Bool.self, forKey: .type)
+        switch type {
+        case true:
+            let lineAttributeType = try container.decode(LineAttributeType.self, forKey: .line)
             self = .line(lineAttributeType)
-            return
-        }
-        if let blockAttributeType = try? BlockAttributeType(from: decoder) {
+        case false:
+            let blockAttributeType = try container.decode(BlockAttributeType.self, forKey: .block)
             self = .block(blockAttributeType)
-            return
         }
-        throw DecodingError.dataCorrupted(
-            DecodingError.Context(
-                codingPath: decoder.codingPath,
-                debugDescription: "Unsupported type"
-            )
-        )
     }
 
     /// Encode function.
     public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case .line(let attributeType):
-            try attributeType.encode(to: encoder)
+            try container.encode(true, forKey: .type)
+            try container.encode(attributeType, forKey: .line)
         case .block(let attributeType):
-            try attributeType.encode(to: encoder)
+            try container.encode(false, forKey: .type)
+            try container.encode(attributeType, forKey: .block)
         }
     }
 

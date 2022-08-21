@@ -199,15 +199,19 @@ extension BlockAttributeType: Codable {
         }
         if let complex = try? ComplexAttributeType(from: decoder) {
             self = .complex(layout: complex.layout)
+            return
         }
         if let enumCollection = try? EnumCollectionAttributeType(from: decoder) {
             self = .enumerableCollection(validValues: enumCollection.validValues)
+            return
         }
         if let table = try? TableAttributeType(from: decoder) {
             self = .table(columns: table.columns)
+            return
         }
         if let collection = try? CollectionAttributeType(from: decoder) {
             self = .collection(type: collection.type)
+            return
         }
         guard let name = try? String(from: decoder), name == BlockAttributeType.text.xmiName else {
             throw DecodingError.dataCorrupted(

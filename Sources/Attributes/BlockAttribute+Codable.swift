@@ -133,49 +133,59 @@ extension BlockAttribute: Codable {
 
     /// Decoder init.
     public init(from decoder: Decoder) throws {
-        if let code = try? CodeAttribute(from: decoder) {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+        switch type {
+        case "code":
+            let code = try container.decode(CodeAttribute.self, forKey: .value)
             self = .code(code.value, language: code.language)
-            return
-        }
-        if let text = try? TextAttribute(from: decoder) {
+        case "text":
+            let text = try container.decode(TextAttribute.self, forKey: .value)
             self = .text(text.value)
-            return
-        }
-        if let collection = try? CollectionAttribute(from: decoder) {
+        case "collection":
+            let collection = try container.decode(CollectionAttribute.self, forKey: .value)
             self = .collection(collection.values, display: nil, type: collection.type)
-        }
-        if let complex = try? ComplexAttribute(from: decoder) {
+        case "complex":
+            let complex = try container.decode(ComplexAttribute.self, forKey: .value)
             self = .complex(complex.values, layout: complex.layout)
-        }
-        if let enumCollection = try? EnumCollectionAttribute(from: decoder) {
+        case "enumerableCollection":
+            let enumCollection = try container.decode(EnumCollectionAttribute.self, forKey: .value)
             self = .enumerableCollection(enumCollection.values, validValues: enumCollection.cases)
-        }
-        if let table = try? TableAttribute(from: decoder) {
+        case "table":
+            let table = try container.decode(TableAttribute.self, forKey: .value)
             self = .table(table.rows, columns: table.columns)
-        }
-        throw DecodingError.dataCorrupted(
-            DecodingError.Context(
-                codingPath: decoder.codingPath,
-                debugDescription: "Unsupported Value"
+        default:
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Unsupported type \(type)"
+                )
             )
-        )
+        }
     }
 
     /// Encode function.
     public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case .code(let value, let language):
-            try CodeAttribute(value: value, language: language).encode(to: encoder)
+            try container.encode("code", forKey: .type)
+            try container.encode(CodeAttribute(value: value, language: language), forKey: .value)
         case .text(let value):
-            try TextAttribute(value).encode(to: encoder)
+            try container.encode("text", forKey: .type)
+            try container.encode(TextAttribute(value), forKey: .value)
         case .collection(let values, _, let type):
-            try CollectionAttribute(type: type, values: values).encode(to: encoder)
+            try container.encode("collection", forKey: .type)
+            try container.encode(CollectionAttribute(type: type, values: values), forKey: .value)
         case .complex(let values, let layout):
-            try ComplexAttribute(values: values, layout: layout).encode(to: encoder)
+            try container.encode("complex", forKey: .type)
+            try container.encode(ComplexAttribute(values: values, layout: layout), forKey: .value)
         case .enumerableCollection(let values, let cases):
-            try EnumCollectionAttribute(cases: cases, values: values).encode(to: encoder)
+            try container.encode("enumerableCollection", forKey: .type)
+            try container.encode(EnumCollectionAttribute(cases: cases, values: values), forKey: .value)
         case .table(let rows, columns: let columns):
-            try TableAttribute(rows: rows, columns: columns).encode(to: encoder)
+            try container.encode("table", forKey: .type)
+            try container.encode(TableAttribute(rows: rows, columns: columns), forKey: .value)
         }
     }
 
