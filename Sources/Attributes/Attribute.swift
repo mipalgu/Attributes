@@ -58,15 +58,22 @@
 
 import XMI
 
+/// All types of Attributes. An attribute is a way of grouping common data
+/// types.
 public enum Attribute: Hashable, Identifiable {
 
+    /// The id of the attribute.
     public var id: Int {
         AttributeIDCache.id(for: self)
     }
 
+    /// A line attribute.
     case line(LineAttribute)
+
+    /// A block attribute.
     case block(BlockAttribute)
 
+    /// The type of the attribute.
     public var type: AttributeType {
         switch self {
         case .line(let attribute):
@@ -102,6 +109,7 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// Whether the attribute is a line attribute.
     public var isLine: Bool {
         switch self {
         case .line:
@@ -111,6 +119,7 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// Whether the attribute is a block attribute.
     public var isBlock: Bool {
         switch self {
         case .block:
@@ -120,6 +129,9 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// The LineAttribute version of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute
+    ///            is a block attribute.
     public var lineAttribute: LineAttribute {
         get {
             switch self {
@@ -133,6 +145,9 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// The BlockAttribute version of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute
+    ///            is a line attribute.
     public var blockAttribute: BlockAttribute {
         get {
             switch self {
@@ -146,6 +161,7 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// A string version of this attribute.
     public var strValue: String? {
         switch self {
         case .line(let lineAttribute):
@@ -155,6 +171,9 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// A Bool value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Bool value.
     public var boolValue: Bool {
         get {
             switch self {
@@ -174,6 +193,9 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// An Integer value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Integer value.
     public var integerValue: Int {
         get {
             switch self {
@@ -195,6 +217,9 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// A Float value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Float value.
     public var floatValue: Double {
         get {
             switch self {
@@ -214,6 +239,9 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// An Expression value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Expression value.
     public var expressionValue: Expression {
         get {
             switch self {
@@ -237,6 +265,9 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// An Enumerated value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Enumerated value.
     public var enumeratedValue: String {
         get {
             switch self {
@@ -260,13 +291,21 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// The valid values from an Enumerated attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Enumerated value.
     public var enumeratedValidValues: Set<String> {
         get {
             switch self {
             case .line(let value):
                 return value.enumeratedValidValues
             default:
-                fatalError("Attempting to fetch an enumerated valid value on a line attribute which is not an enumerated attribute")
+                fatalError(
+                    """
+                    Attempting to fetch an enumerated valid value on a line attribute which
+                    is not an enumerated attribute
+                    """
+                )
             }
         }
         set {
@@ -274,11 +313,19 @@ public enum Attribute: Hashable, Identifiable {
             case .line(.enumerated(let value, _)):
                 self = .line(.enumerated(value, validValues: newValue))
             default:
-                fatalError("Attempting to set an enumerated valid value on a line attribute which is not an enumerated attribute")
+                fatalError(
+                    """
+                    Attempting to set an enumerated valid value on a line attribute which
+                    is not an enumerated attribute
+                    """
+                )
             }
         }
     }
 
+    /// A Line value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Line value.
     public var lineValue: String {
         get {
             switch self {
@@ -298,6 +345,9 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// A Code value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Code value.
     public var codeValue: String {
         get {
             switch self {
@@ -317,6 +367,9 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// A Text value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Text value.
     public var textValue: String {
         get {
             switch self {
@@ -328,7 +381,7 @@ public enum Attribute: Hashable, Identifiable {
         }
         set {
             switch self {
-            case .block(.text(_)):
+            case .block(.text):
                 self = .block(.text(newValue))
             default:
                 fatalError("Attempting to set a text value on an attribute which is not a block attribute")
@@ -336,13 +389,21 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// A Collection value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Collection value.
     public var collectionValue: [Attribute] {
         get {
             switch self {
             case .block(let value):
                 return value.collectionValue
             default:
-                fatalError("Attempting to fetch a collection value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection value on an attribute
+                    which is not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -350,18 +411,25 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(_, let display, let type)):
                 self = .block(.collection(newValue, display: display, type: type))
             default:
-                fatalError("Attempting to set a collection value on an attribute which is not a block attribute")
+                fatalError(
+                    "Attempting to set a collection value on an attribute which is not a block attribute"
+                )
             }
         }
     }
 
+    /// Access the Fields of a complex attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Complex value.
     public var complexFields: [Field] {
         get {
             switch self {
             case .block(let value):
                 return value.complexFields
             default:
-                fatalError("Attempting to fetch complex fields on an attribute which is not a block attribute")
+                fatalError(
+                    "Attempting to fetch complex fields on an attribute which is not a block attribute"
+                )
             }
         }
         set {
@@ -374,13 +442,18 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// A Complex value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Complex value.
     public var complexValue: [Label: Attribute] {
         get {
             switch self {
             case .block(let value):
                 return value.complexValue
             default:
-                fatalError("Attempting to fetch a complex value on an attribute which is not a block attribute")
+                fatalError(
+                    "Attempting to fetch a complex value on an attribute which is not a block attribute"
+                )
             }
         }
         set {
@@ -393,13 +466,21 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// An Enumerable Collection value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Enumerable Collection.
     public var enumerableCollectionValue: Set<String> {
         get {
             switch self {
             case .block(let value):
                 return value.enumerableCollectionValue
             default:
-                fatalError("Attempting to fetch an enumerable collection value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch an enumerable collection value on an attribute
+                    which is not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -407,18 +488,31 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.enumerableCollection(_, let validValues)):
                 self = .block(.enumerableCollection(newValue, validValues: validValues))
             default:
-                fatalError("Attempting to set an enumerable collection value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set an enumerable collection value on an attribute
+                    which is not a block attribute
+                    """
+                )
             }
         }
     }
 
+    /// The valid values of an enumerable collection attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Enumerable Collection.
     public var enumerableCollectionValidValues: Set<String> {
         get {
             switch self {
             case .block(let value):
                 return value.enumerableCollectionValidValues
             default:
-                fatalError("Attempting to fetch enumerable collection valid values on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch enumerable collection valid values on an
+                    attribute which is not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -426,11 +520,19 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.enumerableCollection(let values, _)):
                 self = .block(.enumerableCollection(values, validValues: newValue))
             default:
-                fatalError("Attempting to set enumerable collection valid values on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set enumerable collection valid values
+                    on an attribute which is not a block attribute
+                    """
+                )
             }
         }
     }
 
+    /// A Table value of this attribute.
+    /// - Warning: This property will create runtime errors if the attribute is not
+    ///            a valid Table value.
     public var tableValue: [[LineAttribute]] {
         get {
             switch self {
@@ -449,6 +551,9 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// Access the collection values as Bool types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Bool types.
     public var collectionBools: [Bool] {
         get {
             switch self {
@@ -457,10 +562,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .bool:
                     return values.map { $0.boolValue }
                 default:
-                    fatalError("Attempting to fetch a collection bool value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection bool value on an attribute
+                        which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection bool value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection bool value on an
+                    attribute which is not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -472,14 +587,24 @@ public enum Attribute: Hashable, Identifiable {
                         .collection(newValue.map { Attribute.bool($0) }, display: display, type: type)
                     )
                 default:
-                    fatalError("Attempting to set a collection bool value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection bool value on an attribute
+                        which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection bool value on an attribute which is not a block attribute")
+                fatalError(
+                    "Attempting to set a collection bool value on an attribute which is not a block attribute"
+                )
             }
         }
     }
 
+    /// Access the collection values as Integer types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Integer types.
     public var collectionIntegers: [Int] {
         get {
             switch self {
@@ -488,10 +613,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .integer:
                     return values.map { $0.integerValue }
                 default:
-                    fatalError("Attempting to fetch a collection integer value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection integer value on an attribute which
+                        is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection integer value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection integer value on an attribute which
+                    is not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -503,14 +638,27 @@ public enum Attribute: Hashable, Identifiable {
                         .collection(newValue.map { Attribute.integer($0) }, display: display, type: type)
                     )
                 default:
-                    fatalError("Attempting to set a collection integer value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection integer value on an attribute which is not
+                        a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection integer value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection integer value on an attribute which is not a
+                    block attribute
+                    """
+                )
             }
         }
     }
 
+    /// Access the collection values as Float types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Float types.
     public var collectionFloats: [Double] {
         get {
             switch self {
@@ -519,10 +667,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .float:
                     return values.map { $0.floatValue }
                 default:
-                    fatalError("Attempting to fetch a collection float value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection float value on an attribute which
+                        is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection float value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection float value on an attribute which is
+                    not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -534,14 +692,27 @@ public enum Attribute: Hashable, Identifiable {
                         .collection(newValue.map { Attribute.float($0) }, display: display, type: type)
                     )
                 default:
-                    fatalError("Attempting to set a collection float value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection float value on an attribute which is
+                        not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection float value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection float value on an attribute which is
+                    not a block attribute
+                    """
+                )
             }
         }
     }
 
+    /// Access the collection values as Expression types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Expression types.
     public var collectionExpressions: [Expression] {
         get {
             switch self {
@@ -550,10 +721,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .line(.expression):
                     return values.map { $0.expressionValue }
                 default:
-                    fatalError("Attempting to fetch a collection expression value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection expression value on an
+                        attribute which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection expression value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection expression value on an
+                    attribute which is not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -569,14 +750,27 @@ public enum Attribute: Hashable, Identifiable {
                         )
                     )
                 default:
-                    fatalError("Attempting to set a collection expression value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection expression value on an attribute
+                        which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection expression value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection expression value on an attribute
+                    which is not a block attribute
+                    """
+                )
             }
         }
     }
 
+    /// Access the collection values as Enumerated types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Enumerated types.
     public var collectionEnumerated: [String] {
         get {
             switch self {
@@ -585,10 +779,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .line(.enumerated):
                     return values.map({$0.enumeratedValue})
                 default:
-                    fatalError("Attempting to fetch a collection enumerated value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection enumerated value on an attribute
+                        which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection enumerated value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection enumerated value on an attribute
+                    which is not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -604,14 +808,27 @@ public enum Attribute: Hashable, Identifiable {
                         )
                     )
                 default:
-                    fatalError("Attempting to set a collection enumerated value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection enumerated value on an attribute
+                        which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection enumerated value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection enumerated value on an attribute
+                    which is not a block attribute
+                    """
+                )
             }
         }
     }
 
+    /// Access the collection values as Line types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Line types.
     public var collectionLines: [String] {
         get {
             switch self {
@@ -620,10 +837,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .line:
                     return values.map { $0.lineValue }
                 default:
-                    fatalError("Attempting to fetch a collection lines value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection lines value on an
+                        attribute which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection lines value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection lines value on an attribute which is
+                    not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -635,14 +862,27 @@ public enum Attribute: Hashable, Identifiable {
                         .collection(newValue.map { Attribute.line($0) }, display: display, type: type)
                     )
                 default:
-                    fatalError("Attempting to set a collection lines value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection lines value on an attribute which is
+                        not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection lines value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection lines value on an attribute which is
+                    not a block attribute
+                    """
+                )
             }
         }
     }
 
+    /// Access the collection values as Code types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Code types.
     public var collectionCode: [String] {
         get {
             switch self {
@@ -651,10 +891,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .block(.code):
                     return values.map { $0.codeValue }
                 default:
-                    fatalError("Attempting to fetch a collection code value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection code value on an attribute
+                        which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection code value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection code value on an attribute
+                    which is not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -670,14 +920,27 @@ public enum Attribute: Hashable, Identifiable {
                         )
                     )
                 default:
-                    fatalError("Attempting to set a collection code value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection code value on an attribute which
+                        is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection code value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection code value on an attribute which is
+                    not a block attribute
+                    """
+                )
             }
         }
     }
 
+    /// Access the collection values as Text types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Text types.
     public var collectionText: [String] {
         get {
             switch self {
@@ -686,10 +949,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .text:
                     return values.map { $0.textValue }
                 default:
-                    fatalError("Attempting to fetch a collection text value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection text value on an attribute which
+                        is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection text value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection text value on an attribute which is
+                    not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -701,14 +974,27 @@ public enum Attribute: Hashable, Identifiable {
                         .collection(newValue.map { Attribute.text($0) }, display: display, type: type)
                     )
                 default:
-                    fatalError("Attempting to set a collection text value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection text value on an attribute which is
+                        not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection text value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection text value on an attribute which is not
+                    a block attribute
+                    """
+                )
             }
         }
     }
 
+    /// Access the collection values as Complex types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Complex types.
     public var collectionComplex: [[Label: Attribute]] {
         get {
             switch self {
@@ -717,10 +1003,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .block(.complex):
                     return values.map({$0.complexValue})
                 default:
-                    fatalError("Attempting to fetch a collection complex value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection complex value on an attribute which is
+                        not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection complex value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection complex value on an attribute which is not
+                    a block attribute
+                    """
+                )
             }
         }
         set {
@@ -736,14 +1032,27 @@ public enum Attribute: Hashable, Identifiable {
                         )
                     )
                 default:
-                    fatalError("Attempting to set a collection complex value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection complex value on an attribute which is not
+                        a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection complex value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection complex value on an attribute which is not a
+                    block attribute
+                    """
+                )
             }
         }
     }
 
+    /// Access the collection values as Enumerable Collection types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Enumerable Collection types.
     public var collectionEnumerableCollection: [Set<String>] {
         get {
             switch self {
@@ -752,10 +1061,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .block(.enumerableCollection):
                     return values.map({ $0.enumerableCollectionValue })
                 default:
-                    fatalError("Attempting to fetch a collection enumerable collection value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection enumerable collection value on an
+                        attribute which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection enumerable collection value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection enumerable collection value on an
+                    attribute which is not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -771,14 +1090,27 @@ public enum Attribute: Hashable, Identifiable {
                         )
                     )
                 default:
-                    fatalError("Attempting to set a collection enumerable collection value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection enumerable collection value on an
+                        attribute which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection enumerable collection value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection enumerable collection value on an
+                    attribute which is not a block attribute
+                    """
+                )
             }
         }
     }
 
+    /// Access the collection values as Table types.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection value of Table types.
     public var collectionTable: [[[LineAttribute]]] {
         get {
             switch self {
@@ -787,10 +1119,20 @@ public enum Attribute: Hashable, Identifiable {
                 case .block(.table):
                     return values.map({ $0.tableValue })
                 default:
-                    fatalError("Attempting to fetch a collection table value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to fetch a collection table value on an attribute
+                        which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to fetch a collection table value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection table value on an attribute
+                    which is not a block attribute
+                    """
+                )
             }
         }
         set {
@@ -806,21 +1148,39 @@ public enum Attribute: Hashable, Identifiable {
                         )
                     )
                 default:
-                    fatalError("Attempting to set a collection table value on an attribute which is not a block attribute")
+                    fatalError(
+                        """
+                        Attempting to set a collection table value on an attribute
+                        which is not a block attribute
+                        """
+                    )
                 }
             default:
-                fatalError("Attempting to set a collection table value on an attribute which is not a block attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection table value on an attribute which is
+                    not a block attribute
+                    """
+                )
             }
         }
     }
 
+    /// Access the collection display.
+    /// - Warning: This property will cause runtime errors if the attribute is not
+    ///            a collection type.
     public var collectionDisplay: ReadOnlyPath<Attribute, LineAttribute>? {
         get {
             switch self {
             case .block(.collection(_, let display, _)):
                 return display
             default:
-                fatalError("Attempting to fetch a collection display value on an attribute which is not a collection attribute")
+                fatalError(
+                    """
+                    Attempting to fetch a collection display value on an attribute which is
+                    not a collection attribute
+                    """
+                )
             }
         }
         set {
@@ -828,7 +1188,12 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(let values, _, let type)):
                 self = .block(.collection(values, display: newValue, type: type))
             default:
-                fatalError("Attempting to set a collection display value on an attribute which is not a collection attribute")
+                fatalError(
+                    """
+                    Attempting to set a collection display value on an attribute which is not
+                    a collection attribute
+                    """
+                )
             }
         }
     }
