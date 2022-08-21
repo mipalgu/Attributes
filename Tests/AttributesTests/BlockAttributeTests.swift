@@ -335,4 +335,52 @@ final class BlockAttributeTests: XCTestCase {
         XCTAssertEqual(tableCollection.collectionTable, [[[.line("first")]], [[.line("second")]]])
     }
 
+    /// Test complex collection setters.
+    func testComplexCollectionSetters() {
+        var enumeratedCollection = BlockAttribute.collection(
+            [.enumerated("1", validValues: ["1", "2"]), .enumerated("2", validValues: ["1", "2"])],
+            display: linePath,
+            type: .enumerated(validValues: ["1", "2"])
+        )
+        enumeratedCollection.collectionEnumerated = ["1", "1"]
+        XCTAssertEqual(enumeratedCollection.collectionEnumerated, ["1", "1"])
+        var complexCollection = BlockAttribute.collection(
+            [
+                .complex(
+                    ["Name": .line("complex")],
+                    layout: [Field(name: "Name", type: .line)]
+                ),
+                .complex(
+                    ["Name2": .line("complex2")],
+                    layout: [Field(name: "Name", type: .line)]
+                )
+            ], display: linePath,
+            type: .complex(layout: [Field(name: "Name", type: .line)])
+        )
+        complexCollection.collectionComplex = [["Name": .line("1")], ["Name2": .line("2")]]
+        XCTAssertEqual(
+            complexCollection.collectionComplex, [["Name": .line("1")], ["Name2": .line("2")]]
+        )
+        var enumCollCollection = BlockAttribute.collection(
+            [
+                .enumerableCollection(["1"], validValues: ["1", "2"]),
+                .enumerableCollection(["2"], validValues: ["1", "2"])
+            ],
+            display: linePath,
+            type: .enumerableCollection(validValues: ["1", "2"])
+        )
+        enumCollCollection.collectionEnumerableCollection = [["1"], ["1"]]
+        XCTAssertEqual(enumCollCollection.collectionEnumerableCollection, [["1"], ["1"]])
+        var tableCollection = BlockAttribute.collection(
+            [
+                .table([[.line("first")]], columns: [(name: "Name", type: .line)]),
+                .table([[.line("second")]], columns: [(name: "Name", type: .line)])
+            ],
+            display: linePath,
+            type: .table(columns: [(name: "Name", type: .line)])
+        )
+        tableCollection.collectionTable = [[[.line("1")]], [[.line("1")]]]
+        XCTAssertEqual(tableCollection.collectionTable, [[[.line("1")]], [[.line("1")]]])
+    }
+
 }
