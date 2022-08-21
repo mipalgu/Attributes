@@ -58,14 +58,41 @@
 
 import XMI
 
+/// The supported types for a BlockAttribute.
 public enum BlockAttributeType: Hashable {
 
+    /// A code type with a language.
+    case code(language: Language)
+
+    /// A block of text.
+    case text
+
+    /// A collection of other Attributes.
+    indirect case collection(type: AttributeType)
+
+    /// An array of other Attributes.
+    indirect case complex(layout: [Field])
+
+    /// A collection of Attributes drawn from a set of valid values.
+    case enumerableCollection(validValues: Set<String>)
+
+    /// A table with columns and rows.
+    case table(columns: [TableColumn])
+
+    /// Helper struct used to define tables. This struct represents a
+    /// single column of a table.
     public struct TableColumn: Hashable, Codable {
 
+        /// The name of the column.
         public var name: Label
 
+        /// The data type stored in the column.
         public var type: LineAttributeType
 
+        /// Initialise the column with a name and a type.
+        /// - Parameters:
+        ///   - name: The name of the column.
+        ///   - type: The type of the data in the column.
         public init(name: String, type: LineAttributeType) {
             self.name = name
             self.type = type
@@ -73,13 +100,7 @@ public enum BlockAttributeType: Hashable {
 
     }
 
-    case code(language: Language)
-    case text
-    indirect case collection(type: AttributeType)
-    indirect case complex(layout: [Field])
-    case enumerableCollection(validValues: Set<String>)
-    case table(columns: [TableColumn])
-
+    /// Checks whether the type can contain other types.
     public var isRecursive: Bool {
         switch self {
         case .collection, .complex, .table:
@@ -89,6 +110,7 @@ public enum BlockAttributeType: Hashable {
         }
     }
 
+    /// True if the type is a table.
     public var isTable: Bool {
         switch self {
         case .table:
@@ -98,6 +120,7 @@ public enum BlockAttributeType: Hashable {
         }
     }
 
+    /// The default value of the type.
     public var defaultValue: BlockAttribute {
         switch self {
         case .code(let language):
@@ -105,8 +128,8 @@ public enum BlockAttributeType: Hashable {
         case .collection(let type):
             return .collection([], display: nil, type: type)
         case .complex(let fields):
-            let values = Dictionary(uniqueKeysWithValues: fields.map { (field) -> (Label, Attribute) in
-                return (field.name, field.type.defaultValue)
+            let values = Dictionary(uniqueKeysWithValues: fields.map { field -> (Label, Attribute) in
+                (field.name, field.type.defaultValue)
             })
             return .complex(values, layout: fields)
         case .enumerableCollection(let validValues):
@@ -120,19 +143,59 @@ public enum BlockAttributeType: Hashable {
 
 }
 
+/// Codable conformance.
 extension BlockAttributeType: Codable {
 
+    // swiftlint:disable missing_docs
+
+    private struct CodeAttributeType: Hashable, Codable, XMIConvertible {
+
+        var xmiName: String?
+
+        var language: Language
+
+    }
+
+    private struct CollectionAttributeType: Hashable, Codable, XMIConvertible {
+
+        var xmiName: String?
+
+        var type: AttributeType
+
+    }
+
+    private struct ComplexAttributeType: Hashable, Codable, XMIConvertible {
+
+        var xmiName: String?
+
+        var layout: [Field]
+
+    }
+
+    private struct EnumCollectionAttributeType: Hashable, Codable, XMIConvertible {
+
+        var xmiName: String?
+
+        var validValues: Set<String>
+
+    }
+
+    private struct TableAttributeType: Hashable, Codable, XMIConvertible {
+
+        var xmiName: String?
+
+        var columns: [BlockAttributeType.TableColumn]
+
+    }
+
+    // swiftlint:enable missing_docs
+
+    /// Decoder initialiser.
+    /// - Parameter decoder: The decoder. 
     public init(from decoder: Decoder) throws {
         if let code = try? CodeAttributeType(from: decoder) {
             self = .code(language: code.language)
             return
-        }
-        if let _ = try? TextAttributeType(from: decoder) {
-            self = .text
-            return
-        }
-        if let collection = try? CollectionAttributeType(from: decoder) {
-            self = .collection(type: collection.type)
         }
         if let complex = try? ComplexAttributeType(from: decoder) {
             self = .complex(layout: complex.layout)
@@ -143,95 +206,67 @@ extension BlockAttributeType: Codable {
         if let table = try? TableAttributeType(from: decoder) {
             self = .table(columns: table.columns)
         }
-        throw DecodingError.dataCorrupted(
-            DecodingError.Context(
-                codingPath: decoder.codingPath,
-                debugDescription: "Unsupported type"
+        if let collection = try? CollectionAttributeType(from: decoder) {
+            self = .collection(type: collection.type)
+        }
+        guard let name = try? String(from: decoder), name == BlockAttributeType.text.xmiName else {
+            throw DecodingError.dataCorrupted(
+                DecodingError.Context(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Unsupported type"
+                )
             )
-        )
+        }
+        self = .text
     }
 
+    /// Encode function.
+    /// - Parameter encoder: The encoder.
     public func encode(to encoder: Encoder) throws {
+        guard let name = self.xmiName else {
+            throw EncodingError.invalidValue(
+                "name",
+                EncodingError.Context(
+                    codingPath: encoder.codingPath, debugDescription: "Failed to get xmiName"
+                )
+            )
+        }
         switch self {
         case .code(let language):
-            try CodeAttributeType(language: language).encode(to: encoder)
+            try CodeAttributeType(xmiName: name, language: language).encode(to: encoder)
         case .text:
-            try TextAttributeType().encode(to: encoder)
+            try name.encode(to: encoder)
         case .collection(let type):
-            try CollectionAttributeType(type: type).encode(to: encoder)
+            try CollectionAttributeType(xmiName: name, type: type).encode(to: encoder)
         case .complex(let layout):
-            try ComplexAttributeType(layout: layout).encode(to: encoder)
+            try ComplexAttributeType(xmiName: name, layout: layout).encode(to: encoder)
         case .enumerableCollection(let validValues):
-            try EnumCollectionAttributeType(validValues: validValues).encode(to: encoder)
+            try EnumCollectionAttributeType(xmiName: name, validValues: validValues).encode(to: encoder)
         case .table(columns: let columns):
-            try TableAttributeType(columns: columns).encode(to: encoder)
+            try TableAttributeType(xmiName: name, columns: columns).encode(to: encoder)
         }
-    }
-
-    private struct CodeAttributeType: Hashable, Codable, XMIConvertible {
-
-        var xmiName: String? { "CodeAttributeType" }
-
-        var language: Language
-
-    }
-
-    private struct TextAttributeType: Hashable, Codable, XMIConvertible {
-
-        var xmiName: String? { "TextAttributeType" }
-
-    }
-
-    private struct CollectionAttributeType: Hashable, Codable, XMIConvertible {
-
-        var xmiName: String? { "CollectionAttributeType" }
-
-        var type: AttributeType
-
-    }
-
-    private struct ComplexAttributeType: Hashable, Codable, XMIConvertible {
-
-        var xmiName: String? { "ComplexAttributeType" }
-
-        var layout: [Field]
-
-    }
-
-    private struct EnumCollectionAttributeType: Hashable, Codable, XMIConvertible {
-
-        var xmiName: String? { "EnumCollectionAttributeType" }
-
-        var validValues: Set<String>
-
-    }
-
-    private struct TableAttributeType: Hashable, Codable, XMIConvertible {
-
-        var xmiName: String? { "TableAttributeType" }
-
-        var columns: [BlockAttributeType.TableColumn]
-
     }
 
 }
 
+/// XMIConvertible conformance.
 extension BlockAttributeType: XMIConvertible {
 
+    /// The XMI name of this type.
     public var xmiName: String? {
         switch self {
-        case .code(let language):
-            return CodeAttributeType(language: language).xmiName
+        case .code:
+            return "CodeAttributeType"
         case .text:
-            return TextAttributeType().xmiName
-        case .collection(let type):
-            return CollectionAttributeType(type: type).xmiName
-        case .complex(let layout):
-            return ComplexAttributeType(layout: layout).xmiName
-        case .enumerableCollection(let validValues):
-            return EnumCollectionAttributeType(validValues: validValues).xmiName
-        case .table(columns: let columns):
-            return TableAttributeType(columns: columns).xmiName
+            return "TextAttributeType"
+        case .collection:
+            return "CollectionAttributeType"
+        case .complex:
+            return "ComplexAttributeType"
+        case .enumerableCollection:
+            return "EnumCollectionAttributeType"
+        case .table:
+            return "TableAttributeType"
         }
     }
 
