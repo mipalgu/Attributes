@@ -974,7 +974,7 @@ public enum Attribute: Hashable, Identifiable {
             .collection(
                 collection.map { Attribute.collection($0, type: type) },
                 display: display,
-                type: type
+                type: .collection(type: type)
             )
         )
     }
