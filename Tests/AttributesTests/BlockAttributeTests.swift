@@ -247,6 +247,50 @@ final class BlockAttributeTests: XCTestCase {
         XCTAssertEqual(boolCollection.collectionDisplay, linePath)
     }
 
+    /// Test simple collection setters.
+    func testSimpleCollectionSetters() {
+        var boolCollection = BlockAttribute.collection(
+            [.bool(true), .bool(false)], display: linePath, type: .bool
+        )
+        boolCollection.collectionBools = [true, true]
+        XCTAssertEqual(boolCollection.collectionBools, [true, true])
+        var integerCollection = BlockAttribute.collection(
+            [.integer(1), .integer(2)], display: linePath, type: .integer
+        )
+        integerCollection.collectionIntegers = [5, 6]
+        XCTAssertEqual(integerCollection.collectionIntegers, [5, 6])
+        var floatCollection = BlockAttribute.collection(
+            [.float(10.0), .float(11.1)], display: linePath, type: .float
+        )
+        floatCollection.collectionFloats = [1.0, 2.0]
+        XCTAssertEqual(floatCollection.collectionFloats, [1.0, 2.0])
+        var expressionCollection = BlockAttribute.collection(
+            [.expression("x", language: .c), .expression("y", language: .c)],
+            display: linePath,
+            type: .expression(language: .cxx)
+        )
+        expressionCollection.collectionExpressions = ["a", "b"]
+        XCTAssertEqual(expressionCollection.collectionExpressions, ["a", "b"])
+        var lineCollection = BlockAttribute.collection(
+            [.line("a"), .line("b")], display: linePath, type: .line
+        )
+        lineCollection.collectionLines = ["x", "y"]
+        XCTAssertEqual(lineCollection.collectionLines, ["x", "y"])
+        var codeCollection = BlockAttribute.collection(
+            [.code("X()", language: .cxx), .code("Y()", language: .cxx)],
+            display: linePath,
+            type: .code(language: .cxx)
+        )
+        codeCollection.collectionCode = ["1", "2"]
+        XCTAssertEqual(codeCollection.collectionCode, ["1", "2"])
+        var textCollection = BlockAttribute.collection(
+            [.text("a b c"), .text("d e f")], display: linePath, type: .text
+        )
+        textCollection.collectionText = ["1", "2"]
+        XCTAssertEqual(textCollection.collectionText, ["1", "2"])
+        XCTAssertEqual(boolCollection.collectionDisplay, linePath)
+    }
+
     /// Test complex collection getters.
     func testComplexCollectionGetters() {
         let enumeratedCollection = BlockAttribute.collection(
