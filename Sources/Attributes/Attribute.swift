@@ -58,20 +58,23 @@
 
 import XMI
 
+// swiftlint:disable file_length
+// swiftlint:disable type_body_length
+
 /// All types of Attributes. An attribute is a way of grouping common data
 /// types.
 public enum Attribute: Hashable, Identifiable {
-
-    /// The id of the attribute.
-    public var id: Int {
-        AttributeIDCache.id(for: self)
-    }
 
     /// A line attribute.
     case line(LineAttribute)
 
     /// A block attribute.
     case block(BlockAttribute)
+
+    /// The id of the attribute.
+    public var id: Int {
+        AttributeIDCache.id(for: self)
+    }
 
     /// The type of the attribute.
     public var type: AttributeType {
@@ -777,7 +780,7 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(let values, _, type: let type)):
                 switch type {
                 case .line(.enumerated):
-                    return values.map({$0.enumeratedValue})
+                    return values.map { $0.enumeratedValue }
                 default:
                     fatalError(
                         """
@@ -1001,7 +1004,7 @@ public enum Attribute: Hashable, Identifiable {
             case .block(.collection(let values, _, type: let type)):
                 switch type {
                 case .block(.complex):
-                    return values.map({$0.complexValue})
+                    return values.map { $0.complexValue }
                 default:
                     fatalError(
                         """
@@ -1198,54 +1201,96 @@ public enum Attribute: Hashable, Identifiable {
         }
     }
 
+    /// Initialise this attribute from a LineAttribute.
+    /// - Parameter lineAttribute: The equivalent line attribute.
     public init(lineAttribute: LineAttribute) {
         self = .line(lineAttribute)
     }
 
+    /// Initialise this attribute from a BlockAttribute.
+    /// - Parameter blockAttribute: The equivalent block attribute.
     public init(blockAttribute: BlockAttribute) {
         self = .block(blockAttribute)
     }
 
+    /// Create a bool attribute.
+    /// - Parameter value: The value of the attribute.
+    /// - Returns: The bool attribute.
     public static func bool(_ value: Bool) -> Attribute {
         .line(.bool(value))
     }
 
+    // Create an integer attribute.
+    /// - Parameter value: The value of the attribute.
+    /// - Returns: The integer attribute.
     public static func integer(_ value: Int) -> Attribute {
         .line(.integer(value))
     }
 
+    // Create a float attribute.
+    /// - Parameter value: The value of the attribute.
+    /// - Returns: The float attribute.
     public static func float(_ value: Double) -> Attribute {
         .line(.float(value))
     }
 
+    /// Create an expression attribute.
+    /// - Parameters:
+    ///   - value: The value of the expression.
+    ///   - language: The language of the expression.
+    /// - Returns: The expression attribute.
     public static func expression(_ value: Expression, language: Language) -> Attribute {
         .line(.expression(value, language: language))
     }
 
+    // Create a line attribute.
+    /// - Parameter value: The value of the attribute.
+    /// - Returns: The line attribute.
     public static func line(_ value: String) -> Attribute {
         .line(.line(value))
     }
 
+    /// Create a code attribute.
+    /// - Parameters:
+    ///   - value: The code.
+    ///   - language: The language of the code.
+    /// - Returns: The code attribute.
     public static func code(_ value: String, language: Language) -> Attribute {
         .block(.code(value, language: language))
     }
 
+    // Create a text attribute.
+    /// - Parameter value: The value of the attribute.
+    /// - Returns: The text attribute.
     public static func text(_ value: String) -> Attribute {
         .block(.text(value))
     }
 
+    /// Create a collection of bools.
+    /// - Parameter bools: The bools in the collection.
+    /// - Returns: A collection of bools.
     public static func collection(bools: [Bool]) -> Attribute {
         .block(.collection(bools.map { Attribute.bool($0) }, display: nil, type: .bool))
     }
 
+    /// Create a collection of integers.
+    /// - Parameter integers: The integers in the collection.
+    /// - Returns: A collection of integers.
     public static func collection(integers: [Int]) -> Attribute {
         .block(.collection(integers.map { Attribute.integer($0) }, display: nil, type: .integer))
     }
 
+    /// Create a collection of floats.
+    /// - Parameter floats: The floats in the collection.
+    /// - Returns: A collection of floats.
     public static func collection(floats: [Double]) -> Attribute {
         .block(.collection(floats.map { Attribute.float($0) }, display: nil, type: .float))
     }
 
+    /// Create a collection of expressions.
+    /// - Parameter expressions: The expressions in the collection.
+    /// - Parameter language: The language of the expressions.
+    /// - Returns: A collection of expressions.
     public static func collection(expressions: [Expression], language: Language) -> Attribute {
         .block(
             .collection(
@@ -1256,10 +1301,17 @@ public enum Attribute: Hashable, Identifiable {
         )
     }
 
+    /// Create a collection of lines.
+    /// - Parameter lines: The lines in the collection.
+    /// - Returns: A collection of lines.
     public static func collection(lines: [String]) -> Attribute {
         .block(.collection(lines.map { Attribute.line($0) }, display: nil, type: .line))
     }
 
+    /// Create a collection of code.
+    /// - Parameter code: The expressions in the collection.
+    /// - Parameter language: The language of the code.
+    /// - Returns: A collection of code.
     public static func collection(code: [String], language: Language) -> Attribute {
         .block(
             .collection(
@@ -1270,10 +1322,19 @@ public enum Attribute: Hashable, Identifiable {
         )
     }
 
+    /// Create a collection of text.
+    /// - Parameter text: The text in the collection.
+    /// - Returns: A collection of text.
     public static func collection(text: [String]) -> Attribute {
         .block(.collection(text.map { Attribute.text($0) }, display: nil, type: .text))
     }
 
+    /// Create a collection of complex attributes.
+    /// - Parameters:
+    ///   - complex: The complex values in the collection.
+    ///   - layout: The layout of the complex attributes.
+    ///   - display: The display path of the collection.
+    /// - Returns: A collection of complex attributes.
     public static func collection(
         complex: [[Label: Attribute]],
         layout: [Field],
@@ -1288,6 +1349,12 @@ public enum Attribute: Hashable, Identifiable {
         )
     }
 
+    /// Create a collection of enumerated attributes.
+    /// - Parameters:
+    ///   - enumerated: The enumerated values in the collection.
+    ///   - validValues: The valid values of the enumerations.
+    ///   - display: The display path of the collection.
+    /// - Returns: A collection of enumerated attributes.
     public static func collection(
         enumerated: [String],
         validValues: Set<String>,
@@ -1302,6 +1369,12 @@ public enum Attribute: Hashable, Identifiable {
         )
     }
 
+    /// Create a collection of enumerated collections.
+    /// - Parameters:
+    ///   - enumerables: The enumerated collections in the new collection.
+    ///   - validValues: The valid values of the enumerated collections.
+    ///   - display: The display path of the new collection.
+    /// - Returns: A new collection of enumerated collections.
     public static func collection(
         enumerables: [Set<String>],
         validValues: Set<String>,
@@ -1316,6 +1389,12 @@ public enum Attribute: Hashable, Identifiable {
         )
     }
 
+    /// Create a collection of tables.
+    /// - Parameters:
+    ///   - tables: The tables to store in the collection.
+    ///   - columns: The columns in these tables.
+    ///   - display: The display path to the new collection.
+    /// - Returns: A collection of tables.
     public static func collection(
         tables: [[[LineAttribute]]],
         columns: [(name: Label, type: LineAttributeType)],
@@ -1330,6 +1409,12 @@ public enum Attribute: Hashable, Identifiable {
         )
     }
 
+    /// Create a collection of collections.
+    /// - Parameters:
+    ///   - collection: The collections in the new collection.
+    ///   - type: The type of the elements in the collections.
+    ///   - display: The display path of the new collection.
+    /// - Returns: A collection of collections.
     public static func collection(
         collection: [[Attribute]],
         type: AttributeType,
@@ -1344,6 +1429,12 @@ public enum Attribute: Hashable, Identifiable {
         )
     }
 
+    /// Create a collection of Attributes.
+    /// - Parameters:
+    ///   - values: The Attributes in the collection.
+    ///   - type: The type of the Attributes. Each Attribute must be the same type.
+    ///   - display: The display path of the new collection.
+    /// - Returns: A collection of Attributes.
     public static func collection(
         _ values: [Attribute],
         type: AttributeType,
@@ -1352,18 +1443,38 @@ public enum Attribute: Hashable, Identifiable {
         .block(.collection(values, display: display, type: type))
     }
 
+    /// Create a complex attribute.
+    /// - Parameters:
+    ///   - values: The values of the complex attribute.
+    ///   - layout: The layout of the complex attribute.
+    /// - Returns: A new complex attribute.
     public static func complex(_ values: [Label: Attribute], layout: [Field]) -> Attribute {
         .block(.complex(values, layout: layout))
     }
 
+    /// Create an enumerated attribute.
+    /// - Parameters:
+    ///   - value: The value of the enumerated attribute.
+    ///   - validValues: The valid values in the enumerated attribute.
+    /// - Returns: A new enumerated attribute.
     public static func enumerated(_ value: String, validValues: Set<String>) -> Attribute {
         .line(.enumerated(value, validValues: validValues))
     }
 
+    /// Create an enumerable collection.
+    /// - Parameters:
+    ///   - value: The values in the enumerable collection.
+    ///   - validValues: The valid values in the enumerable collection.
+    /// - Returns: A new enumerable collection.
     public static func enumerableCollection(_ value: Set<String>, validValues: Set<String>) -> Attribute {
         .block(.enumerableCollection(value, validValues: validValues))
     }
 
+    /// Create a table attribute.
+    /// - Parameters:
+    ///   - rows: The row in the table.
+    ///   - columns: The columns in the table.
+    /// - Returns: A new table attribute.
     public static func table(
         _ rows: [[LineAttribute]],
         columns: [(name: Label, type: LineAttributeType)]
@@ -1378,8 +1489,12 @@ public enum Attribute: Hashable, Identifiable {
 
 }
 
+// swiftlint:enable type_body_length
+
+/// Codable conformance.
 extension Attribute: Codable {
 
+    /// Decoder init.
     public init(from decoder: Decoder) throws {
         if let lineAttribute = try? LineAttribute(from: decoder) {
             self = .line(lineAttribute)
@@ -1397,6 +1512,7 @@ extension Attribute: Codable {
         )
     }
 
+    /// Encode function.
     public func encode(to encoder: Encoder) throws {
         switch self {
         case .line(let attribute):
@@ -1408,8 +1524,10 @@ extension Attribute: Codable {
 
 }
 
+/// XMIConvertible conformance.
 extension Attribute: XMIConvertible {
 
+    /// The XMI name of this attribute.
     public var xmiName: String? {
         switch self {
         case .line(let attribute):
@@ -1420,3 +1538,5 @@ extension Attribute: XMIConvertible {
     }
 
 }
+
+// swiftlint:enable file_length
