@@ -80,7 +80,15 @@ public struct MakeUnavailableTrigger<Source: PathProtocol, Fields: PathProtocol>
         if fields.isNil(root) {
             return .success(false)
         }
-        root[keyPath: fields.path].removeAll(where: { $0.name == field.name })
+        let indexes = root[keyPath: fields.keyPath].indices.filter {
+            root[keyPath: fields.keyPath][$0] == field
+        }
+        guard !indexes.isEmpty else {
+            return .success(false)
+        }
+        indexes.reversed().forEach {
+            root[keyPath: fields.path].remove(at: $0)
+        }
         return .success(true)
     }
 
