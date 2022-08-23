@@ -60,17 +60,6 @@ import XCTest
 /// Test class for MakeAvailableTrigger.
 final class MakeAvailableTriggerTests: XCTestCase {
 
-    /// A Person struct used for testing.
-    struct Person: Hashable, Equatable {
-
-        /// The fields of the person.
-        var fields: [Field]
-
-        /// The attributes of the person.
-        var attributes: [String: Attribute]
-
-    }
-
     /// Person test data.
     let person = Person(
         fields: [Field(name: "Name", type: .line), Field(name: "Age", type: .integer)],
