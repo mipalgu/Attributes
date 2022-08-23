@@ -57,28 +57,39 @@
 @testable import Attributes
 import XCTest
 
+/// Test class for CustomTrigger.
 final class CustomTriggerTests: XCTestCase {
 
+    /// The custom trigger function.
     let f: (inout Point) -> Result<Bool, AttributeError<Point>> = { _ in
         .success(false)
     }
 
-    var mockFunction: MockFunctionCreator<Point, Result<Bool, AttributeError<Point>>>!
-
+    /// A path to a point.
     let pointPath = Path(Point.self)
 
+    /// The path to the x-value of a point.
     var path: ReadOnlyPath<Point, Int> {
         ReadOnlyPath(keyPath: \Point.x, ancestors: [AnyPath(pointPath)])
     }
 
+    /// A path to the y-value in a point.
     var yPath: Path<Point, Int> {
         Path(path: \Point.y, ancestors: [AnyPath(pointPath)])
     }
 
+    // swiftlint:disable implicitly_unwrapped_optional
+
+    /// A mock helper to verify that the function was called correctly.
+    var mockFunction: MockFunctionCreator<Point, Result<Bool, AttributeError<Point>>>!
+
+    /// Some test data.
     var point: Point!
 
+    /// The trigger under test.
     var trigger: CustomTrigger<ReadOnlyPath<Point, Int>>!
 
+    /// Initialise the test data and trigger before every test.
     override func setUp() {
         self.mockFunction = MockFunctionCreator(fn: f)
         point = Point(x: 3, y: 4)
@@ -86,6 +97,8 @@ final class CustomTriggerTests: XCTestCase {
             self.mockFunction.perform(parameter: &$0)
         }
     }
+
+    // swiftlint:enable implicitly_unwrapped_optional
 
     /// Test init sets properties correctly.
     func testInit() {
@@ -107,6 +120,7 @@ final class CustomTriggerTests: XCTestCase {
         XCTAssertEqual(trigger.performTrigger(&point, for: AnyPath(yPath)), .success(false))
     }
 
+    /// Test perform calls function correctly for valid path.
     func testPerformWithValidPath() {
         let result = trigger.performTrigger(&point, for: AnyPath(path))
         XCTAssertEqual(result, .success(false))
