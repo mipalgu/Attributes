@@ -56,30 +56,52 @@
  *
  */
 
+/// A trigger that can be customised to perform a function when triggered.
 public struct CustomTrigger<Path: ReadOnlyPathProtocol>: TriggerProtocol {
 
+    /// The root of the trigger is equal to the path root.
     public typealias Root = Path.Root
 
+    /// An AnyPath representation of the actualPath.
     public var path: AnyPath<Root> {
         AnyPath(actualPath)
     }
 
+    /// The path to the object containing the property that triggers the actions of this trigger.
     private let actualPath: Path
 
+    /// The trigger function which is enacted when this trigger fires.
     private let trigger: (inout Root) -> Result<Bool, AttributeError<Root>>
 
+    /// Create a custom trigger for a given path and executing a custom trigger function.
+    /// - Parameters:
+    ///   - path: A path to a property that causes this trigger to fire when changed.
+    ///   - trigger: The trigger function that is executed when this trigger fires.
     public init(path: Path, trigger: @escaping (inout Root) -> Result<Bool, AttributeError<Root>>) {
         self.actualPath = path
         self.trigger = trigger
     }
 
-    public func performTrigger(_ root: inout Root, for path: AnyPath<Root>) -> Result<Bool, AttributeError<Root>> {
+    /// Execute the trigger function when the property in root pointed to by path changes.
+    /// - Parameters:
+    ///   - root: The root object containing the property.
+    ///   - path: The path of the property within root.
+    /// - Returns: The output of the trigger function if the path to the property is valid, .success(false)
+    ///            otherwise.
+    public func performTrigger(
+        _ root: inout Root, for path: AnyPath<Root>
+    ) -> Result<Bool, AttributeError<Root>> {
         if !isTriggerForPath(path, in: root) {
             return .success(false)
         }
         return trigger(&root)
     }
 
+    /// Check if a path triggers this object.
+    /// - Parameters:
+    ///   - path: The path to a property that may trigger this object.
+    ///   - root: The root object containing the property pointed to by path.
+    /// - Returns: Whether this trigger fires from path.
     public func isTriggerForPath(_ path: AnyPath<Root>, in root: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }
