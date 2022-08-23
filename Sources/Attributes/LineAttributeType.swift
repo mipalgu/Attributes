@@ -84,7 +84,7 @@ public enum LineAttributeType: Hashable {
         case .bool:
             return .bool(false)
         case .enumerated(let validValues):
-            return .enumerated(validValues.first ?? "", validValues: validValues)
+            return .enumerated(validValues.min() ?? "", validValues: validValues)
         case .expression(let language):
             return .expression("", language: language)
         case .float:

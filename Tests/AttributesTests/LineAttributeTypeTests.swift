@@ -81,7 +81,7 @@ final class LineAttributeTypeTests: XCTestCase {
         XCTAssertEqual(LineAttributeType.expression(language: .c).defaultValue, .expression("", language: .c))
         XCTAssertEqual(
             LineAttributeType.enumerated(validValues: validValues).defaultValue,
-            .enumerated(validValues.first ?? "", validValues: validValues)
+            .enumerated(validValues.min() ?? "", validValues: validValues)
         )
         XCTAssertEqual(
             LineAttributeType.enumerated(validValues: []).defaultValue,
