@@ -54,20 +54,34 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// A type-erased SearchablePath.
 public struct AnySearchablePath<Root, Value>: SearchablePath {
 
+    /// The isAncestorOrSame function executed by this path.
     private let _isAncestorOrSame: (AnyPath<Root>, Root) -> Bool
+
+    /// The paths function executed by this path.
     private let _paths: (Root) -> [Path<Root, Value>]
 
+    /// Create a type-erased version of a SearchablePath.
+    /// - Parameter base: The path to convert.
     public init<Base: SearchablePath>(_ base: Base) where Base.Root == Root, Base.Value == Value {
         self._isAncestorOrSame = { base.isAncestorOrSame(of: $0, in: $1) }
         self._paths = { base.paths(in: $0) }
     }
 
+    /// Check whether a given path exists as a subpath between the Root and Value pointed to by this path.
+    /// - Parameters:
+    ///   - path: The path to check.
+    ///   - root: The root object containing the properties pointed to by this path.
+    /// - Returns: Whether self is a parent of path.
     public func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
         self._isAncestorOrSame(path, root)
     }
 
+    /// Create an array of all paths between the root object and the value.
+    /// - Parameter root: The root object containing the properties pointed to by this path.
+    /// - Returns: An array of all paths between Root and Value.
     public func paths(in root: Root) -> [Path<Root, Value>] {
         self._paths(root)
     }
