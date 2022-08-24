@@ -172,4 +172,31 @@ final class PathTests: XCTestCase {
         XCTAssertTrue(path.isAncestorOrSame(of: AnyPath(path), in: point))
     }
 
+    /// Test paths returns self in an array.
+    func testPaths() {
+        let pointPath = Path(Point.self)
+        let point = Point(x: 3, y: 4)
+        XCTAssertEqual(pointPath.paths(in: point), [pointPath])
+    }
+
+    /// Test appending method.
+    func testAppendingPoint() {
+        let pointArray = Path([Point].self)
+        let pointPath = Path(path: \[Point][0], ancestors: [AnyPath(pointArray)])
+        let pointXPath = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        let expectedPath = Path(path: \[Point][0].x, ancestors: [AnyPath(pointArray), AnyPath(pointPath)])
+        XCTAssertEqual(pointPath.appending(path: pointXPath), expectedPath)
+    }
+
+    /// Test toNewRoot method correctly prepends path.
+    func testToNewRoot() {
+        let path = Path(Point.self)
+        let xPath = Path(path: \Point.x, ancestors: [AnyPath(path)])
+        let pointArray = Path([Point].self)
+        let point0 = Path(path: \[Point][0], ancestors: [AnyPath(pointArray)])
+        let newPath = xPath.changeRoot(path: point0)
+        let expected = Path(path: \[Point][0].x, ancestors: [AnyPath(pointArray), AnyPath(point0)])
+        XCTAssertEqual(newPath, expected)
+    }
+
 }
