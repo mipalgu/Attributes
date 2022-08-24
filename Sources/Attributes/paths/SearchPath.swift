@@ -77,31 +77,6 @@ public protocol ConvertibleSearchablePath: SearchablePath {
 
 }
 
-extension Path: ConvertibleSearchablePath {
-
-    public func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
-        let anyPath = AnyPath(self)
-        return anyPath.isSame(as: path) || anyPath.isParent(of: path)
-    }
-
-    public func paths(in root: Root) -> [Path<Root, Value>] {
-        return [self]
-    }
-
-    public func appending<Path: PathProtocol>(path: Path) -> AnySearchablePath<Root, Path.Value> where Path.Root == Value {
-        let ancestors = self.ancestors + path.ancestors.map { $0.changeRoot(path: self) }
-        return AnySearchablePath(Attributes.Path<Root, Path.Value>(path: self.path.appending(path: path.path), ancestors: ancestors))
-    }
-
-    public func toNewRoot<Path: PathProtocol>(path: Path) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root {
-        let ancestors = self.ancestors.map {
-            $0.changeRoot(path: path)
-        }
-        return AnySearchablePath(Attributes.Path<Path.Root, Value>(path: path.path.appending(path: self.path), ancestors: ancestors))
-    }
-
-}
-
 public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchablePath where Collection: MutableCollection, Collection.Index: BinaryInteger {
 
     public typealias Root = Root
