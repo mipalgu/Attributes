@@ -56,10 +56,13 @@
  *
  */
 
+/// A container that stores a writeable path.
 public protocol PathContainer {
 
+    /// The type of the path stored.
     associatedtype Path: PathProtocol
 
+    /// The path stored in this container.
     var path: Path { get }
 
 }

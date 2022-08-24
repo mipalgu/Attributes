@@ -56,10 +56,13 @@
  *
  */
 
+/// A container storing a read-only path.
 public protocol ReadOnlyPathContainer {
 
+    /// The type of the read-only path.
     associatedtype Path: ReadOnlyPathProtocol
 
+    /// The path stored in the container.
     var path: Path { get }
 
 }
