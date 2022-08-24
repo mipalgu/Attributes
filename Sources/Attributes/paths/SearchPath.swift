@@ -56,13 +56,28 @@
  *
  */
 
+/// Provides functions for searching a path for sub-paths that exist between the Root and
+/// Value pointed to by the path.
 public protocol SearchablePath {
 
+    /// The type of the root object pointed to by this path.
     associatedtype Root
+
+    /// The type of the value within the Root object pointed to by this path.
     associatedtype Value
 
+    /// Check whether a Path exists within a sub-path between the Root object and the Value pointed to by this
+    /// path.
+    /// - Parameters:
+    ///   - path: The path to check.
+    ///   - root: The root object containing the value pointed to by this path.
+    /// - Returns: Whether path exists between the root object and value pointed to by this path.
     func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool
 
+    /// Create an array of all possible sub-paths between the Root object and the Value pointed to by this
+    /// path.
+    /// - Parameter root: The root object containing the properties pointed to by this path.
+    /// - Returns: An array of all subpaths between Root and Value.
     func paths(in root: Root) -> [Path<Root, Value>]
 
 }
