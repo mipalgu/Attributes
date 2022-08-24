@@ -129,8 +129,8 @@ final class CollectionSearchPathTests: XCTestCase {
             Path(path: \Person.fields[1].name, ancestors: ancestors + [AnyPath(field1)])
         ]
         XCTAssertEqual(collectionSearchPath.paths(in: person), expected)
-        print("Collection Paths: \(collectionSearchPath.paths(in: person).map(\.ancestors).count)")
-        print("Expected Paths: \(expected.map(\.ancestors).count)")
+        // print("Collection Paths: \(collectionSearchPath.paths(in: person).map(\.ancestors).count)")
+        // print("Expected Paths: \(expected.map(\.ancestors).count)")
     }
 
     /// Test appending method correctly appends the new path.
