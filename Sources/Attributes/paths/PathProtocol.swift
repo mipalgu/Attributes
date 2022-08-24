@@ -56,39 +56,6 @@
  *
  */
 
-/// Path to a value that can only be read and never mutated.
-public protocol ReadOnlyPathProtocol: Hashable {
-
-    /// The Root type containing the value.
-    associatedtype Root
-
-    /// The type of the value.
-    associatedtype Value
-
-    /// An array to all members starting at root and finishing just before the value.
-    var ancestors: [AnyPath<Root>] { get }
-
-    /// A KeyPath equivalent type of this path.
-    var keyPath: KeyPath<Root, Value> { get }
-
-    /// Determines if the value pointed to by this path is nil inside a given object.
-    /// - Parameter root: The object containing the value.
-    /// - Returns: Whether the value in root is nil.
-    func isNil(_ root: Root) -> Bool
-
-}
-
-/// fullPath computed property.
-extension ReadOnlyPathProtocol {
-
-    /// An array of all paths between the root object and the value
-    /// pointed to by this path inclusive.
-    public var fullPath: [AnyPath<Root>] {
-        self.ancestors + [AnyPath(self)]
-    }
-
-}
-
 /// Path to a value that can only be read and written to.
 public protocol PathProtocol: ReadOnlyPathProtocol {
 
