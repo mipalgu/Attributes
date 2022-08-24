@@ -57,35 +57,35 @@
 import Attributes
 
 /// A Mock search path.
-    class MockCollectionSearchPath<Root, Value>: SearchablePath where Root: Hashable {
+class MockCollectionSearchPath<Root, Value>: SearchablePath where Root: Hashable {
 
-        /// Parameters for isAncestorOrSame function.
-        struct AncestorParameters<Root>: Equatable, Hashable where Root: Hashable {
+    /// Parameters for isAncestorOrSame function.
+    struct AncestorParameters<Root>: Equatable, Hashable where Root: Hashable {
 
-            /// The path.
-            var path: AnyPath<Root>
+        /// The path.
+        var path: AnyPath<Root>
 
-            /// The root object.
-            var root: Root
-
-        }
-
-        /// The ancestors mock function.
-        var ancestor = MockFunctionCreator<AncestorParameters<Root>, Bool> { _ in true }
-
-        /// The paths mock function.
-        var paths = MockFunctionCreator<Root, [Path<Root, Value>]> { _ in [] }
-
-        /// Delegate to mock functions.
-        func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
-            var mock = AncestorParameters(path: path, root: root)
-            return ancestor.perform(parameter: &mock)
-        }
-
-        /// Delegate to mock functions.
-        func paths(in root: Root) -> [Path<Root, Value>] {
-            var root = root
-            return paths.perform(parameter: &root)
-        }
+        /// The root object.
+        var root: Root
 
     }
+
+    /// The ancestors mock function.
+    var ancestor = MockFunctionCreator<AncestorParameters<Root>, Bool> { _ in true }
+
+    /// The paths mock function.
+    var paths = MockFunctionCreator<Root, [Path<Root, Value>]> { _ in [] }
+
+    /// Delegate to mock functions.
+    func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
+        var mock = AncestorParameters(path: path, root: root)
+        return ancestor.perform(parameter: &mock)
+    }
+
+    /// Delegate to mock functions.
+    func paths(in root: Root) -> [Path<Root, Value>] {
+        var root = root
+        return paths.perform(parameter: &root)
+    }
+
+}
