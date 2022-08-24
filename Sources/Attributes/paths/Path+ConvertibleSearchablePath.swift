@@ -54,27 +54,55 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// ConvertibleSearchablePath conformance.
 extension Path: ConvertibleSearchablePath {
 
+    /// Checks if self is a parent or the same as a given path in a root object.
+    /// - Parameters:
+    ///   - path: The path to compare too.
+    ///   - root: The root object containing the property pointed to by path.
+    /// - Returns: True if self is a parent of the path, false otherwise.
     public func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
         let anyPath = AnyPath(self)
         return anyPath.isSame(as: path) || anyPath.isParent(of: path)
     }
 
+    /// Returns the paths from the Root object to the Value.
+    /// - Parameter root: The root object.
+    /// - Returns: An array of paths from root to the value pointed to by self.
     public func paths(in root: Root) -> [Path<Root, Value>] {
-        return [self]
+        [self]
     }
 
-    public func appending<Path: PathProtocol>(path: Path) -> AnySearchablePath<Root, Path.Value> where Path.Root == Value {
+    /// Creates a new path by appending a path to self. This changes the value pointed to by self in the new
+    /// path.
+    /// - Parameter path: The patht o append to self.
+    /// - Returns: The new path.
+    public func appending<Path: PathProtocol>(
+        path: Path
+    ) -> AnySearchablePath<Root, Path.Value> where Path.Root == Value {
         let ancestors = self.ancestors + path.ancestors.map { $0.changeRoot(path: self) }
-        return AnySearchablePath(Attributes.Path<Root, Path.Value>(path: self.path.appending(path: path.path), ancestors: ancestors))
+        return AnySearchablePath(
+            Attributes.Path<Root, Path.Value>(
+                path: self.path.appending(path: path.path), ancestors: ancestors
+            )
+        )
     }
 
-    public func toNewRoot<Path: PathProtocol>(path: Path) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root {
+    /// Creates a new path that points to the same value as self but has a different root object.
+    /// - Parameter path: A path from the new root object to the current root object.
+    /// - Returns: The new path.
+    public func toNewRoot<Path: PathProtocol>(
+        path: Path
+    ) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root {
         let ancestors = self.ancestors.map {
             $0.changeRoot(path: path)
         }
-        return AnySearchablePath(Attributes.Path<Path.Root, Value>(path: path.path.appending(path: self.path), ancestors: ancestors))
+        return AnySearchablePath(
+            Attributes.Path<Path.Root, Value>(
+                path: path.path.appending(path: self.path), ancestors: ancestors
+            )
+        )
     }
 
 }
