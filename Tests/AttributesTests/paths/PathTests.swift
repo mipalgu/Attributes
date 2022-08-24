@@ -159,4 +159,17 @@ final class PathTests: XCTestCase {
         XCTAssertEqual(path.fullPath, fullPath)
     }
 
+    /// Test isAncestorOrSame function for ancestor case.
+    func testIsAncestorOrSame() {
+        let pointPath = Path(Point.self)
+        let path = Path(path: \Point.x, ancestors: [AnyPath(pointPath)])
+        XCTAssertTrue(pointPath.isAncestorOrSame(of: AnyPath(path), in: point))
+    }
+
+    /// Test same path in isAncestorOrSame function.
+    func testIsSame() {
+        let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
+        XCTAssertTrue(path.isAncestorOrSame(of: AnyPath(path), in: point))
+    }
+
 }
