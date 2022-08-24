@@ -144,4 +144,17 @@ final class CollectionSearchPathTests: XCTestCase {
         )
     }
 
+    /// Test toNewRoot function correctly changes root.
+    func testToNewRoot() {
+        let newRoot = Path([Person].self)
+        let person0 = Path(path: \[Person][0], ancestors: [AnyPath(newRoot)])
+        let newPath = collectionSearchPath.toNewRoot(path: person0)
+        let data = [person]
+        let paths = newPath.paths(in: data)
+        let expectedPaths = collectionSearchPath.paths(in: person).flatMap {
+            $0.toNewRoot(path: person0).paths(in: data)
+        }
+        XCTAssertEqual(paths, expectedPaths)
+    }
+
 }
