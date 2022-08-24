@@ -67,12 +67,25 @@ public protocol SearchablePath {
 
 }
 
+/// Provides methods for modifying a path such as appending path components and changing the root
+/// of the path.
 public protocol ConvertibleSearchablePath: SearchablePath {
 
+    /// The value pointed to by this path.
     associatedtype Value
 
-    func appending<Path: PathProtocol>(path: Path) -> AnySearchablePath<Root, Path.Value> where Path.Root == Value
+    /// Append a new path to end of this path.
+    /// - Parameter path: The path to append to this path.
+    /// - Returns: The new path with the path appended to self.
+    func appending<Path: PathProtocol>(
+        path: Path
+    ) -> AnySearchablePath<Root, Path.Value> where Path.Root == Value
 
-    func toNewRoot<Path: PathProtocol>(path: Path) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root
+    /// Change the root of this path.
+    /// - Parameter path: The path containing the new root.
+    /// - Returns: A new path pointing to the same value as this path but with a different root.
+    func toNewRoot<Path: PathProtocol>(
+        path: Path
+    ) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root
 
 }
