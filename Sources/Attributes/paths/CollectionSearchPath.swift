@@ -79,7 +79,7 @@ public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchab
         }
     }
     public func paths(in root: Root) -> [Path<Root, Value>] {
-        return root[keyPath: collectionPath.keyPath].indices.flatMap { (index) -> [Path<Root, Value>] in
+        root[keyPath: collectionPath.keyPath].indices.flatMap { index -> [Path<Root, Value>] in
             let newElementPath = elementPath.toNewRoot(path: collectionPath[index])
             return newElementPath.paths(in: root)
         }

@@ -116,7 +116,12 @@ final class CollectionSearchPathTests: XCTestCase {
 
     /// Test isAncestorOrSame returns true for same path.
     func testIsSame() {
-        XCTAssertTrue(collectionSearchPath.isAncestorOrSame(of: AnyPath(collectionPath), in: person))
+        let field0 = Path(path: \Person.fields[0], ancestors: [AnyPath(personPath), AnyPath(collectionPath)])
+        let nameField = Path(
+            path: \Person.fields[0].name,
+            ancestors: [AnyPath(personPath), AnyPath(collectionPath), AnyPath(field0)]
+        )
+        XCTAssertTrue(collectionSearchPath.isAncestorOrSame(of: AnyPath(nameField), in: person))
     }
 
     /// Test paths function returns the correct paths.
@@ -129,8 +134,8 @@ final class CollectionSearchPathTests: XCTestCase {
             Path(path: \Person.fields[1].name, ancestors: ancestors + [AnyPath(field1)])
         ]
         XCTAssertEqual(collectionSearchPath.paths(in: person), expected)
-        // print("Collection Paths: \(collectionSearchPath.paths(in: person).map(\.ancestors).count)")
-        // print("Expected Paths: \(expected.map(\.ancestors).count)")
+        print("Collection Paths: \(collectionSearchPath.paths(in: person))")
+        print("Expected Paths: \(expected)")
     }
 
     /// Test appending method correctly appends the new path.

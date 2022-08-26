@@ -74,10 +74,10 @@ public protocol SearchablePath {
     /// - Returns: Whether path exists between the root object and value pointed to by this path.
     func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool
 
-    /// Create an array of all possible sub-paths between the Root object and the Value pointed to by this
-    /// path.
+    /// Create an array of all possible paths that match self in the root object. For example, consider a
+    /// collection that contains an array of 
     /// - Parameter root: The root object containing the properties pointed to by this path.
-    /// - Returns: An array of all subpaths between Root and Value.
+    /// - Returns: An array of all paths matching the SearchablePath.
     func paths(in root: Root) -> [Path<Root, Value>]
 
 }
