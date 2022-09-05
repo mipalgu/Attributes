@@ -95,14 +95,13 @@ extension Path: ConvertibleSearchablePath {
     public func toNewRoot<Path: PathProtocol>(
         path: Path
     ) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root {
-        let ancestors = self.ancestors.map {
+        let ancestors = path.ancestors + self.ancestors.map {
             $0.changeRoot(path: path)
         }
-        return AnySearchablePath(
-            Attributes.Path<Path.Root, Value>(
-                path: path.path.appending(path: self.path), ancestors: ancestors
-            )
+        let newPath = Attributes.Path<Path.Root, Value>(
+            path: path.path.appending(path: self.path), ancestors: ancestors
         )
+        return AnySearchablePath(newPath)
     }
 
 }

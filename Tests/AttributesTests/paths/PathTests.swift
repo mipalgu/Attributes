@@ -177,6 +177,13 @@ final class PathTests: XCTestCase {
         let pointPath = Path(Point.self)
         let point = Point(x: 3, y: 4)
         XCTAssertEqual(pointPath.paths(in: point), [pointPath])
+        let xPath = Path(path: \Point.x, ancestors: [AnyPath(pointPath)])
+        XCTAssertEqual(xPath.paths(in: point), [xPath])
+        let pointArray = Path([Point].self)
+        let point0 = Path(path: \[Point][0], ancestors: [AnyPath(pointArray)])
+        let point0X = Path(path: \[Point][0].x, ancestors: [AnyPath(pointArray), AnyPath(point0)])
+        XCTAssertEqual(point0X.paths(in: [point, point]), [point0X])
+        XCTAssertEqual(point0X.paths(in: [point]), [point0X])
     }
 
     /// Test appending method.

@@ -133,10 +133,52 @@ final class CollectionSearchPathTests: XCTestCase {
             Path(path: \Person.fields[0].name, ancestors: ancestors + [AnyPath(field0)]),
             Path(path: \Person.fields[1].name, ancestors: ancestors + [AnyPath(field1)])
         ]
-        XCTAssertEqual(collectionSearchPath.paths(in: person), expected)
-        print("Collection Paths: \(collectionSearchPath.paths(in: person))")
-        print("Expected Paths: \(expected)")
+        let result = collectionSearchPath.paths(in: person)
+        XCTAssertEqual(result, expected)
     }
+// swiftlint:disable line_length
+// RESULT:
+// ("[
+//     Attributes.Path<AttributesTests.Person, Swift.String>(
+//         ancestors: [
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person>,
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person> -> Swift.WritableKeyPath<AttributesTests.Person, Swift.Array<Attributes.Field>>,
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person> -> Swift.WritableKeyPath<AttributesTests.Person, Swift.Array<Attributes.Field>> -> Swift.WritableKeyPath<AttributesTests.Person, Attributes.Field>
+//         ],
+//         path: Swift.WritableKeyPath<AttributesTests.Person, Swift.String>,
+//         _isNil: (Function)
+//     ), Attributes.Path<AttributesTests.Person, Swift.String>(
+//         ancestors: [
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person>,
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person> -> Swift.WritableKeyPath<AttributesTests.Person, Swift.Array<Attributes.Field>>,
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person> -> Swift.WritableKeyPath<AttributesTests.Person, Swift.Array<Attributes.Field>> -> Swift.WritableKeyPath<AttributesTests.Person, Attributes.Field>
+//         ],
+//         path: Swift.WritableKeyPath<AttributesTests.Person, Swift.String>,
+//         _isNil: (Function)
+//     )
+// ]")
+// EXPECTED:
+// ("[
+//     Attributes.Path<AttributesTests.Person, Swift.String>(
+//         ancestors: [
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person>,
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person> -> Swift.WritableKeyPath<AttributesTests.Person, Swift.Array<Attributes.Field>>,
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person> -> Swift.WritableKeyPath<AttributesTests.Person, Swift.Array<Attributes.Field>> -> Swift.WritableKeyPath<AttributesTests.Person, Attributes.Field>
+//         ],
+//         path: Swift.WritableKeyPath<AttributesTests.Person, Swift.String>,
+//         _isNil: (Function)
+//     ), Attributes.Path<AttributesTests.Person, Swift.String>(
+//         ancestors: [
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person>,
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person> -> Swift.WritableKeyPath<AttributesTests.Person, Swift.Array<Attributes.Field>>,
+//             Swift.WritableKeyPath<AttributesTests.Person, AttributesTests.Person> -> Swift.WritableKeyPath<AttributesTests.Person, Swift.Array<Attributes.Field>> -> Swift.WritableKeyPath<AttributesTests.Person, Attributes.Field>
+//         ],
+//         path: Swift.WritableKeyPath<AttributesTests.Person, Swift.String>,
+//         _isNil: (Function)
+//     )
+// ]")
+
+// swiftlint:enable line_length
 
     /// Test appending method correctly appends the new path.
     func testAppending() {
@@ -154,12 +196,57 @@ final class CollectionSearchPathTests: XCTestCase {
         let newRoot = Path([Person].self)
         let person0 = Path(path: \[Person][0], ancestors: [AnyPath(newRoot)])
         let newPath = collectionSearchPath.toNewRoot(path: person0)
-        let data = [person]
-        let paths = newPath.paths(in: data)
-        let expectedPaths = collectionSearchPath.paths(in: person).flatMap {
-            $0.toNewRoot(path: person0).paths(in: data)
-        }
-        XCTAssertEqual(paths, expectedPaths)
+        let personArray = AnyPath(Path([Person].self))
+        let person = Path(path: \[Person][0], ancestors: [personArray])
+        let fields = Path(path: \[Person][0].fields, ancestors: [personArray, AnyPath(person)])
+        let field0 = Path(
+            path: \[Person][0].fields[0], ancestors: [personArray, AnyPath(person), AnyPath(fields)]
+        )
+        let field1 = Path(
+            path: \[Person][0].fields[1], ancestors: [personArray, AnyPath(person), AnyPath(fields)]
+        )
+        let field0Name = Path(
+            path: \[Person][0].fields[0].name,
+            ancestors: [personArray, AnyPath(person), AnyPath(fields), AnyPath(field0)]
+        )
+        let field1Name = Path(
+            path: \[Person][0].fields[1].name,
+            ancestors: [personArray, AnyPath(person), AnyPath(fields), AnyPath(field1)]
+        )
+        XCTAssertEqual(newPath.paths(in: [self.person]), [field0Name, field1Name])
     }
+
+// swiftlint:disable line_length
+// RESULT:
+// ("[
+//     Attributes.Path<Swift.Array<AttributesTests.Person>, Swift.String>(
+//         ancestors: [
+//             Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.Array<AttributesTests.Person>> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, AttributesTests.Person> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.Array<Attributes.Field>> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Attributes.Field>
+//         ],
+//         path: Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.String>,
+//         _isNil: (Function)
+//     ),
+//     Attributes.Path<Swift.Array<AttributesTests.Person>, Swift.String>(
+//         ancestors: [
+//             Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.Array<AttributesTests.Person>> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, AttributesTests.Person> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.Array<Attributes.Field>> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Attributes.Field>
+//         ],
+//         path: Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.String>,
+//         _isNil: (Function)
+//     )
+// ]")
+// EXPECTED:
+// ("[
+//     Attributes.Path<Swift.Array<AttributesTests.Person>, Swift.String>(
+//         ancestors: [
+//             Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.Array<AttributesTests.Person>>,
+//             Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.Array<AttributesTests.Person>> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, AttributesTests.Person>,
+//             Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.Array<AttributesTests.Person>> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, AttributesTests.Person> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.Array<Attributes.Field>>,
+//             Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.Array<AttributesTests.Person>> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, AttributesTests.Person> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.Array<Attributes.Field>> -> Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Attributes.Field>
+//         ],
+//         path: Swift.WritableKeyPath<Swift.Array<AttributesTests.Person>, Swift.String>,
+//         _isNil: (Function)
+//     )
+// ]")
+// swiftlint:enable line_length
 
 }
