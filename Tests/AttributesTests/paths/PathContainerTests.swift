@@ -1,4 +1,4 @@
-// PersonPathContainer.swift 
+// PathContainerTests.swift 
 // Attributes 
 // 
 // Created by Morgan McColl.
@@ -54,46 +54,35 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Attributes
+@testable import Attributes
+import XCTest
 
-/// Helper container for testing ``ReadOnlyPathContainer`` methods.
-struct PersonReadOnlyPathContainer: ReadOnlyPathContainer, Equatable {
+/// Test class for ``PathContainer``.
+final class PathContainerTests: XCTestCase {
 
-    /// The path points to a Person.
-    typealias Path = ReadOnlyPath<Person, Person>
+    /// A person object to perform validation on.
+    let person = Person(fields: [], attributes: [:])
 
-    /// The stored path that points to a person.
-    var path: Attributes.ReadOnlyPath<Person, Person>
+    /// A validator used by the container.
+    var validator = NullValidator<PersonPathContainer>()
 
-    /// The value to validate.
-    var root: Person
-
-    /// Initialise this container from a path to person.
-    /// - Parameter path: The path to person.
-    init(root: Person, path: ReadOnlyPath<Person, Person> = ReadOnlyPath(Person.self)) {
-        self.root = root
-        self.path = path
+    /// The container under test.
+    var container: PersonPathContainer {
+        PersonPathContainer(root: person)
     }
 
-}
+    /// Initialise the validator before every test case.
+    override func setUp() {
+        validator = NullValidator<PersonPathContainer>()
+    }
 
-/// Helper container for testing ``PathContainer`` methods.
-struct PersonPathContainer: PathContainer, Equatable {
-
-    /// The path points to a Person.
-    typealias Path = Attributes.Path<Person, Person>
-
-    /// The stored path that points to a person.
-    var path: Attributes.Path<Person, Person>
-
-    /// The value to validate.
-    var root: Person
-
-    /// Initialise this container from a path to person.
-    /// - Parameter path: The path to person.
-    init(root: Person, path: Attributes.Path<Person, Person> = Path(Person.self)) {
-        self.root = root
-        self.path = path
+    /// Test validate function calls generated validator.
+    func testValidate() throws {
+        try container.validate { _ in
+            AnyValidator<PersonPathContainer>(validator)
+        }
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, container)
     }
 
 }
