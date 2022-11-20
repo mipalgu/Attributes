@@ -69,8 +69,8 @@ public protocol ReadOnlyPathContainer {
 
 extension ReadOnlyPathContainer {
 
-    public func validate(@ValidatorBuilder<Self> builder: (Validator<Path>) -> [AnyValidator<Self>]) throws {
-        return try AnyValidator(builder(Validator(path: self.path))).performValidation(self)
+    public func validate(@ValidatorBuilder<Self> builder: (Validator<Path>) -> AnyValidator<Self>) throws {
+        return try builder(Validator(path: self.path)).performValidation(self)
     }
 
 }
