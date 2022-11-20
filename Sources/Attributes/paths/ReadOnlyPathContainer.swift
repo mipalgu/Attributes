@@ -67,10 +67,13 @@ public protocol ReadOnlyPathContainer {
 
 }
 
+/// Add validate function as default implementation.
 extension ReadOnlyPathContainer {
 
+    /// Perform a validation using a validator builder.
+    /// - Parameter builder: The builder that generates the validators that perform the validation.
     public func validate(@ValidatorBuilder<Self> builder: (Validator<Path>) -> AnyValidator<Self>) throws {
-        return try builder(Validator(path: self.path)).performValidation(self)
+        try builder(Validator(path: self.path)).performValidation(self)
     }
 
 }
