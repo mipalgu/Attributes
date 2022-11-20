@@ -73,7 +73,7 @@ public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchab
     }
 
     public func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
-        nil != root[keyPath: collectionPath.keyPath].indices.first {
+        root[keyPath: collectionPath.keyPath].indices.contains {
             let newElementPath = elementPath.changeRoot(path: collectionPath[$0])
             return newElementPath.isAncestorOrSame(of: path, in: root)
         }
