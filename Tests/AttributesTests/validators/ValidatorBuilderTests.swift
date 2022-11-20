@@ -60,6 +60,9 @@ import XCTest
 /// Test class for ``ValidatorBuilder``.
 final class ValidatorBuilderTests: XCTestCase {
 
+    /// The builder under test.
+    let builder = ValidatorBuilder<Person>()
+
     /// Null person.
     let person = Person(fields: [], attributes: [:])
 
@@ -95,6 +98,25 @@ final class ValidatorBuilderTests: XCTestCase {
             NullValidator<Person>(),
             NullValidator<Person>()
         ]
+    }
+
+    /// Test that `makeValidator` correctly creates an equivalent validator.
+    func testMakeValidator() throws {
+        let validator: AnyValidator<Person> = builder.makeValidator {
+            let vs: [AnyValidator<Person>] = validators.map {
+                AnyValidator<Person>($0)
+            }
+            return vs
+        }
+        try validator.performValidation(person)
+        assertValidators(numValidators: 12)
+    }
+
+    /// Test `buildBlock` creates a null Validator when none are specified.
+    func testBuilding0() throws {
+        let validator = builder.buildBlock()
+        try validator.performValidation(person)
+        assertValidators(numValidators: 0)
     }
 
     /// Test buildBlock method.
