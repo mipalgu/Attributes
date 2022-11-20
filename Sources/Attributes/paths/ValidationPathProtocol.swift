@@ -56,31 +56,47 @@
  *
  */
 
+/// Provides properties required to add a default `push` method.
 internal protocol _PushValidator {
 
+    /// The type of the path pointing to a value that needs validation.
     associatedtype PathType: ReadOnlyPathProtocol
 
+    /// The path pointing to the value to be validated.
     var path: PathType { get }
 
 }
 
+/// Add default push method.
 extension _PushValidator {
 
+    /// Add a new validation onto the queue of existing validation methods.
+    /// - Parameter f: The new validation method to perform in addition to the existing methods.
+    /// - Returns: A new validator that contains the existing validation function and the new validation
+    /// function `f`.
     public func push(_ f: @escaping (PathType.Root, PathType.Value) throws -> Void) -> Validator<PathType> {
-        return Validator(path, _validate: f)
+        Validator(path, _validate: f)
     }
 
 }
 
+/// Performs a validator for values pointed to by a ``ReadOnlyPath``.
 public protocol ValidationPathProtocol: ValidationPushProtocol {
 
+    /// The type of the path pointing to a value that is to be validated.
     associatedtype PathType: ReadOnlyPathProtocol
+
+    /// The `PushValidator` associatedType is a ``Validator``.
     associatedtype PushValidator = Validator<PathType>
 
+    /// The path to the value required validation.
     var path: PathType { get }
 
+    /// Initialise `Self` from the path to a value that requires validation.
+    /// - Parameter path: The path pointing to the value to be verified.
     init(path: PathType)
 
 }
 
+/// Typealias for default implementation conformance.
 internal typealias _ValidationPath = _PushValidator & ValidationPathProtocol
