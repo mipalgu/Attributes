@@ -64,22 +64,22 @@ final class ReadOnlyPathContainerTests: XCTestCase {
     let person = Person(fields: [], attributes: [:])
 
     /// A validator used by the container.
-    var validator = NullValidator<PersonPathContainer>()
+    var validator = NullValidator<PersonReadOnlyPathContainer>()
 
     /// The container under test.
-    var container: PersonPathContainer {
-        PersonPathContainer(root: person)
+    var container: PersonReadOnlyPathContainer {
+        PersonReadOnlyPathContainer(root: person)
     }
 
     /// Initialise the validator before every test case.
     override func setUp() {
-        validator = NullValidator<PersonPathContainer>()
+        validator = NullValidator<PersonReadOnlyPathContainer>()
     }
 
     /// Test validate function calls generated validator.
     func testValidate() throws {
         try container.validate { _ in
-            AnyValidator<PersonPathContainer>(validator)
+            AnyValidator<PersonReadOnlyPathContainer>(validator)
         }
         XCTAssertEqual(validator.timesCalled, 1)
         XCTAssertEqual(validator.lastParameter, container)

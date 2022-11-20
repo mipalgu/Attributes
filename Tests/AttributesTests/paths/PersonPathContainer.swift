@@ -57,7 +57,7 @@
 import Attributes
 
 /// Helper container for testing ``ReadOnlyPathContainer`` methods.
-struct PersonPathContainer: ReadOnlyPathContainer, Equatable {
+struct PersonReadOnlyPathContainer: ReadOnlyPathContainer, Equatable {
 
     /// The path points to a Person.
     typealias Path = ReadOnlyPath<Person, Person>
