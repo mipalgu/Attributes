@@ -79,6 +79,7 @@ final class ValidatorBuilderTests: XCTestCase {
         NullValidator<Person>()
     ]
 
+    /// Initialise the validators before every test.
     override func setUp() {
         validators = [
             NullValidator<Person>(),
