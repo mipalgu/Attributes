@@ -67,10 +67,15 @@ public protocol PathContainer {
 
 }
 
+/// Add validate method to ``PathContainer``.
 extension PathContainer {
 
-    public func validate(@ValidatorBuilder<Self> builder: (ValidationPath<Path>) -> AnyValidator<Self>) throws {
-        return try builder(ValidationPath(path: self.path)).performValidation(self)
+    /// Perform a validation method provided by a ``ValidatorBuilder``.
+    /// - Parameter builder: The builder that generates the validator that performs the validation.
+    public func validate(
+        @ValidatorBuilder<Self> builder: (ValidationPath<Path>) -> AnyValidator<Self>
+    ) throws {
+        try builder(ValidationPath(path: self.path)).performValidation(self)
     }
 
 }
