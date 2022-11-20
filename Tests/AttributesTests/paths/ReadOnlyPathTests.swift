@@ -137,4 +137,36 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertEqual(newPath.fullPath, fullPath)
     }
 
+    /// Test subscript operator correctly appends path and updates ancestors.
+    func testSubscript() {
+        let ogKp: KeyPath<Person, Person> = \Person.self
+        let path = ReadOnlyPath(keyPath: ogKp, ancestors: [])
+        let path2 = path.fields
+        let newPath = path2[0]
+        let newVariable: KeyPath<[Field], Field> = \.[0]
+        let kp: KeyPath<Person, Field> = path2.keyPath.appending(path: newVariable)
+        print(type(of: ogKp))
+        print(type(of: path.keyPath))
+        print(type(of: path2.keyPath))
+        print(type(of: path2))
+        print(type(of: kp))
+        print(type(of: newPath.keyPath))
+        let expected = ReadOnlyPath(
+            keyPath: kp,
+            ancestors: path2.ancestors + [AnyPath(path2)],
+            isNil: { root in root[keyPath: path2.keyPath].count <= 0 }
+        )
+        let expectedResult: KeyPath<Person, Field> = expected.keyPath
+        let result: KeyPath<Person, Field> = newPath.keyPath
+        let mkp: KeyPath<Person, Field> = \Person.fields[0]
+        XCTAssertEqual(expectedResult, expectedResult)
+        XCTAssertEqual(result, result)
+        XCTAssertEqual(expectedResult, result)
+        XCTAssertEqual(expectedResult, mkp)
+        XCTAssertEqual(result, mkp)
+        let kp1: KeyPath<Person, Field> = \Person.fields[0]
+        let kp2: KeyPath<Person, Field> = \Person.fields[0]
+        XCTAssertEqual(kp1, kp2)
+    }
+
 }

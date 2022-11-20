@@ -61,7 +61,8 @@ import Foundation
 extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteger {
 
     public subscript(index: Value.Index) -> ReadOnlyPath<Root, Value.Element> {
-        ReadOnlyPath<Root, Value.Element>(
+        print(type(of: self.keyPath.appending(path: \.[index])))
+        return ReadOnlyPath<Root, Value.Element>(
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)],
             isNil: { root in root[keyPath: keyPath].count <= index }
