@@ -61,10 +61,10 @@ import Foundation
 final class NullValidator<Root>: ValidatorProtocol {
 
     /// The numer of times performValidation is called.
-    var timesCalled: Int = 0
+    private(set) var timesCalled: Int = 0
 
     /// The last parameter passed to `performValidation`.
-    var lastParameter: Root?
+    private(set) var lastParameter: Root?
 
     /// A validation that will count the times it is called.
     func performValidation(_ root: Root) throws {
