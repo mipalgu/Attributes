@@ -56,21 +56,40 @@
  *
  */
 
+/// Provides properties to allow for default implementations of `push` method.
 internal protocol _Push {
 
+    /// The type of the path used to reference a value that needs validation.
     associatedtype PathType: ReadOnlyPathProtocol
 
+    /// The path to the value that needs validation.
     var path: PathType { get }
+
+    // swiftlint:disable identifier_name
+
+    /// A validate function that performs a validation on a value existing within a root object.
     var _validate: (PathType.Root, PathType.Value) throws -> Void { get }
 
+    /// Instantiate the properties inside this protocol.
+    /// - Parameters:
+    ///   - path: The path to the value requiring validation.
+    ///   - _validate: The validation method that performs the validation.
     init(_ path: PathType, _validate: @escaping (PathType.Root, PathType.Value) throws -> Void)
+
+    // swiftlint:enable identifier_name
 
 }
 
+/// Default implementation of `push` method.
 extension _Push {
 
+    /// Create a new instance of ``_Push`` that contains the validation functions within `Self` and an
+    /// additional validation function provided by the `f` parameter.
+    /// - Parameter f: The extra validation function to perform.
+    /// - Returns: A new instance of `Self` that uses the existing validation functions and the new
+    /// validation function `f`.
     public func push(_ f: @escaping (PathType.Root, PathType.Value) throws -> Void) -> Self {
-        return Self(self.path) {
+        Self(self.path) {
             try self._validate($0, $1)
             try f($0, $1)
         }
@@ -78,17 +97,32 @@ extension _Push {
 
 }
 
+/// Provides default implementations for ``PathValidator``.
 internal typealias _PathValidator = _Push & PathValidator
 
+/// Provides the means to perform validations using ``ReadOnlyPathProtocol``s. This protocol
+/// allows the dynamic allocation of validation functions to members existing within a root
+/// object by using a key path.
 public protocol PathValidator: ValidatorProtocol, ValidationPushProtocol {
 
+    /// The type of the path pointing to the value to be validated.
     associatedtype PathType: ReadOnlyPathProtocol
+
+    /// The `PushValidator` existing within ``ValidationPushProtocol`` is `Self`.
     associatedtype PushValidator = Self
 
+    /// The path to the value that needs to be validated.
     var path: PathType { get }
 
+    /// Instantiate this validator from the path of the value that requires validation.
+    /// - Parameter path: The path to the value that is to be validated.
     init(path: PathType)
 
+    /// Push an additional validation function onto the stack of existing validation functions. This
+    /// function acts as a pure function creating a new instance of `Self` with the new validation stack.
+    /// - Parameter f: The validation function to perform in addition to the existing validation functions.
+    /// - Returns: A new instance of `Self` that performs the validation functions contained within `self`
+    /// and the new validation function `f`.
     func push(_ f: @escaping (Root, Value) throws -> Void) -> Self
 
 }
