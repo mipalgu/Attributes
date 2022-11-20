@@ -6,7 +6,7 @@ import PackageDescription
 /// Additional dependencies for specific architectures.
 let dependencies: [Package.Dependency]
 
-#if os(Linux)
+#if os(Linux) || os(macOS)
     dependencies = [.package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0")]
 #else
     dependencies = []
