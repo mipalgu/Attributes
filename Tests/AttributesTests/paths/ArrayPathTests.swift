@@ -57,7 +57,7 @@
 @testable import Attributes
 import XCTest
 
-/// Test class for subscript extensions on custom paths.
+/// Test class for subscript and each method extensions on custom paths.
 final class ArrayPathTests: XCTestCase {
 
     /// Test subscript operator correctly appends path and updates ancestors for nonmutating collection.
@@ -69,8 +69,6 @@ final class ArrayPathTests: XCTestCase {
             keyPath: path.appending(path: \.[0]), ancestors: [AnyPath(pointArray)]
         )
         XCTAssertEqual(point0, expected)
-        let point = NonMutatingPoint(x: 1, y: 2)
-        print(point[keyPath: expected.keyPath])
     }
 
     /// Test subscript operator correctly appends path and updates ancestors for mutating collection.
