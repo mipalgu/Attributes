@@ -1,4 +1,4 @@
-// Point.swift 
+// ArrayPathTests.swift 
 // Attributes 
 // 
 // Created by Morgan McColl.
@@ -54,42 +54,57 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-/// Helper struct for providing test data. This struct provides a point in 2 dimensions
-/// using a cartesian coordinate system.
-struct Point: Equatable, Hashable {
+@testable import Attributes
+import XCTest
 
-    /// The x-coordinate.
-    var x: Int
+/// Test class for subscript extensions on custom paths.
+final class ArrayPathTests: XCTestCase {
 
-    /// The y-coordinate.
-    var y: Int
+    /// Test subscript operator correctly appends path and updates ancestors for nonmutating collection.
+    func testReadOnlySubscriptNonMutatingCollection() {
+        let path: KeyPath<NonMutatingPoint, NonMutatingPoint> = \NonMutatingPoint.self
+        let pointArray = ReadOnlyPath(keyPath: path, ancestors: [])
+        let point0 = pointArray[0]
+        let expected = ReadOnlyPath(
+            keyPath: path.appending(path: \.[0]), ancestors: [AnyPath(pointArray)]
+        )
+        XCTAssertEqual(point0, expected)
+        let point = NonMutatingPoint(x: 1, y: 2)
+        print(point[keyPath: expected.keyPath])
+    }
+
+    /// Test subscript operator correctly appends path and updates ancestors for mutating collection.
+    func testReadOnlySubscriptMutatingCollection() {
+        // We get WritableKeyPath from accessing an Array through a KeyPath since Array is a
+        // MutableCollection. You can verify this with type(of: path).
+        let path: KeyPath<[Point], [Point]> = \[Point].self
+        let pointArray = ReadOnlyPath(keyPath: path, ancestors: [])
+        let point0 = pointArray[0]
+        let expected = ReadOnlyPath(
+            keyPath: path.appending(path: \.[0]), ancestors: [AnyPath(pointArray)]
+        )
+        XCTAssertEqual(point0, expected)
+    }
 
 }
 
-struct NonMutatingPoint: Equatable, Hashable, Collection {
+/// `CustomStringConvertible` conformance.
+extension ReadOnlyPath: CustomStringConvertible {
 
-    func index(after i: Int) -> Int {
-        i + 1
-    }
-
-    subscript(position: Int) -> Slice<NonMutatingPoint> {
-        if position == 0 {
-            return Slice(base: self, bounds: 0..<1)
+    /// Provide keyPath definition-style description.
+    public var description: String {
+        "\\" + (self.ancestors).map {
+            "\($0.targetType)"
         }
-        if position == 1 {
-            return Slice(base: self, bounds: 0..<2)
-        }
-        return Slice(base: self, bounds: 0..<0)
+        .joined(separator: ".") + " -> \(keyPath)"
     }
-
-    let startIndex: Int = 0
-
-    let endIndex: Int = 1
-
-    typealias Index = Int
-
-    let x: Int
-
-    let y: Int
 
 }
+
+// extension KeyPath: CustomStringConvertible  {
+
+//     public var description: String {
+//         "\(type(of: self))(\(Self.rootType) -> \(Self.valueType))"
+//     }
+
+// }

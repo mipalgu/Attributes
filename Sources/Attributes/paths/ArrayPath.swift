@@ -70,6 +70,18 @@ extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteg
 
 }
 
+extension ReadOnlyPathProtocol where Value: MutableCollection, Value.Index: BinaryInteger {
+
+    public subscript(index: Value.Index) -> ReadOnlyPath<Root, Value.Element> {
+        ReadOnlyPath<Root, Value.Element>(
+            keyPath: self.keyPath.appending(path: \.[index]),
+            ancestors: self.ancestors + [AnyPath(self)],
+            isNil: { root in root[keyPath: keyPath].count <= index }
+        )
+    }
+
+}
+
 extension PathProtocol where Value: MutableCollection, Value.Index: BinaryInteger {
 
     public subscript(index: Value.Index) -> Path<Root, Value.Element> {
@@ -95,6 +107,32 @@ extension Path where Value: MutableCollection, Value.Index: Hashable {
 }
 
 extension ValidationPath where P.Value: Collection, P.Value.Index: Hashable {
+
+    public func each(
+        @ValidatorBuilder<Root> builder: @escaping (
+            Value.Index,
+            ValidationPath<ReadOnlyPath<Root, Value.Element>>
+        ) -> AnyValidator<Root>
+    ) -> PushValidator {
+        push { root, value in
+            let validators: [AnyValidator<Root>] = value.indices.map { index -> AnyValidator<Root> in
+                builder(
+                    index,
+                    ValidationPath<ReadOnlyPath<Root, Value.Element>>(
+                        path: ReadOnlyPath<Root, Value.Element>(
+                            keyPath: self.path.keyPath.appending(path: \.[index]),
+                            ancestors: self.path.fullPath
+                        )
+                    )
+                )
+            }
+            return try AnyValidator(validators).performValidation(root)
+        }
+    }
+
+}
+
+extension ValidationPath where P.Value: MutableCollection, P.Value.Index: Hashable {
 
     public func each(
         @ValidatorBuilder<Root> builder: @escaping (

@@ -137,45 +137,4 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertEqual(newPath.fullPath, fullPath)
     }
 
-    /// Test subscript operator correctly appends path and updates ancestors.
-    func testSubscript() {
-        // swiftlint:disable missing_docs
-        typealias Root = ReadOnlyPath<Person, [Field]>.Root
-        typealias Value = ReadOnlyPath<Person, [Field]>.Value
-        // swiftlint:enable missing_docs
-        let path: ReadOnlyPath<Root, Root> = ReadOnlyPath(keyPath: \Root.self, ancestors: [])
-        let path2: ReadOnlyPath<Root, Value> = ReadOnlyPath(
-            keyPath: \Root.self.fields, ancestors: [AnyPath(path)]
-        )
-        let index: Value.Index = 0
-        let newPath: ReadOnlyPath<Root, Value.Element> = path2[index]
-        let fieldKeyPath: KeyPath<Root, Value.Element> = \Root.self.fields[index]
-        let expected: ReadOnlyPath<Root, Value.Element> = ReadOnlyPath(
-            keyPath: fieldKeyPath,
-            ancestors: [AnyPath(path), AnyPath(path2)],
-            isNil: { root in root[keyPath: path2.keyPath].count <= index }
-        )
-        XCTAssertEqual(newPath, expected)
-        XCTAssertEqual(newPath.keyPath, expected.keyPath)
-    }
-
-}
-
-extension ReadOnlyPath: CustomStringConvertible {
-
-    public var description: String {
-        "\\" + (self.ancestors + [AnyPath(self)]).map {
-            "\($0.targetType)"
-        }
-        .joined(separator: ".")
-    }
-
-}
-
-extension KeyPath: CustomStringConvertible  {
-
-    public var description: String {
-        "\(Self.rootType) -> \(Self.valueType)"
-    }
-
 }
