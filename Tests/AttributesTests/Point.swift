@@ -66,12 +66,30 @@ struct Point: Equatable, Hashable {
 
 }
 
+/// A Point that acts as a Collection.
 struct NonMutatingPoint: Equatable, Hashable, Collection {
 
+    /// Index is an Int.
+    typealias Index = Int
+
+    /// End index.
+    let endIndex: Int = 1
+
+    /// Start index.
+    let startIndex: Int = 0
+
+    /// x.
+    let x: Int
+
+    /// y.
+    let y: Int
+
+    /// The next index.
     func index(after i: Int) -> Int {
         i + 1
     }
 
+    /// The Slice at `position`.
     subscript(position: Int) -> Slice<NonMutatingPoint> {
         if position == 0 {
             return Slice(base: self, bounds: 0..<1)
@@ -81,15 +99,5 @@ struct NonMutatingPoint: Equatable, Hashable, Collection {
         }
         return Slice(base: self, bounds: 0..<0)
     }
-
-    let startIndex: Int = 0
-
-    let endIndex: Int = 1
-
-    typealias Index = Int
-
-    let x: Int
-
-    let y: Int
 
 }
