@@ -75,6 +75,16 @@ final class AnyTriggerTests: XCTestCase {
         point = Point(x: 1, y: 2)
     }
 
+    /// Test arrayLiteral initialisation.
+    func testArrayLiteralInit() {
+        let trigger2 = MockTrigger<Point>()
+        let anyTrigger = AnyTrigger<Point>(arrayLiteral: AnyTrigger(trigger), AnyTrigger(trigger2))
+        checkTrigger(root: &point, path: path, trigger: anyTrigger)
+        XCTAssertEqual(trigger2.timesCalled, 1)
+        XCTAssertEqual(trigger2.rootPassed, point)
+        XCTAssertEqual(trigger2.pathPassed, path)
+    }
+
     /// Test the base init sets the callbacks correctly.
     func testBaseInit() {
         let anyTrigger = AnyTrigger(trigger)
