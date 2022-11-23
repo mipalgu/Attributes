@@ -56,14 +56,6 @@
  *
  */
 
-protocol SchemaAttributeConvertible {
-
-    var allTriggers: Any { get }
-
-    var schemaAttribute: Any { get }
-
-}
-
 @propertyWrapper
 public struct ComplexProperty<Base: ComplexProtocol> {
 
