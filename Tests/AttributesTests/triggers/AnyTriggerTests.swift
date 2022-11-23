@@ -120,8 +120,12 @@ final class AnyTriggerTests: XCTestCase {
 
     /// Test sequence init.
     func testSequenceInit() {
-        let anyTrigger = AnyTrigger([trigger])
+        let trigger2 = MockTrigger<Point>()
+        let anyTrigger = AnyTrigger([trigger, trigger2])
         checkTrigger(root: &point, path: path, trigger: anyTrigger)
+        XCTAssertEqual(trigger2.timesCalled, 1)
+        XCTAssertEqual(trigger2.rootPassed, point)
+        XCTAssertEqual(trigger2.pathPassed, path)
     }
 
     /// Check the type-erased trigger succesfully calls the typed triggers functions.
