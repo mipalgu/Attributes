@@ -81,6 +81,14 @@ final class AnyTriggerTests: XCTestCase {
         checkTrigger(root: &point, path: path, trigger: anyTrigger)
     }
 
+    /// Test TriggerBuilder init.
+    func testBuilderInit() {
+        let anyTrigger = AnyTrigger {
+            AnyTrigger(trigger)
+        }
+        checkTrigger(root: &point, path: path, trigger: anyTrigger)
+    }
+
     /// Test copy initialiser sets callbacks appropriately.
     func testCopyInit() {
         let anyTrigger = AnyTrigger(trigger)
@@ -108,6 +116,12 @@ final class AnyTriggerTests: XCTestCase {
         XCTAssertEqual(mockTrigger.timesCalled, 1)
         XCTAssertEqual(mockTrigger.rootPassed, points)
         XCTAssertEqual(mockTrigger.pathPassed, anyPath)
+    }
+
+    /// Test sequence init.
+    func testSequenceInit() {
+        let anyTrigger = AnyTrigger([trigger])
+        checkTrigger(root: &point, path: path, trigger: anyTrigger)
     }
 
     /// Check the type-erased trigger succesfully calls the typed triggers functions.

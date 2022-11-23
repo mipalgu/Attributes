@@ -28,7 +28,7 @@ public struct AnyTrigger<Root>: TriggerProtocol {
         self = trigger
     }
 
-    public init(@TriggerBuilder<Root> builder: () -> [AnyTrigger<Root>]) {
+    public init(@TriggerBuilder<Root> builder: () -> AnyTrigger<Root>) {
         self.init(builder())
     }
 
