@@ -8,7 +8,7 @@
 @resultBuilder
 public struct TriggerBuilder<Root> {
 
-    func buildBlock() -> [AnyTrigger<Root>] { [] }
+    func buildBlock() -> AnyTrigger<Root> { [] }
 
     public func makeTrigger<Trigger: TriggerProtocol>(@TriggerBuilder _ content: () -> [Trigger])
         -> AnyTrigger<Root> where Trigger.Root == Root {
