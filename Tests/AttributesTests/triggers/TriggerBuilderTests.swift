@@ -104,6 +104,32 @@ final class TriggerBuilderTests: XCTestCase {
         person = Person(fields: [], attributes: [:])
     }
 
+    /// Test makeTrigger method that uses an array of type-erased triggers.
+    func testMakeTriggerReturningArray() {
+        let trigger = builder.makeTrigger {
+            let ts: [AnyTrigger<Person>] = triggers.map(AnyTrigger.init)
+            return ts
+        }
+        guard case .success(let redraw) = trigger.performTrigger(&person, for: path), !redraw else {
+            XCTFail("Invalid return type from trigger")
+            return
+        }
+        assertTriggers(numTriggers: 12)
+    }
+
+    /// Test makeTrigger method that uses a single type-erased trigger.
+    func testMakeTriggerReturningAnyTrigger() {
+        let trigger = builder.makeTrigger {
+            let ts: [AnyTrigger<Person>] = triggers.map(AnyTrigger.init)
+            return AnyTrigger(ts)
+        }
+        guard case .success(let redraw) = trigger.performTrigger(&person, for: path), !redraw else {
+            XCTFail("Invalid return type from trigger")
+            return
+        }
+        assertTriggers(numTriggers: 12)
+    }
+
     /// Test buildBlock method.
     func testBuild0() {
         let trigger = builder.buildBlock()
