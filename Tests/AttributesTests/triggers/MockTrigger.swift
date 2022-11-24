@@ -69,12 +69,22 @@ class MockTrigger<Root>: TriggerProtocol {
     /// The path passed to the trigger function.
     var pathPassed: AnyPath<Root>?
 
+    /// The result returned by `performTrigger`.
+    let result: Result<Bool, AttributeError<Root>>
+
+    /// Initialise this MockTrigger.
+    /// 
+    /// - Parameter result: The result returned by the `performTrigger` method.
+    init(result: Result<Bool, AttributeError<Root>> = .success(false)) {
+        self.result = result
+    }
+
     /// Mock trigger function.
     func performTrigger(_ root: inout Root, for path: AnyPath<Root>) -> Result<Bool, AttributeError<Root>> {
         self.timesCalled += 1
         self.rootPassed = root
         self.pathPassed = path
-        return .success(false)
+        return result
     }
 
     /// Mock trigger function.

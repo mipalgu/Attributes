@@ -60,6 +60,11 @@ import XCTest
 /// Test class for ``AnyTrigger``.
 final class AnyTriggerTests: XCTestCase {
 
+    /// An error for a failed trigger.
+    var error: AttributeError<Point> {
+        AttributeError(message: "error", path: path)
+    }
+
     /// Trigger under test.
     var trigger = MockTrigger<Point>()
 
@@ -149,16 +154,53 @@ final class AnyTriggerTests: XCTestCase {
         XCTAssertNil(self.trigger.pathPassed)
     }
 
+    /// Test sequence init.
+    func testSequenceWithSecondFailingTrigger() {
+        let trigger2 = MockTrigger<Point>(result: .failure(error))
+        let anyTrigger = AnyTrigger([trigger, trigger2])
+        checkTrigger(root: &point, path: path, trigger: anyTrigger, result: .failure(error))
+        XCTAssertEqual(trigger2.timesCalled, 1)
+        XCTAssertEqual(trigger2.rootPassed, point)
+        XCTAssertEqual(trigger2.pathPassed, path)
+    }
+
+    /// Test sequence init.
+    func testSequenceWithFailingTrigger() {
+        let trigger2 = MockTrigger<Point>(result: .failure(error))
+        let anyTrigger = AnyTrigger([trigger2, trigger])
+        XCTAssertEqual(.failure(error), anyTrigger.performTrigger(&point, for: path))
+        XCTAssertEqual(trigger2.timesCalled, 1)
+        XCTAssertEqual(trigger2.rootPassed, point)
+        XCTAssertEqual(trigger2.pathPassed, path)
+        XCTAssertEqual(self.trigger.timesCalled, 1)
+        XCTAssertEqual(self.trigger.rootPassed, point)
+        XCTAssertEqual(self.trigger.pathPassed, path)
+        trigger2.rootPassed = nil
+        trigger2.pathPassed = nil
+        self.trigger.rootPassed = nil
+        self.trigger.pathPassed = nil
+        XCTAssertTrue(anyTrigger.isTriggerForPath(path, in: point))
+        XCTAssertEqual(self.trigger.timesCalled, 1)
+        XCTAssertNil(self.trigger.rootPassed)
+        XCTAssertNil(self.trigger.pathPassed)
+        XCTAssertEqual(trigger2.timesCalled, 2)
+        XCTAssertEqual(trigger2.rootPassed, point)
+        XCTAssertEqual(trigger2.pathPassed, path)
+    }
+
     /// Check the type-erased trigger succesfully calls the typed triggers functions.
     /// - Parameters:
     ///   - root: A root to act upon.
     ///   - path: A path to use in the trigger.
     ///   - trigger: The type-erased trigger.
-    private func checkTrigger(root: inout Point, path: AnyPath<Point>, trigger: AnyTrigger<Point>) {
-        guard case .success(let bool) = trigger.performTrigger(&root, for: path), !bool else {
-            XCTFail("Invalid return from trigger.")
-            return
-        }
+    ///   - result: The expected result from the performTrigger method.
+    private func checkTrigger(
+        root: inout Point,
+        path: AnyPath<Point>,
+        trigger: AnyTrigger<Point>,
+        result: Result<Bool, AttributeError<Point>> = .success(false)
+    ) {
+        XCTAssertEqual(result, trigger.performTrigger(&root, for: path))
         XCTAssertEqual(self.trigger.timesCalled, 1)
         XCTAssertEqual(self.trigger.rootPassed, root)
         XCTAssertEqual(self.trigger.pathPassed, path)
