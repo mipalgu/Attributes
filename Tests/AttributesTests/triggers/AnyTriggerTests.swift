@@ -138,6 +138,17 @@ final class AnyTriggerTests: XCTestCase {
         XCTAssertEqual(trigger2.pathPassed, path)
     }
 
+    /// Test init using an empty sequence.
+    func testEmptySequenceInit() throws {
+        let triggers: [MockTrigger<Point>] = []
+        let anyTrigger = AnyTrigger(triggers)
+        XCTAssertFalse(try anyTrigger.performTrigger(&point, for: path).get())
+        XCTAssertFalse(anyTrigger.isTriggerForPath(path, in: point))
+        XCTAssertEqual(self.trigger.timesCalled, 0)
+        XCTAssertNil(self.trigger.rootPassed)
+        XCTAssertNil(self.trigger.pathPassed)
+    }
+
     /// Check the type-erased trigger succesfully calls the typed triggers functions.
     /// - Parameters:
     ///   - root: A root to act upon.
