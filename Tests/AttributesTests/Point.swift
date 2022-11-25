@@ -66,6 +66,18 @@ struct Point: Equatable, Hashable {
 
 }
 
+/// Helper struct for providing test data. This struct provides a point in 2 dimensions
+/// using a cartesian coordinate system.
+struct EquatablePoint: Equatable {
+
+    /// The x-coordinate.
+    var x: Int
+
+    /// The y-coordinate.
+    var y: Int
+
+}
+
 /// A Point that acts as a Collection.
 struct NonMutatingPoint: Equatable, Hashable, Collection {
 
