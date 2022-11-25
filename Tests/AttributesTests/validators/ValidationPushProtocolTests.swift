@@ -57,6 +57,8 @@
 @testable import Attributes
 import XCTest
 
+// swiftlint:disable type_body_length
+
 /// Test class for ``ValidationPushProtocol`` default implementations.
 final class ValidationPushProtocolTests: XCTestCase {
 
@@ -365,4 +367,133 @@ final class ValidationPushProtocolTests: XCTestCase {
         XCTAssertEqual(validator.lastParameter, value)
     }
 
+    /// Test between method.
+    func testBetween() throws {
+        let readPath = ReadOnlyPath(Int.self)
+        let validator = NullValidator<Int>()
+        let path = TestValidationPath(path: readPath).push { root, _ in
+            try validator.performValidation(root)
+        }
+        .between(min: 3, max: 7)
+        try path.performValidation(5)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, 5)
+        try path.performValidation(3)
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, 3)
+        try path.performValidation(7)
+        XCTAssertEqual(validator.timesCalled, 3)
+        XCTAssertEqual(validator.lastParameter, 7)
+        XCTAssertThrowsError(try path.performValidation(1)) {
+            guard let error = $0 as? ValidationError<Int> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be between \(3) and \(7).")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 4)
+        XCTAssertEqual(validator.lastParameter, 1)
+    }
+
+    /// Test `lessThan` method.
+    func testLessThan() throws {
+        let readPath = ReadOnlyPath(Int.self)
+        let validator = NullValidator<Int>()
+        let path = TestValidationPath(path: readPath).push { root, _ in
+            try validator.performValidation(root)
+        }
+        .lessThan(5)
+        try path.performValidation(4)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, 4)
+        XCTAssertThrowsError(try path.performValidation(5)) {
+            guard let error = $0 as? ValidationError<Int> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be less than \(5).")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, 5)
+    }
+
+    /// Test `lessThanEqual` method.
+    func testLessThanEqual() throws {
+        let readPath = ReadOnlyPath(Int.self)
+        let validator = NullValidator<Int>()
+        let path = TestValidationPath(path: readPath).push { root, _ in
+            try validator.performValidation(root)
+        }
+        .lessThanEqual(5)
+        try path.performValidation(4)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, 4)
+        try path.performValidation(5)
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, 5)
+        XCTAssertThrowsError(try path.performValidation(6)) {
+            guard let error = $0 as? ValidationError<Int> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be less than or equal to \(5).")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 3)
+        XCTAssertEqual(validator.lastParameter, 6)
+    }
+
+    /// Test `greaterThan` method.
+    func testGreaterThan() throws {
+        let readPath = ReadOnlyPath(Int.self)
+        let validator = NullValidator<Int>()
+        let path = TestValidationPath(path: readPath).push { root, _ in
+            try validator.performValidation(root)
+        }
+        .greaterThan(5)
+        try path.performValidation(6)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, 6)
+        XCTAssertThrowsError(try path.performValidation(5)) {
+            guard let error = $0 as? ValidationError<Int> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be greater than \(5).")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, 5)
+    }
+
+    /// Test `greaterThanEqual` method.
+    func testGreaterThanEqual() throws {
+        let readPath = ReadOnlyPath(Int.self)
+        let validator = NullValidator<Int>()
+        let path = TestValidationPath(path: readPath).push { root, _ in
+            try validator.performValidation(root)
+        }
+        .greaterThanEqual(5)
+        try path.performValidation(5)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, 5)
+        try path.performValidation(6)
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, 6)
+        XCTAssertThrowsError(try path.performValidation(4)) {
+            guard let error = $0 as? ValidationError<Int> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be greater than or equal to \(5).")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 3)
+        XCTAssertEqual(validator.lastParameter, 4)
+    }
+
 }
+
+// swiftlint:enable type_body_length
