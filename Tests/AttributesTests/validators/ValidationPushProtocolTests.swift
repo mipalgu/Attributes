@@ -60,7 +60,73 @@ import XCTest
 /// Test class for ``ValidationPushProtocol`` default implementations.
 final class ValidationPushProtocolTests: XCTestCase {
 
-    /// The path under test.
-    let path = TestValidationPath(path: ReadOnlyPath(Point.self))
+    /// A path under test.
+    let pointPath = TestValidationPath(path: ReadOnlyPath(Point.self))
+
+    /// A path to a Person under test.
+    let personPath = TestValidationPath(path: ReadOnlyPath(Person.self))
+
+    /// A point test data.
+    var point = Point(x: 1, y: 2)
+
+    /// A validator for a point.
+    var pointValidator = NullValidator<Point>()
+
+    override func setUp() {
+        point = Point(x: 1, y: 2)
+        pointValidator = NullValidator()
+    }
+
+    /// Test push method incorporates new validator.
+    func testPush() throws {
+        let newValidator = pointPath.push { point, _ in try self.pointValidator.performValidation(point) }
+        try newValidator.performValidation(point)
+        XCTAssertEqual(pointValidator.timesCalled, 1)
+        XCTAssertEqual(pointValidator.lastParameter, point)
+    }
+
+    /// Test validation is performed when if condition is true.
+    func testIf() throws {
+        let newPath = pointPath.if({
+                $0.x.isMultiple(of: 2)
+            },
+            then: {
+                self.pointValidator
+            }
+        )
+        try newPath.performValidation(point)
+        XCTAssertEqual(pointValidator.timesCalled, 0)
+        XCTAssertNil(pointValidator.lastParameter)
+        let point1 = Point(x: 2, y: 3)
+        try newPath.performValidation(point1)
+        XCTAssertEqual(pointValidator.timesCalled, 1)
+        XCTAssertEqual(pointValidator.lastParameter, point1)
+    }
+
+    /// Test if-else calls correct validators.
+    func testIfElse() throws {
+        let validator2 = NullValidator<Point>()
+        let newPath = pointPath.if({
+                $0.x.isMultiple(of: 2)
+            },
+            then: {
+                self.pointValidator
+            },
+            else: {
+                validator2
+            }
+        )
+        try newPath.performValidation(point)
+        XCTAssertEqual(pointValidator.timesCalled, 0)
+        XCTAssertNil(pointValidator.lastParameter)
+        XCTAssertEqual(validator2.timesCalled, 1)
+        XCTAssertEqual(validator2.lastParameter, point)
+        let point1 = Point(x: 2, y: 3)
+        try newPath.performValidation(point1)
+        XCTAssertEqual(pointValidator.timesCalled, 1)
+        XCTAssertEqual(pointValidator.lastParameter, point1)
+        XCTAssertEqual(validator2.timesCalled, 1)
+        XCTAssertEqual(validator2.lastParameter, point)
+    }
 
 }
