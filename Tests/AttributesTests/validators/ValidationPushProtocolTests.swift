@@ -163,7 +163,7 @@ final class ValidationPushProtocolTests: XCTestCase {
             $0.dropFirst()
         }
         let points = [EquatablePoint(x: 2, y: 3), EquatablePoint(x: 1, y: 2)]
-        XCTAssertThrowsError(try newPath.performValidation(points), "") {
+        XCTAssertThrowsError(try newPath.performValidation(points)) {
             guard let error = $0 as? ValidationError<[EquatablePoint]> else {
                 XCTFail("Incorrect error thrown.")
                 return
