@@ -221,4 +221,48 @@ final class ValidationPushProtocolTests: XCTestCase {
         XCTAssertEqual(val.lastParameter, Point(x: 2, y: 3))
     }
 
+    /// Test in method when value in path is a Set.
+    func testHashableInSetPath() throws {
+        let readPath = ReadOnlyPath(Set<Point>.self)
+        let path = TestValidationPath(path: readPath.first.unsafelyUnwrapped)
+        let points: Set<Point> = [Point(x: 2, y: 3), Point(x: 1, y: 2)]
+        let newPath = path.push { _, value in try self.pointValidator.performValidation(value) }.in(readPath)
+        try newPath.performValidation(points)
+        XCTAssertEqual(pointValidator.timesCalled, 1)
+        XCTAssertNotNil(pointValidator.lastParameter)
+        XCTAssertTrue(points.contains(pointValidator.lastParameter ?? Point(x: 3, y: 4)))
+    }
+
+    /// Test in method taking Set doesn't throw error.
+    func testHashableInSet() throws {
+        let readPath = ReadOnlyPath(Set<Point>.self)
+        let path = TestValidationPath(path: readPath.first)
+        let points: Set<Point> = [Point(x: 1, y: 2)]
+        let newPath = path.push { _, value in
+            try self.pointValidator.performValidation(value.unsafelyUnwrapped)
+        }
+        .in(points)
+        try newPath.performValidation(points)
+        XCTAssertEqual(pointValidator.timesCalled, 1)
+        XCTAssertEqual(pointValidator.lastParameter, Point(x: 1, y: 2))
+    }
+
+    /// Test in method taking set throws correct error for empty set.
+    func testHashableInSetThrowsError() {
+        let readPath = ReadOnlyPath(Set<Point>.self)
+        let path = TestValidationPath(path: readPath.first)
+        let points: Set<Point> = [Point(x: 1, y: 2)]
+        let newPath = path.in(points)
+        XCTAssertThrowsError(try newPath.performValidation(Set<Point>())) {
+            guard let error = $0 as? ValidationError<Set<Point>> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(
+                error.message, "Must equal one of the following: '\([Optional.some(Point(x: 1, y: 2))])'."
+            )
+            XCTAssertEqual(error.path, AnyPath(newPath.path))
+        }
+    }
+
 }
