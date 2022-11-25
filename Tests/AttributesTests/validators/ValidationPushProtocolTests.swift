@@ -265,4 +265,104 @@ final class ValidationPushProtocolTests: XCTestCase {
         }
     }
 
+    /// Test equals function.
+    func testEquals() throws {
+        let readPath = ReadOnlyPath(EquatablePoint.self)
+        let point = EquatablePoint(x: 1, y: 2)
+        let validator = NullValidator<EquatablePoint>()
+        let path = TestValidationPath(path: readPath).push {root, _ in
+            try validator.performValidation(root)
+        }
+        .equals(point)
+        try path.performValidation(point)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, point)
+        let point2 = EquatablePoint(x: 2, y: 3)
+        XCTAssertThrowsError(try path.performValidation(point2)) {
+            guard let error = $0 as? AttributeError<EquatablePoint> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must equal \(point).")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, point2)
+    }
+
+    /// Test notEquals function.
+    func testNotEquals() throws {
+        let readPath = ReadOnlyPath(EquatablePoint.self)
+        let point = EquatablePoint(x: 1, y: 2)
+        let point2 = EquatablePoint(x: 2, y: 3)
+        let validator = NullValidator<EquatablePoint>()
+        let path = TestValidationPath(path: readPath).push {root, _ in
+            try validator.performValidation(root)
+        }
+        .notEquals(point)
+        try path.performValidation(point2)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, point2)
+        XCTAssertThrowsError(try path.performValidation(point)) {
+            guard let error = $0 as? AttributeError<EquatablePoint> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must not equal \(point).")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, point)
+    }
+
+    /// Test equalsTrue method.
+    func testEqualsTrue() throws {
+        let readPath = ReadOnlyPath(Bool.self)
+        let value = true
+        let notValue = false
+        let validator = NullValidator<Bool>()
+        let path = TestValidationPath(path: readPath).push {root, _ in
+            try validator.performValidation(root)
+        }
+        .equalsTrue()
+        try path.performValidation(value)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, value)
+        XCTAssertThrowsError(try path.performValidation(notValue)) {
+            guard let error = $0 as? AttributeError<Bool> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must equal \(value).")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, notValue)
+    }
+
+    /// Test equalsFalse method.
+    func testEqualsFalse() throws {
+        let readPath = ReadOnlyPath(Bool.self)
+        let value = true
+        let notValue = false
+        let validator = NullValidator<Bool>()
+        let path = TestValidationPath(path: readPath).push {root, _ in
+            try validator.performValidation(root)
+        }
+        .equalsFalse()
+        try path.performValidation(notValue)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, notValue)
+        XCTAssertThrowsError(try path.performValidation(value)) {
+            guard let error = $0 as? AttributeError<Bool> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must equal \(notValue).")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, value)
+    }
+
 }
