@@ -175,4 +175,50 @@ final class ValidationPushProtocolTests: XCTestCase {
         XCTAssertEqual(val.lastParameter, EquatablePoint(x: 2, y: 3))
     }
 
+    /// Test `in` method doesn't throw when the Sequence element is hashable.
+    func testHashableInSequence() throws {
+        let readPath = ReadOnlyPath([Point].self)
+        let path = TestValidationPath(path: readPath[0])
+        let newPath = path.in(readPath)
+        let points = [Point(x: 1, y: 2)]
+        try newPath.performValidation(points)
+    }
+
+    /// Test `in` sequence with hashable elements using transform doesn't throw error.
+    func testHashableInSeuenceWithTransform() throws {
+        let readPath = ReadOnlyPath([Point].self)
+        let path = TestValidationPath(path: readPath[0])
+        let val = NullValidator<Point>()
+        let newPath = path.push { _, value in try val.performValidation(value) }.in(readPath) {
+            $0.sorted { p0, p1 in
+                p0.x < p1.x
+            }
+        }
+        let points = [Point(x: 2, y: 3), Point(x: 1, y: 2)]
+        try newPath.performValidation(points)
+        XCTAssertEqual(val.timesCalled, 1)
+        XCTAssertEqual(val.lastParameter, Point(x: 2, y: 3))
+    }
+
+    /// Test `in` sequence with hashable elements using transform throws correct error.
+    func testHashableInSequenceWithTransformThrowingError() {
+        let readPath = ReadOnlyPath([Point].self)
+        let path = TestValidationPath(path: readPath[0])
+        let val = NullValidator<Point>()
+        let newPath = path.push { _, value in try val.performValidation(value) }.in(readPath) {
+            $0.dropFirst()
+        }
+        let points = [Point(x: 2, y: 3), Point(x: 1, y: 2)]
+        XCTAssertThrowsError(try newPath.performValidation(points)) {
+            guard let error = $0 as? ValidationError<[Point]> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must equal one of the following: '\(Point(x: 1, y: 2))'.")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(val.timesCalled, 1)
+        XCTAssertEqual(val.lastParameter, Point(x: 2, y: 3))
+    }
+
 }
