@@ -265,4 +265,58 @@ final class ValidationPushProtocolTests: XCTestCase {
         }
     }
 
+    /// Test unique method.
+    func testUnique() throws {
+        let readPath = ReadOnlyPath([Point].self)
+        let validator = NullValidator<[Point]>()
+        let path = TestValidationPath(path: readPath).push { root, _ in
+            try validator.performValidation(root)
+        }
+        .unique()
+        let points = [Point(x: 1, y: 2), Point(x: 3, y: 4), Point(x: 5, y: 6)]
+        try path.performValidation(points)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, points)
+        let points2 = points + [Point(x: 1, y: 2)]
+        XCTAssertThrowsError(try path.performValidation(points2)) {
+            guard let error = $0 as? ValidationError<[Point]> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be unique")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, points2)
+    }
+
+    /// Test unique function with transform.
+    func testUniqueWithTransform() throws {
+        let readPath = ReadOnlyPath([Point].self)
+        let validator = NullValidator<[Point]>()
+        let path = TestValidationPath(path: readPath).push { root, _ in
+            try validator.performValidation(root)
+        }
+        .unique { $0.dropFirst() }
+        let points = [Point(x: 1, y: 2), Point(x: 3, y: 4), Point(x: 5, y: 6)]
+        try path.performValidation(points)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, points)
+        let points2 = points + [Point(x: 1, y: 2)]
+        try path.performValidation(points2)
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.lastParameter, points2)
+        let points3 = points + [Point(x: 3, y: 4)]
+        XCTAssertThrowsError(try path.performValidation(points3)) {
+            guard let error = $0 as? ValidationError<[Point]> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be unique")
+            XCTAssertEqual(error.path, AnyPath(path.path))
+        }
+        XCTAssertEqual(validator.timesCalled, 3)
+        XCTAssertEqual(validator.lastParameter, points3)
+    }
+
 }
