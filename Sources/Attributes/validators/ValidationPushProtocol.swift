@@ -148,7 +148,7 @@ extension ValidationPushProtocol where Value: Equatable {
         return push { (root, value) in
             let collection = transform(root[keyPath: p.keyPath])
             if nil == collection.first(where: { $0 == value }) {
-                throw ValidationError(message: "Must equal on of the following: '\(collection.map { "\($0)" }.joined(separator: ", "))'.", path: AnyPath(path))
+                throw ValidationError(message: "Must equal one of the following: '\(collection.map { "\($0)" }.joined(separator: ", "))'.", path: AnyPath(path))
             }
         }
     }
@@ -157,7 +157,7 @@ extension ValidationPushProtocol where Value: Equatable {
         return push { (root, value) in
             let collection = root[keyPath: p.keyPath]
             if nil == collection.first(where: { $0 == value }) {
-                throw ValidationError(message: "Must equal on of the following: '\(collection.map { "\($0)" }.joined(separator: ", "))'.", path: path)
+                throw ValidationError(message: "Must equal one of the following: '\(collection.map { "\($0)" }.joined(separator: ", "))'.", path: path)
             }
         }
     }
@@ -170,7 +170,7 @@ extension ValidationPushProtocol where Value: Hashable {
         return push {
             let set = transform($0[keyPath: p.keyPath])
             if !set.contains($1) {
-                throw ValidationError(message: "Must equal on of the following: '\(set.map { "\($0)" }.joined(separator: ", "))'.", path: path)
+                throw ValidationError(message: "Must equal one of the following: '\(set.map { "\($0)" }.joined(separator: ", "))'.", path: path)
             }
         }
     }
@@ -179,7 +179,7 @@ extension ValidationPushProtocol where Value: Hashable {
         return push {
             let set = Set($0[keyPath: p.keyPath])
             if !set.contains($1) {
-                throw ValidationError(message: "Must equal on of the following: '\(set.map { "\($0)" }.joined(separator: ", "))'.", path: path)
+                throw ValidationError(message: "Must equal one of the following: '\(set.map { "\($0)" }.joined(separator: ", "))'.", path: path)
             }
         }
     }
@@ -188,7 +188,7 @@ extension ValidationPushProtocol where Value: Hashable {
         return push {
             let set = $0[keyPath: p.keyPath]
             if !set.contains($1) {
-                throw ValidationError(message: "Must equal on of the following: '\(set.map { "\($0)" }.joined(separator: ", "))'.", path: path)
+                throw ValidationError(message: "Must equal one of the following: '\(set.map { "\($0)" }.joined(separator: ", "))'.", path: path)
             }
         }
     }
@@ -196,7 +196,7 @@ extension ValidationPushProtocol where Value: Hashable {
     public func `in`(_ set: Set<Value>) -> PushValidator {
         return push {
             if !set.contains($1) {
-                throw ValidationError(message: "Must equal on of the following: '\(set)'.", path: path)
+                throw ValidationError(message: "Must equal one of the following: '\(set)'.", path: path)
             }
         }
     }
