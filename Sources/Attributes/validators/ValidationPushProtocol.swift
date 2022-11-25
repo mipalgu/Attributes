@@ -56,35 +56,68 @@
  *
  */
 
+/// This protocol provides a mechanism for chaining different validators together into a
+/// single validator that can perform a single validation function. This protocol also
+/// forms a basis for defining common validation function such as validating that
+/// collections aren't empty, or that collections have a specific amount of elements, etc.
+/// 
+/// The fundamental function of the type of operations described above is the `push` method
+/// that acts as a pure function creating more instances of `PushValidator` by combining
+/// validation functions sequentially together.
+/// - SeeAlso: ``PathValidator``.
 public protocol ValidationPushProtocol: ReadOnlyPathContainer {
 
+    /// The type of the root object this protocol acts upon.
     associatedtype Root
+
+    /// The type of the Value contained within `Root` that this protocol acts upon.
     associatedtype Value
+
+    /// The validator type used by this protocol.
     associatedtype PushValidator: PathValidator
 
+    /// Push a new validation function onto the stack of existing validators.
+    /// - Parameter f: The new validation function.
+    /// - Returns: A new validator that uses pre-existing validation functions and the
+    /// new validation function `f` sequentially.
     func push(_ f: @escaping (Root, Value) throws -> Void) -> PushValidator
 
 }
 
+/// Add conditional validation rules.
 extension ValidationPushProtocol {
 
+    /// Perform some validation function given that a precondition is met.
+    /// - Parameters:
+    ///   - condition: The condition that triggers the validation function.
+    ///   - builder: The validation function performed when `condition` is true.
+    /// - Returns: A new validator that performs the validation functions contained
+    /// within `builder` when `condition` is true.
     public func `if`(
         _ condition: @escaping (Value) -> Bool,
         @ValidatorBuilder<Root> then builder: @escaping () -> AnyValidator<Root>
     ) -> PushValidator {
-        return push {
+        push {
             if condition($1) {
                 try builder().performValidation($0)
             }
         }
     }
 
+    /// Perform some validation function `builder1` provided that a precondition is met, otherwise
+    /// perform a different validation function `builder2`.
+    /// - Parameters:
+    ///   - condition: The condition that determins whether `builder1` or `builder2` is executed.
+    ///   - builder1: The validation function that is executed when `condition` is true.
+    ///   - builder2: The validation function that is executed when `condition` is false.
+    /// - Returns: A new validator that performs the validation function `builder1` when `condition`
+    /// is true, or `builder2` otherwise.
     public func `if`(
         _ condition: @escaping (Value) -> Bool,
         @ValidatorBuilder<Root> then builder1: @escaping () -> AnyValidator<Root>,
         @ValidatorBuilder<Root> else builder2: @escaping () -> AnyValidator<Root>
     ) -> PushValidator {
-        return push {
+        push {
             if condition($1) {
                 try builder1().performValidation($0)
             } else {
