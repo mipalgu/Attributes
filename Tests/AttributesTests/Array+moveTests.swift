@@ -67,4 +67,18 @@ final class ArrayMoveTests: XCTestCase {
         XCTAssertEqual(array, [0, 2, 1, 3, 5, 4, 6, 7])
     }
 
+    func testKeyPath() {
+        let arr = [1, 2, 3]
+        let kp = \Array<Int>[0]
+        let p = ReadOnlyPath([Int].self)
+        let (_, kp2) = p[0]
+        let kp3 = p.keyPath.appending(path: \.[0])
+        XCTAssertEqual(kp, kp3)
+        XCTAssertEqual(kp2, kp3)
+        XCTAssertEqual(kp2, kp)
+        XCTAssertEqual(arr[keyPath: kp2], arr[keyPath: kp])
+    }
+
 }
+
+

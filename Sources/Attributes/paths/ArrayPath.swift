@@ -61,7 +61,9 @@ import Foundation
 extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteger {
 
     public subscript(index: Value.Index) -> ReadOnlyPath<Root, Value.Element> {
-        ReadOnlyPath<Root, Value.Element>(
+        print("Called2!")
+        fflush(stdout)
+        return ReadOnlyPath<Root, Value.Element>(
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)],
             isNil: { root in root[keyPath: keyPath].count <= index }
@@ -73,10 +75,25 @@ extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteg
 extension ReadOnlyPathProtocol where Value: MutableCollection, Value.Index: BinaryInteger {
 
     public subscript(index: Value.Index) -> ReadOnlyPath<Root, Value.Element> {
-        ReadOnlyPath<Root, Value.Element>(
+        print("Called!")
+        fflush(stdout)
+        return ReadOnlyPath<Root, Value.Element>(
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)],
             isNil: { root in root[keyPath: keyPath].count <= index }
+        )
+    }
+
+    public subscript(index: Value.Index) -> (ReadOnlyPath<Root, Value.Element>, KeyPath<Root, Value.Element>) {
+        print("Called!")
+        fflush(stdout)
+        let kp = self.keyPath.appending(path: \.[index])
+        return (ReadOnlyPath<Root, Value.Element>(
+            keyPath: kp,
+            ancestors: self.ancestors + [AnyPath(self)],
+            isNil: { root in root[keyPath: keyPath].count <= index }
+        ),
+        kp
         )
     }
 
@@ -85,7 +102,9 @@ extension ReadOnlyPathProtocol where Value: MutableCollection, Value.Index: Bina
 extension PathProtocol where Value: MutableCollection, Value.Index: BinaryInteger {
 
     public subscript(index: Value.Index) -> Path<Root, Value.Element> {
-        Path<Root, Value.Element>(
+        print("Called4!")
+        fflush(stdout)
+        return Path<Root, Value.Element>(
             path: self.path.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)],
             isNil: { root in root[keyPath: self.path].count <= index }
