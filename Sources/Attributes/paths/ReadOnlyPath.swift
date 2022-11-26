@@ -54,8 +54,6 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Foundation
-
 /// Path for pointing to members that are read-only.
 @dynamicMemberLookup
 public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
@@ -119,9 +117,7 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
     public subscript<AppendedValue>(
         dynamicMember member: KeyPath<Value, AppendedValue>
     ) -> ReadOnlyPath<Root, AppendedValue> {
-        print("Called3")
-        fflush(stdout)
-        return ReadOnlyPath<Root, AppendedValue>(
+        ReadOnlyPath<Root, AppendedValue>(
             keyPath: keyPath.appending(path: member), ancestors: fullPath
         )
     }
