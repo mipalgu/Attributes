@@ -56,7 +56,9 @@
  *
  */
 
-public struct WhenChanged<Path: ReadOnlyPathProtocol, Trigger: TriggerProtocol>: TriggerProtocol where Path.Root == Trigger.Root {
+public struct WhenChanged<
+    Path: ReadOnlyPathProtocol, Trigger: TriggerProtocol
+>: TriggerProtocol where Path.Root == Trigger.Root {
 
     public typealias Root = Path.Root
 
@@ -73,14 +75,13 @@ public struct WhenChanged<Path: ReadOnlyPathProtocol, Trigger: TriggerProtocol>:
         self.trigger = trigger
     }
 
-    public func performTrigger(_ root: inout Path.Root, for path: AnyPath<Root>) -> Result<Bool, AttributeError<Path.Root>> {
-        print("Performing WhenChanged triggers...")
-        if isTriggerForPath(path, in: root) {
-            print("Trigger in path")
-            return trigger.performTrigger(&root, for: path)
+    public func performTrigger(
+        _ root: inout Path.Root, for path: AnyPath<Root>
+    ) -> Result<Bool, AttributeError<Path.Root>> {
+        guard isTriggerForPath(path, in: root) else {
+            return .success(false)
         }
-        print("WhenChanged trigger isn't in \nroot: \(self.path)\n path: \(path)")
-        return .success(false)
+        return trigger.performTrigger(&root, for: path)
     }
 
     public func isTriggerForPath(_ path: AnyPath<Path.Root>, in _: Root) -> Bool {
