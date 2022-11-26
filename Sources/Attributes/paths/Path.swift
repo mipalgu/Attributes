@@ -91,7 +91,7 @@ public struct Path<Root, Value>: PathProtocol {
     /// - Parameters:
     ///   - path: The path this object is initialised from.
     ///   - ancestors: The ancestors of path.
-    public init(path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>]) {
+    init(path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>]) {
         self.init(path: path, ancestors: ancestors) { _ in false }
     }
 
@@ -99,7 +99,7 @@ public struct Path<Root, Value>: PathProtocol {
     /// - Parameters:
     ///   - path: The path this object is initialised from.
     ///   - ancestors: The ancestors of path.
-    public init(
+    init(
         path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>]
     ) where Value: Nilable {
         self.init(path: path, ancestors: ancestors) { root in root[keyPath: path].isNil }

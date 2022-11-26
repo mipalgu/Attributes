@@ -76,7 +76,7 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
     ///   - keyPath: The keyPath to construct this path from.
     ///   - ancestors: The ancestors of the keyPath.
     ///   - isNil: An isNil function for checking for nil values.
-    public init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>], isNil: @escaping (Root) -> Bool) {
+    init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>], isNil: @escaping (Root) -> Bool) {
         self.ancestors = ancestors.reversed().drop { $0.partialKeyPath == keyPath }.reversed()
         self.keyPath = keyPath
         self._isNil = { root in ancestors.last?.isNil(root) ?? false || isNil(root) }
@@ -86,7 +86,7 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
     /// - Parameters:
     ///   - keyPath: The keyPath that represents a values location within a Root.
     ///   - ancestors: The ancestors of the keyPath.
-    public init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) {
+    init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) {
         self.init(keyPath: keyPath, ancestors: ancestors) { _ in false }
     }
 
@@ -94,7 +94,7 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
     /// - Parameters:
     ///   - keyPath: The keyPath to initialise this object from.
     ///   - ancestors: The ancestors of this keyPath.
-    public init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) where Value: Nilable {
+    init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) where Value: Nilable {
         self.init(keyPath: keyPath, ancestors: ancestors) { root in root[keyPath: keyPath].isNil }
     }
 
