@@ -69,6 +69,9 @@ final class WhenChangedTests: XCTestCase {
     /// The trigger under test.
     lazy var trigger = WhenChanged(actualPath: path, trigger: mockTrigger)
 
+    /// A trigger using an identity trigger in it's implementation.
+    lazy var identityTrigger = WhenChanged(path)
+
     /// Test data.
     var point = Point(x: 1, y: 2)
 
@@ -76,14 +79,14 @@ final class WhenChangedTests: XCTestCase {
     override func setUp() {
         mockTrigger = MockTrigger()
         trigger = WhenChanged(actualPath: path, trigger: mockTrigger)
+        identityTrigger = WhenChanged(path)
         point = Point(x: 1, y: 2)
     }
 
     /// Test init sets path correctly.
     func testInit() {
         XCTAssertEqual(trigger.path, AnyPath(path))
-        let trigger2 = WhenChanged(path)
-        XCTAssertEqual(trigger2.path, AnyPath(path))
+        XCTAssertEqual(identityTrigger.path, AnyPath(path))
     }
 
     /// Test isTriggerForPath returns correct result.
