@@ -62,12 +62,9 @@ final class ArrayPathTests: XCTestCase {
 
     /// Test subscript operator correctly appends path and updates ancestors for nonmutating collection.
     func testReadOnlySubscriptNonMutatingCollection() {
-        let path: KeyPath<NonMutatingPoint, NonMutatingPoint> = \NonMutatingPoint.self
-        let pointArray = ReadOnlyPath(keyPath: path, ancestors: [])
+        let pointArray = ReadOnlyPath(NonMutatingPoint.self)
         let point0 = pointArray[0]
-        let expected = ReadOnlyPath(
-            keyPath: path.appending(path: \.[0]), ancestors: [AnyPath(pointArray)]
-        )
+        let expected = getReadPath(to: NonMutatingPoint.self)
         XCTAssertEqual(point0, expected)
     }
 
@@ -78,10 +75,35 @@ final class ArrayPathTests: XCTestCase {
         let path: KeyPath<[Point], [Point]> = \[Point].self
         let pointArray = ReadOnlyPath(keyPath: path, ancestors: [])
         let point0: ReadOnlyPath<[Point], Point> = pointArray[0]
-        let expected = ReadOnlyPath(
-            keyPath: path.appending(path: \.[0]), ancestors: [AnyPath(pointArray)]
-        )
+        let expected = getMutatingReadPath(to: [Point].self)
         XCTAssertEqual(point0, expected)
+    }
+
+    /// Creates a ReadOnlyPath for a mutable collection.
+    /// - Parameter type: Root type.
+    /// - Returns: ReadOnlyPath to the first element in `type`.
+    private func getReadPath<T>(
+        to type: T.Type
+    ) -> ReadOnlyPath<T, T.Element> where T: Collection, T.Index: BinaryInteger {
+        ReadOnlyPath(keyPath: (\T.self).appending(path: \.[0]), ancestors: [AnyPath(ReadOnlyPath(T.self))])
+    }
+
+    /// Creates a ReadOnlyPath for a collection.
+    /// - Parameter type: Root type.
+    /// - Returns: ReadOnlyPath to the first element in `type`.
+    private func getMutatingReadPath<T>(
+        to type: T.Type
+    ) -> ReadOnlyPath<T, T.Element> where T: MutableCollection, T.Index: BinaryInteger {
+        ReadOnlyPath(keyPath: (\T.self).appending(path: \.[0]), ancestors: [AnyPath(ReadOnlyPath(T.self))])
+    }
+
+    /// Creates a Path for a collection.
+    /// - Parameter type: Root type.
+    /// - Returns: Path to the first element in `type`.
+    private func getPath<T>(
+        to type: T.Type
+    ) -> Path<T, T.Element> where T: MutableCollection, T.Index: BinaryInteger {
+        Path(path: (\T.self).appending(path: \.[0]), ancestors: [AnyPath(ReadOnlyPath(T.self))])
     }
 
 }
