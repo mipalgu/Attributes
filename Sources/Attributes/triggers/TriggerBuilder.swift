@@ -1,5 +1,5 @@
 /*
- * SyncWithTransformTrigger.swift
+ * TriggerBuilder.swift
  * Attributes
  *
  * Created by Morgan McColl on 30/5/21.
