@@ -147,8 +147,6 @@ extension ValidationPushProtocol where Value: StringProtocol {
         }
     }
 
-    // swiftlint:disable inclusive_language
-
     /// Creates a new validator that checks whether a given string matches a banned word. If
     /// the string matches the banned word, then the validation will fail.
     /// - Parameter list: The list of banned words.
@@ -192,7 +190,5 @@ extension ValidationPushProtocol where Value: StringProtocol {
             }
         }
     }
-
-    // swiftlint:enable inclusive_language
 
 }
