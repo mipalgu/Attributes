@@ -496,24 +496,35 @@ extension ValidationPushProtocol where Value: Sequence, Value.Element: Hashable 
 /// Provide `String` validation methods.
 extension ValidationPushProtocol where Value: StringProtocol {
 
+    /// All characters must be alphabetic (a-z, A-Z).
+    /// - Returns: A new validator that ensures all characters within a given string are alphabetic.
+    /// - Note: Empty strings will pass validation.
     public func alpha() -> PushValidator {
-        return push {
-            if nil != $1.first(where: { !$0.isLetter }) {
+        push {
+            if $1.contains(where: { !$0.isLetter }) {
                 throw ValidationError(message: "Must be alphabetic.", path: path)
             }
         }
     }
 
+    /// All characters must be alphabetic (a-z, A-Z), numeric (0-9), underscores (_) or dashes (-).
+    /// - Returns: A new validator that verifies a string only contains alphabetic, numeric, underscores
+    /// or dash characters.
     public func alphadash() -> PushValidator {
-        return push {
-            if nil != $1.first(where: { !$0.isLetter && !$0.isNumber && $0 != "_" && $0 != "-" }) {
-                throw ValidationError(message: "Must be alphabetic with underscores and dashes allowed.", path: path)
+        push {
+            if $1.contains(where: { !$0.isLetter && !$0.isNumber && $0 != "_" && $0 != "-" }) {
+                throw ValidationError(
+                    message: "Must be alphabetic with underscores and dashes allowed.", path: path
+                )
             }
         }
     }
 
+    /// The first character in a string must be alphabetic (a-z, A-Z).
+    /// - Returns: A new validator that ensures the first character is alphabetic.
+    /// - Note: Empty strings will pass validation.
     public func alphafirst() -> PushValidator {
-        return push {
+        push {
             guard let firstChar = $1.first else {
                 return
             }
@@ -523,63 +534,104 @@ extension ValidationPushProtocol where Value: StringProtocol {
         }
     }
 
+    /// All characters within a string must either be alphabetic (a-z, A-Z) or numeric (0-9).
+    /// - Returns: A new validator that verifies that a string contains only alphabetic or
+    /// numeric characters.
+    /// - Note: Empty strings will pass validation.
     public func alphanumeric() -> PushValidator {
-        return push {
-            if nil != $1.first(where: { !$0.isLetter && !$0.isNumber }) {
+        push {
+            if $1.contains(where: { !$0.isLetter && !$0.isNumber }) {
                 throw ValidationError(message: "Must be alphanumeric.", path: path)
             }
         }
     }
 
+    /// All characters within a string must be alphabetic (a-z, A-Z), numeric (0-9), or underscores (_).
+    /// - Returns: A new validator that ensures all characters within a given string are alphabetic,
+    /// numeric, or underscores.
+    /// - Note: Empty strings will pass validation.
     public func alphaunderscore() -> PushValidator {
-        return push {
-            if nil != $1.first(where: { !$0.isLetter && !$0.isNumber && $0 != "_" }) {
+        push {
+            if $1.contains(where: { !$0.isLetter && !$0.isNumber && $0 != "_" }) {
                 throw ValidationError(message: "Must be alphabetic with underscores allowed.", path: path)
             }
         }
     }
 
+    /// The first character in a given string must be alphabetic (a-z, A-Z) or an underscore (_).
+    /// - Returns: A new validator that verifies that the first character in a given string is
+    /// an alphabetic character or an underscore.
+    /// - Note: Empty strings will pass validation.
     public func alphaunderscorefirst() -> PushValidator {
-        return push {
+        push {
             guard let firstChar = $1.first else {
                 return
             }
             if !(firstChar.isLetter || firstChar == "_") {
-                throw ValidationError(message: "First Character must be alphabetic or an underscore.", path: path)
+                throw ValidationError(
+                    message: "First Character must be alphabetic or an underscore.", path: path
+                )
             }
         }
     }
 
+    /// All characters within a string must be numeric (0-9).
+    /// - Returns: A new validator that ensures all characters within a string are numeric.
+    /// - Note: Empty strings will pass validation.
+    public func numeric() -> PushValidator {
+        push {
+            if $1.contains(where: { !$0.isNumber }) {
+                throw ValidationError(message: "Must be numeric.", path: path)
+            }
+        }
+    }
+
+    // swiftlint:disable inclusive_language
+
+    /// Creates a new validator that checks whether a given string matches a banned word. If
+    /// the string matches the banned word, then the validation will fail.
+    /// - Parameter list: The list of banned words.
+    /// - Returns: A new validator that ensures a given string is not equal to a banned word
+    /// contained within `list`.
     public func blacklist(_ list: Set<String>) -> PushValidator {
-        return push { (_, val) in
+        push { _, val in
             if list.contains(String(val)) {
                 throw ValidationError(message: "\(val) is a banned word.", path: path)
             }
         }
     }
 
-    public func numeric() -> PushValidator {
-        return push {
-            if nil != $1.first(where: { !$0.isNumber }) {
-                throw ValidationError(message: "Must be numeric.", path: path)
-            }
-        }
-    }
-
+    /// Creates a new validator that ensures a given string exist within a list of allowed
+    /// words.
+    /// - Parameter list: The list of permissible words.
+    /// - Returns: A new validator that verifies that a given string exist within `list`.
     public func whitelist(_ list: Set<String>) -> PushValidator {
-        return push { (_, val) in
+        push { _, val in
             if !list.contains(String(val)) {
-                throw ValidationError(message: "\(val) is not valid, you must use pre-existing words. Candidates: \(list)", path: path)
+                throw ValidationError(
+                    message: "\(val) is not valid, you must use pre-existing words. Candidates: \(list)",
+                    path: path
+                )
             }
         }
     }
 
+    /// Verifies that a given string contain a substring that exists within a list of permissible
+    /// words.
+    /// - Parameter list: The list of permissible words.
+    /// - Returns: A new validator that ensures a given string contains a substring existing within
+    /// `list`.
     public func greyList(_ list: Set<String>) -> PushValidator {
-        return push { (_, val) in
-            guard let _ = list.first(where: { val.contains($0) }) else {
-                throw ValidationError(message: "\(val) is not valid, it must contain pre-existing words. Candidates: \(list)", path: path)
+        push { _, val in
+            guard list.contains(where: { val.contains($0) }) else {
+                throw ValidationError(
+                    message: "\(val) is not valid, it must contain pre-existing words. Candidates: \(list)",
+                    path: path
+                )
             }
         }
     }
+
+    // swiftlint:enable inclusive_language
 
 }
