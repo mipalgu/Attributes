@@ -79,6 +79,14 @@ final class ArrayPathTests: XCTestCase {
         XCTAssertEqual(point0, expected)
     }
 
+    /// Test subscript operator for PathProtocol.
+    func testPathSubscript() {
+        let pointArray = Path([Point].self)
+        let point0: Path<[Point], Point> = pointArray[0]
+        let expected = getPath(to: [Point].self)
+        XCTAssertEqual(point0, expected)
+    }
+
     /// Creates a ReadOnlyPath for a mutable collection.
     /// - Parameter type: Root type.
     /// - Returns: ReadOnlyPath to the first element in `type`.
