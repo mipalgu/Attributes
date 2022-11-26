@@ -84,19 +84,6 @@ extension ReadOnlyPathProtocol where Value: MutableCollection, Value.Index: Bina
         )
     }
 
-    public subscript(index: Value.Index) -> (ReadOnlyPath<Root, Value.Element>, KeyPath<Root, Value.Element>) {
-        print("Called!")
-        fflush(stdout)
-        let kp = self.keyPath.appending(path: \.[index])
-        return (ReadOnlyPath<Root, Value.Element>(
-            keyPath: kp,
-            ancestors: self.ancestors + [AnyPath(self)],
-            isNil: { root in root[keyPath: keyPath].count <= index }
-        ),
-        kp
-        )
-    }
-
 }
 
 extension PathProtocol where Value: MutableCollection, Value.Index: BinaryInteger {

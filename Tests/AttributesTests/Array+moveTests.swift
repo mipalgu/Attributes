@@ -68,15 +68,19 @@ final class ArrayMoveTests: XCTestCase {
     }
 
     func testKeyPath() {
-        let arr = [1, 2, 3]
-        let kp = \Array<Int>[0]
-        let p = ReadOnlyPath([Int].self)
-        let (_, kp2) = p[0]
-        let kp3 = p.keyPath.appending(path: \.[0])
-        XCTAssertEqual(kp, kp3)
-        XCTAssertEqual(kp2, kp3)
-        XCTAssertEqual(kp2, kp)
-        XCTAssertEqual(arr[keyPath: kp2], arr[keyPath: kp])
+        func path<R, C: MutableCollection>(
+            from source: ReadOnlyPath<R, C>,
+            toIndex index: C.Index
+        ) -> ReadOnlyPath<R, C.Element> where C.Index: BinaryInteger {
+            ReadOnlyPath(
+                keyPath: source.keyPath.appending(path: \.[index]),
+                ancestors: source.ancestors + [AnyPath(source)]
+            )
+        }
+        let basePath = ReadOnlyPath([Int].self)
+        let expectedPath = path(from: basePath, toIndex: 0)
+        let result = basePath[0]
+        XCTAssertEqual(expectedPath, result)
     }
 
 }

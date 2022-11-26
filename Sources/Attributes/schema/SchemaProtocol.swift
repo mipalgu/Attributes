@@ -45,8 +45,9 @@ public extension SchemaProtocol {
     }
 
     func makeValidator(root: Root) -> AnyValidator<Root> {
-        AnyValidator(groups.enumerated().map {
-            let path = Root.path.attributes[$0]
+        let groups: [AnyGroup<Root>] = self.groups
+        return AnyValidator(groups.enumerated().map {
+            let path: ReadOnlyPath<Root, AttributeGroup> = Root.path.attributes[$0]
             let propertiesValidator = ChainValidator(path: path, validator: $1.propertiesValidator)
             let groupValidator = ChainValidator(path: path, validator: $1.groupValidation)
             let rootValidator = $1.rootValidation

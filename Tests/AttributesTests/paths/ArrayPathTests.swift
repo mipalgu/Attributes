@@ -77,7 +77,7 @@ final class ArrayPathTests: XCTestCase {
         // MutableCollection. You can verify this with type(of: path).
         let path: KeyPath<[Point], [Point]> = \[Point].self
         let pointArray = ReadOnlyPath(keyPath: path, ancestors: [])
-        let point0 = pointArray[0]
+        let point0: ReadOnlyPath<[Point], Point> = pointArray[0]
         let expected = ReadOnlyPath(
             keyPath: path.appending(path: \.[0]), ancestors: [AnyPath(pointArray)]
         )
