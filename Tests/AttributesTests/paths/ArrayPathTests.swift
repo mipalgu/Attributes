@@ -107,6 +107,24 @@ final class ArrayPathTests: XCTestCase {
         }
     }
 
+    /// Test keyPath semantics.
+    func testKeyPath() {
+        /// Get keyPath
+        func path<R, C: MutableCollection>(
+            from source: ReadOnlyPath<R, C>,
+            toIndex index: C.Index
+        ) -> ReadOnlyPath<R, C.Element> where C.Index: BinaryInteger {
+            ReadOnlyPath(
+                keyPath: source.keyPath.appending(path: \.[index]),
+                ancestors: source.ancestors + [AnyPath(source)]
+            )
+        }
+        let basePath = ReadOnlyPath([Int].self)
+        let expectedPath = path(from: basePath, toIndex: 0)
+        let result = basePath[0]
+        XCTAssertEqual(expectedPath, result)
+    }
+
     /// Creates a ReadOnlyPath for a mutable collection.
     /// - Parameter type: Root type.
     /// - Returns: ReadOnlyPath to the first element in `type`.

@@ -67,22 +67,4 @@ final class ArrayMoveTests: XCTestCase {
         XCTAssertEqual(array, [0, 2, 1, 3, 5, 4, 6, 7])
     }
 
-    func testKeyPath() {
-        func path<R, C: MutableCollection>(
-            from source: ReadOnlyPath<R, C>,
-            toIndex index: C.Index
-        ) -> ReadOnlyPath<R, C.Element> where C.Index: BinaryInteger {
-            ReadOnlyPath(
-                keyPath: source.keyPath.appending(path: \.[index]),
-                ancestors: source.ancestors + [AnyPath(source)]
-            )
-        }
-        let basePath = ReadOnlyPath([Int].self)
-        let expectedPath = path(from: basePath, toIndex: 0)
-        let result = basePath[0]
-        XCTAssertEqual(expectedPath, result)
-    }
-
 }
-
-
