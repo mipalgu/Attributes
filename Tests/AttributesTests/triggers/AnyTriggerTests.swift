@@ -175,15 +175,13 @@ final class AnyTriggerTests: XCTestCase {
         XCTAssertEqual(self.trigger.timesCalled, 1)
         XCTAssertEqual(self.trigger.rootPassed, point)
         XCTAssertEqual(self.trigger.pathPassed, path)
-        trigger2.rootPassed = nil
-        trigger2.pathPassed = nil
-        self.trigger.rootPassed = nil
-        self.trigger.pathPassed = nil
+        trigger2.reset()
+        self.trigger.reset()
         XCTAssertTrue(anyTrigger.isTriggerForPath(path, in: point))
-        XCTAssertEqual(self.trigger.timesCalled, 1)
+        XCTAssertEqual(self.trigger.timesCalled, 0)
         XCTAssertNil(self.trigger.rootPassed)
         XCTAssertNil(self.trigger.pathPassed)
-        XCTAssertEqual(trigger2.timesCalled, 2)
+        XCTAssertEqual(trigger2.timesCalled, 1)
         XCTAssertEqual(trigger2.rootPassed, point)
         XCTAssertEqual(trigger2.pathPassed, path)
     }
@@ -204,8 +202,6 @@ final class AnyTriggerTests: XCTestCase {
         XCTAssertEqual(self.trigger.timesCalled, 1)
         XCTAssertEqual(self.trigger.rootPassed, root)
         XCTAssertEqual(self.trigger.pathPassed, path)
-        self.trigger.rootPassed = nil
-        self.trigger.pathPassed = nil
         guard trigger.isTriggerForPath(path, in: root) else {
             XCTFail("Invalid return from trigger.")
             return

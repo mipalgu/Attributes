@@ -61,16 +61,24 @@ import Foundation
 class MockTrigger<Root>: TriggerProtocol {
 
     /// How many times the trigger was called.
-    var timesCalled: Int = 0
+    private(set) var timesCalled: Int = 0
 
     /// The root passed to the trigger function.
-    var rootPassed: Root?
+    var rootPassed: Root? {
+        rootsPassed.last
+    }
 
     /// The path passed to the trigger function.
-    var pathPassed: AnyPath<Root>?
+    var pathPassed: AnyPath<Root>? {
+        pathsPassed.last
+    }
 
     /// The result returned by `performTrigger`.
     let result: Result<Bool, AttributeError<Root>>
+
+    private(set) var rootsPassed: [Root] = []
+
+    private(set) var pathsPassed: [AnyPath<Root>] = []
 
     /// Initialise this MockTrigger.
     /// 
@@ -82,17 +90,23 @@ class MockTrigger<Root>: TriggerProtocol {
     /// Mock trigger function.
     func performTrigger(_ root: inout Root, for path: AnyPath<Root>) -> Result<Bool, AttributeError<Root>> {
         self.timesCalled += 1
-        self.rootPassed = root
-        self.pathPassed = path
+        self.rootsPassed.append(root)
+        self.pathsPassed.append(path)
         return result
     }
 
     /// Mock trigger function.
     func isTriggerForPath(_ path: AnyPath<Root>, in root: Root) -> Bool {
         self.timesCalled += 1
-        self.rootPassed = root
-        self.pathPassed = path
+        self.rootsPassed.append(root)
+        self.pathsPassed.append(path)
         return true
+    }
+
+    func reset() {
+        self.rootsPassed = []
+        self.pathsPassed = []
+        self.timesCalled = 0
     }
 
 }
