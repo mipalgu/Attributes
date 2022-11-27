@@ -156,4 +156,70 @@ final class WhenChangedTests: XCTestCase {
         XCTAssertEqual(point.y, 6)
     }
 
+    /// Test `makeAvailable` creates correct trigger.
+    func testMakeAvailable() throws {
+        let newField = Field(name: "Age", type: .line)
+        let fieldsPath = Path(Person.self).fields
+        let attributesPath = Path(Person.self).attributes
+        let trigger = WhenChanged(Path(Person.self)).makeAvailable(
+            field: newField,
+            after: ["Name"],
+            fields: fieldsPath,
+            attributes: attributesPath
+        )
+        let expected = MakeAvailableTrigger(
+            field: newField,
+            after: ["Name"],
+            source: ReadOnlyPath(Person.self),
+            fields: fieldsPath,
+            attributes: attributesPath
+        )
+        XCTAssertEqual(trigger.attributes, expected.attributes)
+        XCTAssertEqual(trigger.field, expected.field)
+        XCTAssertEqual(trigger.fields, expected.fields)
+        XCTAssertEqual(trigger.order, expected.order)
+        XCTAssertEqual(trigger.path, expected.path)
+        XCTAssertEqual(AnyPath(trigger.source), AnyPath(expected.source))
+        var person = Person(fields: [Field(name: "Name", type: .line)], attributes: ["Name": .line("John")])
+        var person2 = person
+        XCTAssertTrue(try trigger.performTrigger(&person, for: AnyPath(Path(Person.self))).get())
+        XCTAssertTrue(try expected.performTrigger(&person2, for: AnyPath(Path(Person.self))).get())
+        XCTAssertEqual(person, person2)
+        XCTAssertEqual(person.fields, [Field(name: "Age", type: .line), Field(name: "Name", type: .line)])
+    }
+
+    /// Test `makeUnavailable` creates correct trigger.
+    func testMakeUnavailable() throws {
+        let field = Field(name: "Name", type: .line)
+        let fieldsPath = Path(Person.self).fields
+        let trigger = WhenChanged(Path(Person.self)).makeUnavailable(
+            field: field, fields: fieldsPath
+        )
+        let expected = MakeUnavailableTrigger(
+            field: field, source: Path(Person.self), fields: fieldsPath
+        )
+        XCTAssertEqual(trigger.field, expected.field)
+        XCTAssertEqual(trigger.fields, expected.fields)
+        XCTAssertEqual(trigger.path, expected.path)
+        XCTAssertEqual(AnyPath(trigger.source), AnyPath(expected.source))
+        var person = Person(fields: [Field(name: "Name", type: .line)], attributes: ["Name": .line("John")])
+        var person2 = person
+        XCTAssertTrue(try trigger.performTrigger(&person, for: AnyPath(Path(Person.self))).get())
+        XCTAssertTrue(try expected.performTrigger(&person2, for: AnyPath(Path(Person.self))).get())
+        XCTAssertEqual(person, person2)
+        XCTAssertTrue(person.fields.isEmpty)
+    }
+
+    /// Test `custom` created correct trigger.
+    func testCustom() throws {
+        let trigger = identityTrigger.custom {
+            self.mockTrigger.performTrigger(&$0, for: AnyPath(self.path))
+        }
+        XCTAssertTrue(try trigger.performTrigger(&point, for: AnyPath(path)).get())
+        XCTAssertEqual(mockTrigger.timesCalled, 1)
+        XCTAssertEqual(mockTrigger.pathPassed, AnyPath(path))
+        XCTAssertEqual(mockTrigger.rootPassed, point)
+        XCTAssertEqual(trigger.path, AnyPath(path))
+    }
+
 }
