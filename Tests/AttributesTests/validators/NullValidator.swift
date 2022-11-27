@@ -64,11 +64,16 @@ final class NullValidator<Root>: ValidatorProtocol {
     private(set) var timesCalled: Int = 0
 
     /// The last parameter passed to `performValidation`.
-    private(set) var lastParameter: Root?
+    var lastParameter: Root? {
+        parameters.last
+    }
+
+    /// All parameters passed to performValidation in order of how it was called.
+    private(set) var parameters: [Root] = []
 
     /// A validation that will count the times it is called.
     func performValidation(_ root: Root) throws {
-        lastParameter = root
+        parameters.append(root)
         timesCalled += 1
     }
 
