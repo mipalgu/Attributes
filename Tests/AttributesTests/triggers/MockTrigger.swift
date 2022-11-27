@@ -63,12 +63,12 @@ class MockTrigger<Root>: TriggerProtocol {
     /// How many times the trigger was called.
     private(set) var timesCalled: Int = 0
 
-    /// The root passed to the trigger function.
+    /// The last root passed to the trigger function.
     var rootPassed: Root? {
         rootsPassed.last
     }
 
-    /// The path passed to the trigger function.
+    /// The last path passed to the trigger function.
     var pathPassed: AnyPath<Root>? {
         pathsPassed.last
     }
@@ -76,8 +76,10 @@ class MockTrigger<Root>: TriggerProtocol {
     /// The result returned by `performTrigger`.
     let result: Result<Bool, AttributeError<Root>>
 
+    /// All of the roots passed to the trigger functions.
     private(set) var rootsPassed: [Root] = []
 
+    /// All of the paths passed to the trigger function.
     private(set) var pathsPassed: [AnyPath<Root>] = []
 
     /// Initialise this MockTrigger.
@@ -103,6 +105,7 @@ class MockTrigger<Root>: TriggerProtocol {
         return true
     }
 
+    /// Set the trigger back to it's original state when created.
     func reset() {
         self.rootsPassed = []
         self.pathsPassed = []

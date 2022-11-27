@@ -60,18 +60,24 @@ import XCTest
 /// Test class for ``ForEach``.
 final class ForEachTests: XCTestCase {
 
+    /// A path to an array of points.
     let arrayPath = Path([Point].self)
 
+    /// The collection search path used with the trigger.
     lazy var path = CollectionSearchPath(arrayPath)
 
+    /// A mock trigger.
     var mockTrigger = MockTrigger<[Point]>(result: .success(true))
 
+    /// An array of points.
     var points = [Point(x: 1, y: 2), Point(x: 3, y: 4)]
 
+    /// The trigger under test.
     lazy var trigger = ForEach(path) { _ in
         self.mockTrigger
     }
 
+    /// Initialise all properties before testing.
     override func setUp() {
         mockTrigger = MockTrigger(result: .success(true))
         trigger = ForEach(path) { _ in
@@ -81,6 +87,7 @@ final class ForEachTests: XCTestCase {
         path = CollectionSearchPath(arrayPath)
     }
 
+    /// Test `performTrigger` calls mockTrigger with correct parameters.
     func testPerformTrigger() throws {
         XCTAssertTrue(try trigger.performTrigger(&points, for: AnyPath(arrayPath)).get())
         XCTAssertEqual(mockTrigger.timesCalled, 2)
