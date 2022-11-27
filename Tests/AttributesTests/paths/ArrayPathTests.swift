@@ -107,6 +107,36 @@ final class ArrayPathTests: XCTestCase {
         }
     }
 
+    /// Test each method on ``ValidationPath`` where `Value` is a `MutableCollection`.
+    func testValidationPathMutableEach() throws {
+        let path = ValidationPath(path: Path([Point].self))
+        let validator = NullValidator<[Point]>()
+        let f = path.each { _, _ in
+            validator
+        }
+        let points = [Point(x: 1, y: 2), Point(x: 3, y: 4)]
+        XCTAssertEqual(validator.timesCalled, 0)
+        XCTAssertNil(validator.lastParameter)
+        try f.performValidation(points)
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.parameters, [points, points])
+    }
+
+    /// Test each method on ``ValidationPath`` where `Value` is a `Collection`.
+    func testValidationPathEach() throws {
+        let path = ValidationPath(path: Path([NonMutatingPoint].self))
+        let validator = NullValidator<[NonMutatingPoint]>()
+        let f = path.each { _, _ in
+            validator
+        }
+        let points = [NonMutatingPoint(x: 1, y: 2), NonMutatingPoint(x: 3, y: 4)]
+        XCTAssertEqual(validator.timesCalled, 0)
+        XCTAssertNil(validator.lastParameter)
+        try f.performValidation(points)
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.parameters, [points, points])
+    }
+
     /// Test keyPath semantics.
     func testKeyPath() {
         /// Get keyPath
