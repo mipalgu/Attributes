@@ -61,7 +61,7 @@ import XCTest
 final class WhenChangedTests: XCTestCase {
 
     /// A path to the x-property of a point.
-    let path = ReadOnlyPath(Point.self).x
+    let path = Path(Point.self).x
 
     /// A mock trigger.
     var mockTrigger = MockTrigger<Point>(result: .success(true))
@@ -136,6 +136,24 @@ final class WhenChangedTests: XCTestCase {
         XCTAssertEqual(mockTrigger.timesCalled, 1)
         XCTAssertEqual(mockTrigger.pathPassed, AnyPath(path))
         XCTAssertEqual(mockTrigger.rootPassed, point)
+    }
+
+    /// Test sync creates correct SyncTrigger.
+    func testSync() throws {
+        let newTrigger = identityTrigger.sync(target: Path(Point.self).y)
+        XCTAssertTrue(try newTrigger.performTrigger(&point, for: AnyPath(path)).get())
+        XCTAssertEqual(point.y, 1)
+        XCTAssertEqual(point.x, 1)
+    }
+
+    /// Test sync performs transform correctly.
+    func testSyncWithTransform() throws {
+        let newTrigger = identityTrigger.sync(target: Path(Point.self).y) { val, _ in
+            val + 5
+        }
+        XCTAssertTrue(try newTrigger.performTrigger(&point, for: AnyPath(path)).get())
+        XCTAssertEqual(point.x, 1)
+        XCTAssertEqual(point.y, 6)
     }
 
 }
