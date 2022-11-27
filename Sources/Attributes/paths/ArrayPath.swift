@@ -58,44 +58,57 @@
 
 import Foundation
 
+/// Add subscript.
 extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteger {
 
+    /// Creates a new path to the value located at `index` in the collection.
     public subscript(index: Value.Index) -> ReadOnlyPath<Root, Value.Element> {
         ReadOnlyPath<Root, Value.Element>(
             keyPath: self.keyPath.appending(path: \.[index]),
-            ancestors: self.ancestors + [AnyPath(self)],
-            isNil: { root in root[keyPath: keyPath].count <= index }
-        )
+            ancestors: self.ancestors + [AnyPath(self)]
+        ) { root in
+            root[keyPath: keyPath].count <= index
+        }
     }
 
 }
 
+/// Add subscript.
 extension ReadOnlyPathProtocol where Value: MutableCollection, Value.Index: BinaryInteger {
 
+    /// Creates a new path to the value located at `index` in the collection.
     public subscript(index: Value.Index) -> ReadOnlyPath<Root, Value.Element> {
         ReadOnlyPath<Root, Value.Element>(
             keyPath: self.keyPath.appending(path: \.[index]),
-            ancestors: self.ancestors + [AnyPath(self)],
-            isNil: { root in root[keyPath: keyPath].count <= index }
-        )
+            ancestors: self.ancestors + [AnyPath(self)]
+        ) { root in
+            root[keyPath: keyPath].count <= index
+        }
     }
 
 }
 
+/// Add subscript.
 extension PathProtocol where Value: MutableCollection, Value.Index: BinaryInteger {
 
+    /// Creates a new path to the value located at `index` in the collection.
     public subscript(index: Value.Index) -> Path<Root, Value.Element> {
         Path<Root, Value.Element>(
             path: self.path.appending(path: \.[index]),
-            ancestors: self.ancestors + [AnyPath(self)],
-            isNil: { root in root[keyPath: self.path].count <= index }
-        )
+            ancestors: self.ancestors + [AnyPath(self)]
+        ) { root in
+            root[keyPath: self.path].count <= index
+        }
     }
 
 }
 
+/// Add each method.
 extension Path where Value: MutableCollection, Value.Index: Hashable {
 
+    /// Allows the use of a `map` mechanism accross the paths to each element in the root collection.
+    /// - Parameter f: A function to transform the path.
+    /// - Returns: An array of transformed paths.
     public func each<T>(_ f: @escaping (Value.Index, Path<Root, Value.Element>) -> T) -> (Root) -> [T] {
         { root in
             root[keyPath: self.path].indices.map {
@@ -106,8 +119,13 @@ extension Path where Value: MutableCollection, Value.Index: Hashable {
 
 }
 
+/// Add each method.
 extension ValidationPath where P.Value: Collection, P.Value.Index: Hashable {
 
+    /// Allows the use of a `map` mechanism accross the paths to each element in the root collection. This
+    /// allows the chaining of validators for each element in a collection.
+    /// - Parameter builder: The validators to apply to each element.
+    /// - Returns: A single validator that will perform the validators in `builder` to each element.
     public func each(
         @ValidatorBuilder<Root> builder: @escaping (
             Value.Index,
@@ -132,8 +150,13 @@ extension ValidationPath where P.Value: Collection, P.Value.Index: Hashable {
 
 }
 
+/// Add each method.
 extension ValidationPath where P.Value: MutableCollection, P.Value.Index: Hashable {
 
+    /// Allows the use of a `map` mechanism accross the paths to each element in the root collection. This
+    /// allows the chaining of validators for each element in a collection.
+    /// - Parameter builder: The validators to apply to each element.
+    /// - Returns: A single validator that will perform the validators in `builder` to each element.
     public func each(
         @ValidatorBuilder<Root> builder: @escaping (
             Value.Index,
