@@ -64,7 +64,7 @@ final class WhenChangedTests: XCTestCase {
     let path = ReadOnlyPath(Point.self).x
 
     /// A mock trigger.
-    var mockTrigger = MockTrigger<Point>()
+    var mockTrigger = MockTrigger<Point>(result: .success(true))
 
     /// The trigger under test.
     lazy var trigger = WhenChanged(actualPath: path, trigger: mockTrigger)
@@ -77,7 +77,7 @@ final class WhenChangedTests: XCTestCase {
 
     /// Reinitialise properties before every test case.
     override func setUp() {
-        mockTrigger = MockTrigger()
+        mockTrigger = MockTrigger(result: .success(true))
         trigger = WhenChanged(actualPath: path, trigger: mockTrigger)
         identityTrigger = WhenChanged(path)
         point = Point(x: 1, y: 2)
@@ -98,7 +98,7 @@ final class WhenChangedTests: XCTestCase {
 
     /// Test `performTrigger` uses mock trigger when given valid path.
     func testPerformTriggerForValidPath() throws {
-        XCTAssertFalse(try trigger.performTrigger(&point, for: AnyPath(path)).get())
+        XCTAssertTrue(try trigger.performTrigger(&point, for: AnyPath(path)).get())
         XCTAssertEqual(mockTrigger.timesCalled, 1)
         XCTAssertEqual(mockTrigger.rootPassed, point)
         XCTAssertEqual(mockTrigger.pathPassed, AnyPath(path))
@@ -110,6 +110,32 @@ final class WhenChangedTests: XCTestCase {
         XCTAssertEqual(mockTrigger.timesCalled, 0)
         XCTAssertNil(mockTrigger.rootPassed)
         XCTAssertNil(mockTrigger.pathPassed)
+    }
+
+    /// Test when calls trigger correctly for correct condition.
+    func testWhen() throws {
+        let falseTrigger = identityTrigger.when({ _ in
+                false
+            },
+            then: { _ in
+                mockTrigger
+            }
+        )
+        XCTAssertFalse(try falseTrigger.performTrigger(&point, for: AnyPath(path)).get())
+        XCTAssertEqual(mockTrigger.timesCalled, 0)
+        XCTAssertNil(mockTrigger.pathPassed)
+        XCTAssertNil(mockTrigger.rootPassed)
+        let newTrigger = identityTrigger.when({ _ in
+                true
+            },
+            then: { _ in
+                mockTrigger
+            }
+        )
+        XCTAssertTrue(try newTrigger.performTrigger(&point, for: AnyPath(path)).get())
+        XCTAssertEqual(mockTrigger.timesCalled, 1)
+        XCTAssertEqual(mockTrigger.pathPassed, AnyPath(path))
+        XCTAssertEqual(mockTrigger.rootPassed, point)
     }
 
 }
