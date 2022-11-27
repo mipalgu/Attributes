@@ -87,6 +87,26 @@ final class ArrayPathTests: XCTestCase {
         XCTAssertEqual(point0, expected)
     }
 
+    /// Test path `each` method applies function to all elements.
+    func testPathEach() {
+        let path = Path([Point].self)
+        let points = [Point(x: 1, y: 2), Point(x: 3, y: 4)]
+        let f = path.each { index, pPath in
+            (index, points[keyPath: pPath.keyPath])
+        }
+        let result = f(points)
+        let expected = [(0, Point(x: 1, y: 2)), (1, Point(x: 3, y: 4))]
+        guard result.count == expected.count else {
+            XCTFail("Incorrect result.")
+            return
+        }
+        result.forEach { index, point in
+            let exp = expected[index]
+            XCTAssertEqual(exp.0, index)
+            XCTAssertEqual(exp.1, point)
+        }
+    }
+
     /// Creates a ReadOnlyPath for a mutable collection.
     /// - Parameter type: Root type.
     /// - Returns: ReadOnlyPath to the first element in `type`.
