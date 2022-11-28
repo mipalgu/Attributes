@@ -82,6 +82,11 @@ class MockTrigger<Root>: TriggerProtocol {
     /// All of the paths passed to the trigger function.
     private(set) var pathsPassed: [AnyPath<Root>] = []
 
+    /// Has this trigger been called in any way?
+    var isCalled: Bool {
+        timesCalled == 0 && rootPassed == nil && pathPassed == nil
+    }
+
     /// Initialise this MockTrigger.
     /// 
     /// - Parameter result: The result returned by the `performTrigger` method.
