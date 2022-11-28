@@ -77,6 +77,11 @@ final class ForEachTests: XCTestCase {
         self.mockTrigger
     }
 
+    /// A trigger that does no function.
+    lazy var identityTrigger = ForEach(path) { _ in
+        WhenChanged(self.arrayPath[1])
+    }
+
     /// Initialise all properties before testing.
     override func setUp() {
         mockTrigger = MockTrigger(result: .success(true))
@@ -85,6 +90,9 @@ final class ForEachTests: XCTestCase {
         }
         points = [Point(x: 1, y: 2), Point(x: 3, y: 4)]
         path = CollectionSearchPath(arrayPath)
+        identityTrigger = ForEach(path) { _ in
+            WhenChanged(self.arrayPath[1])
+        }
     }
 
     /// Test `performTrigger` calls mockTrigger with correct parameters.
@@ -93,6 +101,36 @@ final class ForEachTests: XCTestCase {
         XCTAssertEqual(mockTrigger.timesCalled, 2)
         XCTAssertEqual(mockTrigger.rootsPassed, [points, points])
         XCTAssertEqual(mockTrigger.pathsPassed, [AnyPath(arrayPath), AnyPath(arrayPath)])
+    }
+
+    /// Test isTriggerOrSame returns correctly for paths.
+    func testIsTriggerOrSame() {
+        XCTAssertFalse(trigger.isTriggerForPath(AnyPath(arrayPath), in: points))
+        XCTAssertTrue(trigger.isTriggerForPath(AnyPath(arrayPath[0]), in: points))
+    }
+
+    /// Test `when` calls trigger correctly.
+    func testWhen() throws {
+        let newTrigger = identityTrigger.when({ _ in true }, then: { _ in self.mockTrigger })
+        XCTAssertTrue(try newTrigger.performTrigger(&points, for: AnyPath(arrayPath[0])).get())
+        XCTAssertEqual(mockTrigger.timesCalled, 1)
+        XCTAssertEqual(mockTrigger.rootsPassed, [points])
+        XCTAssertEqual(mockTrigger.pathsPassed, [AnyPath(arrayPath[0])])
+        XCTAssertTrue(try newTrigger.performTrigger(&points, for: AnyPath(arrayPath[1])).get())
+        XCTAssertEqual(mockTrigger.timesCalled, 2)
+        XCTAssertEqual(mockTrigger.rootsPassed, [points, points])
+        XCTAssertEqual(mockTrigger.pathsPassed, [AnyPath(arrayPath[0]), AnyPath(arrayPath[1])])
+    }
+
+    func testSync() throws {
+        let newTrigger = identityTrigger.sync(target: arrayPath[1])
+        points += [Point(x: 5, y: 6)]
+        XCTAssertTrue(try newTrigger.performTrigger(&points, for: AnyPath(arrayPath[0])).get())
+        XCTAssertEqual(points, [Point(x: 1, y: 2), Point(x: 1, y: 2)])
+        points[0] = Point(x: 3, y: 4)
+        XCTAssertFalse(try newTrigger.performTrigger(&points, for: AnyPath(arrayPath.count)).get())
+        XCTAssertEqual(points, [Point(x: 1, y: 2), Point(x: 1, y: 2)])
+        XCTFail("Not correct...Fix later.")
     }
 
 }
