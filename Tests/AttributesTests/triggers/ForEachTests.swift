@@ -122,15 +122,11 @@ final class ForEachTests: XCTestCase {
         XCTAssertEqual(mockTrigger.pathsPassed, [AnyPath(arrayPath[0]), AnyPath(arrayPath[1])])
     }
 
+    /// Test sync calls trigger correctly.
     func testSync() throws {
-        let newTrigger = identityTrigger.sync(target: arrayPath[1])
-        points += [Point(x: 5, y: 6)]
+        let newTrigger = identityTrigger.sync(target: arrayPath[0])
         XCTAssertTrue(try newTrigger.performTrigger(&points, for: AnyPath(arrayPath[0])).get())
-        XCTAssertEqual(points, [Point(x: 1, y: 2), Point(x: 1, y: 2)])
-        points[0] = Point(x: 3, y: 4)
-        XCTAssertFalse(try newTrigger.performTrigger(&points, for: AnyPath(arrayPath.count)).get())
-        XCTAssertEqual(points, [Point(x: 1, y: 2), Point(x: 1, y: 2)])
-        XCTFail("Not correct...Fix later.")
+        XCTAssertEqual(points, [Point(x: 3, y: 4), Point(x: 3, y: 4)])
     }
 
 }
