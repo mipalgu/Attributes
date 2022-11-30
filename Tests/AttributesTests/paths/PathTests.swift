@@ -103,6 +103,12 @@ final class PathTests: XCTestCase {
         XCTAssertEqual(path.ancestors, [AnyPath(Path(OptionalPoint.self))])
     }
 
+        /// Test isNil still works when appending members.
+    func testIsNilAppendingPath() {
+        let path = Path(OptionalPoint.self).x
+        XCTAssertTrue(path.isNil(OptionalPoint()))
+    }
+
     /// Test type initialiser.
     func testTypeInit() {
         let keyPath = \Point.self
