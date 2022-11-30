@@ -85,10 +85,12 @@ final class ValidationFactoryTests: XCTestCase {
         XCTAssertEqual(pointValidator.lastParameter, point)
     }
 
+    /// Test make creates validator.
     func testMake() throws {
         try factory.make(path: path).performValidation(point)
     }
 
+    /// Test make throws correct error for nil value in root.
     func testOptionalMake() throws {
         let newFactory = ValidatorFactory<Int?>.required()
         let point = OptionalPoint()
@@ -108,13 +110,29 @@ final class ValidationFactoryTests: XCTestCase {
         }
     }
 
+    /// Test make optional creates validator that isn't used for nil value.
     func testOptionalMakeNotRequired() throws {
-        let newFactory = ValidatorFactory<Int?>.optional()
+        let validator = NullValidator<Int?>()
+        let newFactory = ValidatorFactory<Int?>.optional().push { _ in
+            validator
+        }
         let point = OptionalPoint()
         let path = ReadOnlyPath(OptionalPoint.self).x
         XCTAssertNil(point.x)
         XCTAssertTrue(path.isNil(point))
         try newFactory.make(path: path).performValidation(point)
+        XCTAssertEqual(validator.timesCalled, 0)
+        XCTAssertNil(validator.lastParameter as Any?)
+    }
+
+    /// Test validate function creates correct validator.
+    func testValidate() throws {
+        let validator = ValidatorFactory<Point>.validate { _ in
+            AnyValidator(self.pointValidator)
+        }
+        try validator.performValidation(point)
+        XCTAssertEqual(pointValidator.timesCalled, 1)
+        XCTAssertEqual(pointValidator.lastParameter, point)
     }
 
     /// Test validation is performed when if condition is true.
