@@ -122,11 +122,57 @@ final class ForEachTests: XCTestCase {
         XCTAssertEqual(mockTrigger.pathsPassed, [AnyPath(arrayPath[0]), AnyPath(arrayPath[1])])
     }
 
-    /// Test sync calls trigger correctly.
+    /// Test `sync` calls trigger correctly.
     func testSync() throws {
         let newTrigger = identityTrigger.sync(target: arrayPath[0])
         XCTAssertTrue(try newTrigger.performTrigger(&points, for: AnyPath(arrayPath[0])).get())
         XCTAssertEqual(points, [Point(x: 3, y: 4), Point(x: 3, y: 4)])
+    }
+
+    /// Sync with transform.
+    func testSyncWithTransform() throws {
+        let newTrigger = identityTrigger.sync(target: arrayPath[0]) { _, _ in
+            Point(x: 10, y: 11)
+        }
+        XCTAssertTrue(try newTrigger.performTrigger(&points, for: AnyPath(arrayPath[0])).get())
+        XCTAssertEqual(points, [Point(x: 10, y: 11), Point(x: 3, y: 4)])
+    }
+
+    /// Test `makeAvailable` makes field available.
+    func testMakeAvailable() throws {
+        let path = Path(Person.self)
+        let newTrigger = ForEach(path) { _ in
+            WhenChanged(path)
+        }
+        .makeAvailable(
+            field: Field(name: "Name", type: .line),
+            after: [],
+            fields: path.fields,
+            attributes: path.attributes
+        )
+        var person = Person(fields: [], attributes: [:])
+        XCTAssertTrue(try newTrigger.performTrigger(&person, for: AnyPath(path)).get())
+        XCTAssertEqual(
+            person,
+            Person(fields: [Field(name: "Name", type: .line)], attributes: ["Name": .line("")])
+        )
+    }
+
+    /// Test `makeUnavailable` removes field.
+    func testMakeUnavailable() throws {
+        let path = Path(Person.self)
+        let newTrigger = ForEach(path) { _ in
+            WhenChanged(path)
+        }
+        .makeUnavailable(field: Field(name: "Name", type: .line), fields: path.fields)
+        var person = Person(
+            fields: [Field(name: "Name", type: .line)], attributes: ["Name": .line("John Smith")]
+        )
+        XCTAssertTrue(try newTrigger.performTrigger(&person, for: AnyPath(path)).get())
+        XCTAssertEqual(
+            person,
+            Person(fields: [], attributes: ["Name": .line("John Smith")])
+        )
     }
 
 }
