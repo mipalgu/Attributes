@@ -279,7 +279,7 @@ extension ValidatorFactory where Value: StringProtocol {
         push { $0.whitelist(list) }
     }
 
-    public func greylist(_ list: Set<String>) -> ValidatorFactory<Value> {
+    public func greyList(_ list: Set<String>) -> ValidatorFactory<Value> {
         push { $0.greyList(list) }
     }
 
