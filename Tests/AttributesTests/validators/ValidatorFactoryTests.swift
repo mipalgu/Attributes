@@ -217,4 +217,151 @@ final class ValidationFactoryTests: XCTestCase {
         }
     }
 
+    /// Test equals function.
+    func testEquals() throws {
+        let readPath = ReadOnlyPath(EquatablePoint.self)
+        let point = EquatablePoint(x: 1, y: 2)
+        let factory = ValidatorFactory<EquatablePoint>.required().equals(point)
+        try factory.make(path: readPath).performValidation(point)
+        let point2 = EquatablePoint(x: 2, y: 3)
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(point2)) {
+            guard let error = $0 as? AttributeError<EquatablePoint> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must equal \(point).")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
+    /// Test notEquals function.
+    func testNotEquals() throws {
+        let readPath = ReadOnlyPath(EquatablePoint.self)
+        let point = EquatablePoint(x: 1, y: 2)
+        let point2 = EquatablePoint(x: 2, y: 3)
+        let factory = ValidatorFactory<EquatablePoint>.required().notEquals(point)
+        try factory.make(path: readPath).performValidation(point2)
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(point)) {
+            guard let error = $0 as? AttributeError<EquatablePoint> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must not equal \(point).")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
+    /// Test equalsTrue method.
+    func testEqualsTrue() throws {
+        let readPath = ReadOnlyPath(Bool.self)
+        let value = true
+        let notValue = false
+        let factory = ValidatorFactory<Bool>.required().equalsTrue()
+        try factory.make(path: readPath).performValidation(value)
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(notValue)) {
+            guard let error = $0 as? AttributeError<Bool> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must equal \(value).")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
+    /// Test equalsFalse method.
+    func testEqualsFalse() throws {
+        let readPath = ReadOnlyPath(Bool.self)
+        let value = true
+        let notValue = false
+        let factory = ValidatorFactory<Bool>.required().equalsFalse()
+        try factory.make(path: readPath).performValidation(notValue)
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(value)) {
+            guard let error = $0 as? AttributeError<Bool> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must equal \(notValue).")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
+    /// Test between method.
+    func testBetween() throws {
+        let readPath = ReadOnlyPath(Int.self)
+        let factory = ValidatorFactory<Int>.required().between(min: 3, max: 7)
+        try factory.make(path: readPath).performValidation(5)
+        try factory.make(path: readPath).performValidation(3)
+        try factory.make(path: readPath).performValidation(7)
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(1)) {
+            guard let error = $0 as? ValidationError<Int> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be between \(3) and \(7).")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
+    /// Test `lessThan` method.
+    func testLessThan() throws {
+        let readPath = ReadOnlyPath(Int.self)
+        let factory = ValidatorFactory<Int>.required().lessThan(5)
+        try factory.make(path: readPath).performValidation(4)
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(5)) {
+            guard let error = $0 as? ValidationError<Int> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be less than \(5).")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
+    /// Test `lessThanEqual` method.
+    func testLessThanEqual() throws {
+        let readPath = ReadOnlyPath(Int.self)
+        let factory = ValidatorFactory<Int>.required().lessThanEqual(5)
+        try factory.make(path: readPath).performValidation(4)
+        try factory.make(path: readPath).performValidation(5)
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(6)) {
+            guard let error = $0 as? ValidationError<Int> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be less than or equal to \(5).")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
+    /// Test `greaterThan` method.
+    func testGreaterThan() throws {
+        let readPath = ReadOnlyPath(Int.self)
+        let factory = ValidatorFactory<Int>.required().greaterThan(5)
+        try factory.make(path: readPath).performValidation(6)
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(5)) {
+            guard let error = $0 as? ValidationError<Int> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be greater than \(5).")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
+    /// Test `greaterThanEqual` method.
+    func testGreaterThanEqual() throws {
+        let readPath = ReadOnlyPath(Int.self)
+        let factory = ValidatorFactory<Int>.required().greaterThanEqual(5)
+        try factory.make(path: readPath).performValidation(5)
+        try factory.make(path: readPath).performValidation(6)
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(4)) {
+            guard let error = $0 as? ValidationError<Int> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be greater than or equal to \(5).")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
 }
