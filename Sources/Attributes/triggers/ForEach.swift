@@ -179,14 +179,14 @@ extension ForEach where
         }
     }
 
-    /// Create a ``MakeAvailable`` trigger.
+    /// Create a ``MakeAvailableTrigger``.
     /// - Parameters:
     ///   - field: The new field to make available.
-    ///   - order: The order to place the new field in. (see ``MakeAvailable``).
+    ///   - order: The order to place the new field in. (see ``MakeAvailableTrigger``).
     ///   - fields: A path to the fields array to mutate.
     ///   - attributes: A path to the attributes array to mutate.
     /// - Returns: The new trigger.
-    /// - SeeAlso: ``MakeAvailable``.
+    /// - SeeAlso: ``MakeAvailableTrigger``.
     public func makeAvailable<FieldsPath: PathProtocol, AttributesPath: PathProtocol>(
         field: Field, after order: [String], fields: FieldsPath, attributes: AttributesPath
     ) -> ForEach<
@@ -204,12 +204,12 @@ extension ForEach where
         }
     }
 
-    /// Create a ``MakeUnavailable`` trigger.
+    /// Create a ``MakeUnavailableTrigger``.
     /// - Parameters:
     ///   - field: The field to remove.
     ///   - fields: A path to the fields array to mutate.
     /// - Returns: The new trigger.
-    /// - SeeAlso: ``MakeUnavailable``.
+    /// - SeeAlso: ``MakeUnavailableTrigger``.
     public func makeUnavailable<FieldsPath: PathProtocol>(
         field: Field, fields: FieldsPath
     ) -> ForEach<
