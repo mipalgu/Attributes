@@ -85,6 +85,38 @@ final class ValidationFactoryTests: XCTestCase {
         XCTAssertEqual(pointValidator.lastParameter, point)
     }
 
+    func testMake() throws {
+        try factory.make(path: path).performValidation(point)
+    }
+
+    func testOptionalMake() throws {
+        let newFactory = ValidatorFactory<Int?>.required()
+        let point = OptionalPoint()
+        let path = ReadOnlyPath(OptionalPoint.self).x
+        XCTAssertNil(point.x)
+        XCTAssertTrue(point[keyPath: path.keyPath].isNil)
+        XCTAssertTrue(path.isNil(point))
+        XCTAssertThrowsError(
+            try newFactory.make(path: path).performValidation(point)
+        ) {
+            guard let error = $0 as? AttributeError<OptionalPoint> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Does not exist")
+            XCTAssertEqual(error.path, AnyPath(path))
+        }
+    }
+
+    func testOptionalMakeNotRequired() throws {
+        let newFactory = ValidatorFactory<Int?>.optional()
+        let point = OptionalPoint()
+        let path = ReadOnlyPath(OptionalPoint.self).x
+        XCTAssertNil(point.x)
+        XCTAssertTrue(path.isNil(point))
+        try newFactory.make(path: path).performValidation(point)
+    }
+
     /// Test validation is performed when if condition is true.
     func testIf() throws {
         let newFactory = factory.if({
