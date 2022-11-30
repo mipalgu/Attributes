@@ -57,6 +57,7 @@
 @testable import Attributes
 import XCTest
 
+/// Test class for ``ValidatorFactory`` comparable implementations.
 final class ValidatorFactoryComparableTests: XCTestCase {
 
         /// Test between method.
