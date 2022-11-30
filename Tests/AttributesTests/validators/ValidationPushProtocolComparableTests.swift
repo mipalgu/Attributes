@@ -60,7 +60,7 @@ import XCTest
 /// Test class for ``ValidationPushProtocol`` methods where Value is `Equatable`, `Hashable`, or `Comparable`.
 final class ValidationPushProtocolComparableTests: XCTestCase {
 
-        /// Test equals function.
+    /// Test equals function.
     func testEquals() throws {
         let readPath = ReadOnlyPath(EquatablePoint.self)
         let point = EquatablePoint(x: 1, y: 2)
