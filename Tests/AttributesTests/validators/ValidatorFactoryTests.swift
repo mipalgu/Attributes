@@ -179,4 +179,42 @@ final class ValidationFactoryTests: XCTestCase {
         XCTAssertEqual(validator2.lastParameter, point)
     }
 
+    /// Test unique method.
+    func testUnique() throws {
+        let readPath = ReadOnlyPath([Point].self)
+        let factory = ValidatorFactory<[Point]>.required().unique()
+        let points = [Point(x: 1, y: 2), Point(x: 3, y: 4), Point(x: 5, y: 6)]
+        try factory.make(path: readPath).performValidation(points)
+        let points2 = points + [Point(x: 1, y: 2)]
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(points2)) {
+            guard let error = $0 as? ValidationError<[Point]> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be unique")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
+    /// Test unique function with transform.
+    func testUniqueWithTransform() throws {
+        let readPath = ReadOnlyPath([Point].self)
+        let factory = ValidatorFactory<[Point]>.required().unique {
+            $0.dropFirst()
+        }
+        let points = [Point(x: 1, y: 2), Point(x: 3, y: 4), Point(x: 5, y: 6)]
+        try factory.make(path: readPath).performValidation(points)
+        let points2 = points + [Point(x: 1, y: 2)]
+        try factory.make(path: readPath).performValidation(points2)
+        let points3 = points + [Point(x: 3, y: 4)]
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation(points3)) {
+            guard let error = $0 as? ValidationError<[Point]> else {
+                XCTFail("Incorrect error thrown.")
+                return
+            }
+            XCTAssertEqual(error.message, "Must be unique")
+            XCTAssertEqual(error.path, AnyPath(readPath))
+        }
+    }
+
 }
