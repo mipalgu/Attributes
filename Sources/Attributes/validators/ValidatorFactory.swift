@@ -121,38 +121,37 @@ extension ValidatorFactory {
 
 }
 
+// extension ValidatorFactory where Value: Equatable {
 
-extension ValidatorFactory where Value: Equatable {
+//     public func `in`<P: ReadOnlyPathProtocol, S: Sequence, S2: Sequence>(_ p: P, transform: @escaping (S) -> S2) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S, S2.Element == Value {
+//         push { $0.in(p, transform: transform) }
+//     }
 
-    public func `in`<P: ReadOnlyPathProtocol, S: Sequence, S2: Sequence>(_ p: P, transform: @escaping (S) -> S2) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S, S2.Element == Value {
-        push { $0.in(p, transform: transform) }
-    }
+//     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S, S.Element == Value {
+//         push { $0.in(p) }
+//     }
 
-    public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S, S.Element == Value {
-        push { $0.in(p) }
-    }
+// }
 
-}
+// extension ValidatorFactory where Value: Hashable {
 
-extension ValidatorFactory where Value: Hashable {
+//     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P, transform: @escaping (S) -> Set<Value>) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S {
+//         push { $0.in(p, transform: transform) }
+//     }
 
-    public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P, transform: @escaping (S) -> Set<Value>) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S {
-        push { $0.in(p, transform: transform) }
-    }
+//     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S, S.Element == Value {
+//         push { $0.in(p) }
+//     }
 
-    public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(_ p: P) -> ValidatorFactory<Value> where P.Root == Value, P.Value == S, S.Element == Value {
-        push { $0.in(p) }
-    }
+//     public func `in`<P: ReadOnlyPathProtocol>(_ p: P) -> ValidatorFactory<Value> where P.Root == Value, P.Value == Set<Value> {
+//         push { $0.in(p) }
+//     }
 
-    public func `in`<P: ReadOnlyPathProtocol>(_ p: P) -> ValidatorFactory<Value> where P.Root == Value, P.Value == Set<Value> {
-        push { $0.in(p) }
-    }
+//     public func `in`(_ set: Set<Value>) -> ValidatorFactory<Value> {
+//         push { $0.in(set) }
+//     }
 
-    public func `in`(_ set: Set<Value>) -> ValidatorFactory<Value> {
-        push { $0.in(set) }
-    }
-
-}
+// }
 
 extension ValidatorFactory where Value: Equatable {
 
