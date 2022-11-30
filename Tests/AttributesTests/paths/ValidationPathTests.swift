@@ -125,4 +125,11 @@ final class ValidationPathTests: XCTestCase {
         XCTAssertEqual(opt.path, path)
     }
 
+    /// Test isNil on new path.
+    func testPathIsNil() {
+        let path = ReadOnlyPath(OptionalPoint.self)
+        let validationPath = ValidationPath(path: path).x
+        XCTAssertTrue(validationPath.path.isNil(OptionalPoint()))
+    }
+
 }
