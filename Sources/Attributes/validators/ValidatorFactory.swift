@@ -58,18 +58,56 @@
 
 import Foundation
 
+/// A simple interface for chaining together different validators. This factory can be reused to create a
+/// validator that may perform the task of several validators chained together. This factory will
+/// store a function to generate a complex validation rule that can be modified/altered to work with
+/// other validators. When the user is satisfied with the validation rule, this factory may be used
+/// to generate the validator as many times as required by using the `make` function.
 public struct ValidatorFactory<Value> {
 
+    /// The function to create the validator.
     private let _make: () -> AnyValidator<Value>
 
+    /// Whether the validator rule created by `make` is required to succeed.
     private let required: Bool
 
+    /// Initialise this struct from a make function and `required` bool.
+    /// - Parameters:
+    ///   - required: Whether this validator is required to succeed.
+    ///   - make: The function to create the validator.
     private init(required: Bool, make: @escaping () -> AnyValidator<Value>) {
         self._make = make
         self.required = required
     }
 
-    func make<Path: ReadOnlyPathProtocol>(path: Path) -> AnyValidator<Path.Root> where Path.Value == Value {
+    /// Create a factory that produces a validation rule that is required to succeed.
+    /// - Returns: The new factory.
+    public static func required() -> ValidatorFactory<Value> {
+        .init(required: true) { AnyValidator() }
+    }
+
+    /// Create a factory that produces a validator that is **not** required to succeed.
+    /// - Returns: The new factory.
+    public static func optional() -> ValidatorFactory<Value> {
+        .init(required: false) { AnyValidator() }
+    }
+
+    /// Creates a validator that performs a custom validation function.
+    /// - Parameter builder: The custom validation function.
+    /// - Returns: The new validator.
+    public static func validate(
+        @ValidatorBuilder<Value> builder: (ValidatorFactory<Value>) -> AnyValidator<Value>
+    ) -> AnyValidator<Value> {
+        builder(.init(required: true) { AnyValidator() })
+    }
+
+    /// Create a validator that is preconfigured to verify some validation rule. This rule may be created by
+    /// chaining together different validators.
+    /// - Parameter path: The path to the object to validate..
+    /// - Returns: A new validator.
+    public func make<Path: ReadOnlyPathProtocol>(
+        path: Path
+    ) -> AnyValidator<Path.Root> where Path.Value == Value {
         AnyValidator { root in
             if required && path.isNil(root) {
                 throw AttributeError(message: "Does not exist", path: AnyPath(path))
@@ -81,19 +119,14 @@ public struct ValidatorFactory<Value> {
         }
     }
 
-    public static func required() -> ValidatorFactory<Value> {
-        .init(required: true) { AnyValidator() }
-    }
-
-    public static func optional() -> ValidatorFactory<Value> {
-        .init(required: false) { AnyValidator() }
-    }
-
-    public static func validate(@ValidatorBuilder<Value> builder: (ValidatorFactory<Value>) -> AnyValidator<Value>) -> AnyValidator<Value> {
-        return builder(.init(required: true) { AnyValidator() })
-    }
-
-    internal func push<Validator: ValidatorProtocol>(_ make: @escaping (ValidationPath<ReadOnlyPath<Value, Value>>) -> Validator) -> ValidatorFactory<Value> where Validator.Root == Value {
+    /// Push a new validator onto the current stack of validation rules.
+    /// - Parameter make: A function to generate the new validator.
+    /// - Returns: A new factory that incorporates the new validator into the current
+    /// stack of validators.
+    /// - SeeAlso: ``ValidationPath``.
+    internal func push<Validator: ValidatorProtocol>(
+        _ make: @escaping (ValidationPath<ReadOnlyPath<Value, Value>>) -> Validator
+    ) -> ValidatorFactory<Value> where Validator.Root == Value {
         ValidatorFactory(required: required) {
             let newValidator = make(ValidationPath(path: ReadOnlyPath(keyPath: \Value.self, ancestors: [])))
             return AnyValidator([_make(), AnyValidator(newValidator)])
@@ -102,8 +135,12 @@ public struct ValidatorFactory<Value> {
 
 }
 
+/// Add conditional rules.
 extension ValidatorFactory {
 
+    /// Creates a factory that will perform the `if` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func `if`(
         _ condition: @escaping (Value) -> Bool,
         @ValidatorBuilder<Value> then builder: @escaping () -> AnyValidator<Value>
@@ -111,6 +148,9 @@ extension ValidatorFactory {
         push { $0.if(condition, then: builder) }
     }
 
+    /// Creates a factory that will perform the `if` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func `if`(
         _ condition: @escaping (Value) -> Bool,
         @ValidatorBuilder<Value> then builder1: @escaping () -> AnyValidator<Value>,
@@ -153,132 +193,219 @@ extension ValidatorFactory {
 
 // }
 
+/// Adds equal methods.
 extension ValidatorFactory where Value: Equatable {
 
+    /// Creates a factory that will perform the `equals` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func equals(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.equals(value) }
     }
 
+    /// Creates a factory that will perform the `notEquals` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func notEquals(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.notEquals(value) }
     }
 
 }
 
+/// Adds equal methods for boolean values.
 extension ValidatorFactory where Value == Bool {
 
-    public func equalsFalse() -> ValidatorFactory<Value>  {
+    /// Creates a factory that will perform the `equalsFalse` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
+    public func equalsFalse() -> ValidatorFactory<Value> {
         push { $0.equalsFalse() }
     }
 
-    public func equalsTrue() -> ValidatorFactory<Value>  {
+    /// Creates a factory that will perform the `equalsTrue` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
+    public func equalsTrue() -> ValidatorFactory<Value> {
         push { $0.equalsTrue() }
     }
 
 }
 
+/// Add comparable methods.
 extension ValidatorFactory where Value: Comparable {
 
+    /// Creates a factory that will perform the `between` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func between(min: Value, max: Value) -> ValidatorFactory<Value> {
         push { $0.between(min: min, max: max) }
     }
 
+    /// Creates a factory that will perform the `lessThan` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func lessThan(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.lessThan(value) }
     }
 
+    /// Creates a factory that will perform the `lessThanEqual` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func lessThanEqual(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.lessThanEqual(value) }
     }
 
+    /// Creates a factory that will perform the `greaterThan` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func greaterThan(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.greaterThan(value) }
     }
 
+    /// Creates a factory that will perform the `greaterThanEqual` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func greaterThanEqual(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.greaterThanEqual(value) }
     }
 
 }
 
+/// Add collection methods.
 extension ValidatorFactory where Value: Collection {
 
+    /// Creates a factory that will perform the `empty` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func empty() -> ValidatorFactory<Value> {
         push { $0.empty() }
     }
 
+    /// Creates a factory that will perform the `notEmpty` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func notEmpty() -> ValidatorFactory<Value> {
         push { $0.notEmpty() }
     }
 
+    /// Creates a factory that will perform the `length` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func length(_ length: Int) -> ValidatorFactory<Value> {
         push { $0.length(length) }
     }
 
+    /// Creates a factory that will perform the `minLength` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func minLength(_ length: Int) -> ValidatorFactory<Value> {
         push { $0.minLength(length) }
     }
 
+    /// Creates a factory that will perform the `maxLength` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func maxLength(_ length: Int) -> ValidatorFactory<Value> {
         push { $0.maxLength(length) }
     }
 
 }
 
+/// Add unique method.
 extension ValidatorFactory where Value: Sequence {
 
-    public func unique<S: Sequence>(_ transform: @escaping (Value) -> S) -> ValidatorFactory<Value> where S.Element: Hashable {
+    /// Creates a factory that will perform the `unique` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
+    public func unique<S: Sequence>(
+        _ transform: @escaping (Value) -> S
+    ) -> ValidatorFactory<Value> where S.Element: Hashable {
         push { $0.unique(transform) }
     }
 
 }
 
+/// Add unique method.
 extension ValidatorFactory where Value: Sequence, Value.Element: Hashable {
 
+    /// Creates a factory that will perform the `unique` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func unique() -> ValidatorFactory<Value> {
         push { $0.unique() }
     }
 
 }
 
+/// Add string methods.
 extension ValidatorFactory where Value: StringProtocol {
 
+    /// Creates a factory that will perform the `alpha` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func alpha() -> ValidatorFactory<Value> {
         push { $0.alpha() }
     }
 
+    /// Creates a factory that will perform the `alphadash` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func alphadash() -> ValidatorFactory<Value> {
         push { $0.alphadash() }
     }
 
+    /// Creates a factory that will perform the `alphafirst` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func alphafirst() -> ValidatorFactory<Value> {
         push { $0.alphafirst() }
     }
 
+    /// Creates a factory that will perform the `alphanumeric` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func alphanumeric() -> ValidatorFactory<Value> {
         push { $0.alphanumeric() }
     }
 
+    /// Creates a factory that will perform the `alphaunderscore` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func alphaunderscore() -> ValidatorFactory<Value> {
         push { $0.alphaunderscore() }
     }
 
+    /// Creates a factory that will perform the `alphaunderscorefirst` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func alphaunderscorefirst() -> ValidatorFactory<Value> {
         push { $0.alphaunderscorefirst() }
     }
 
+    /// Creates a factory that will perform the `blacklist` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func blacklist(_ list: Set<String>) -> ValidatorFactory<Value> {
         push { $0.blacklist(list) }
     }
 
+    /// Creates a factory that will perform the `numeric` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func numeric() -> ValidatorFactory<Value> {
         push { $0.numeric() }
     }
 
+    /// Creates a factory that will perform the `whitelist` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func whitelist(_ list: Set<String>) -> ValidatorFactory<Value> {
         push { $0.whitelist(list) }
     }
 
+    /// Creates a factory that will perform the `greyList` rule. For a full list of rules,
+    /// see ``ValidationPushProtocol``.
+    /// - SeeAlso: ``ValidationPushProtocol``.
     public func greyList(_ list: Set<String>) -> ValidatorFactory<Value> {
         push { $0.greyList(list) }
     }
