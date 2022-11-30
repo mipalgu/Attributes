@@ -1,4 +1,4 @@
-# Attributes
+# ``Attributes``
 
 A swift abstraction for defining types of data commonly rendered within a Graphical User Interface (GUI). This package provides
 the means to define, validate, and relate different forms of data.
