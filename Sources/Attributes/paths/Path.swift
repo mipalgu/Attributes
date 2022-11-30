@@ -149,6 +149,19 @@ public struct Path<Root, Value>: PathProtocol {
         ReadOnlyPath<Root, AppendedValue>(keyPath: path.appending(path: member), ancestors: fullPath)
     }
 
+    /// Append to this path with a keyPath. This operation acts as a pure function by returning a new
+    /// Path with the keyPath appended.
+    /// - Parameter dynamicMember: The keyPath to append to this path.
+    /// - Returns: A new path with the keyPath appended to self.
+    public subscript<AppendedValue>(
+        dynamicMember member: KeyPath<Value, AppendedValue>
+    ) -> ReadOnlyPath<Root, AppendedValue> where AppendedValue: Nilable {
+        let newPath = path.appending(path: member)
+        return ReadOnlyPath<Root, AppendedValue>(keyPath: newPath, ancestors: fullPath) {
+            $0[keyPath: newPath].isNil
+        }
+    }
+
     /// Append a WriteableKeyPath to self. This function creates a new Path pointing from self's Root to
     /// the new Path's value.
     /// - Parameter dynamicMember: The WriteableKeyPath to be appended to self.
@@ -157,6 +170,19 @@ public struct Path<Root, Value>: PathProtocol {
         dynamicMember member: WritableKeyPath<Value, AppendedValue>
     ) -> Path<Root, AppendedValue> {
         Path<Root, AppendedValue>(path: path.appending(path: member), ancestors: fullPath)
+    }
+
+    /// Append a WriteableKeyPath to self. This function creates a new Path pointing from self's Root to
+    /// the new Path's value.
+    /// - Parameter dynamicMember: The WriteableKeyPath to be appended to self.
+    /// - Returns: A new Path with dynamicMember appended to self.
+    public subscript<AppendedValue>(
+        dynamicMember member: WritableKeyPath<Value, AppendedValue>
+    ) -> Path<Root, AppendedValue> where AppendedValue: Nilable {
+        let newPath = path.appending(path: member)
+        return Path<Root, AppendedValue>(path: newPath, ancestors: fullPath) {
+            $0[keyPath: newPath].isNil
+        }
     }
 
 }

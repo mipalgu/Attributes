@@ -122,6 +122,23 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
         )
     }
 
+    /// Append a path to this ReadOnlyPath. This operation is enacted as a pure
+    /// function without mutating the original path.
+    /// - Parameter dynamicMember: The path to append to this keyPath
+    /// - Returns: A new keypath with the original Root pointing to a new Value
+    ///            specified by dynamicMember. 
+    public subscript<AppendedValue>(
+        dynamicMember member: KeyPath<Value, AppendedValue>
+    ) -> ReadOnlyPath<Root, AppendedValue> where AppendedValue: Nilable {
+        let newPath = keyPath.appending(path: member)
+        return ReadOnlyPath<Root, AppendedValue>(
+            keyPath: newPath,
+            ancestors: fullPath
+        ) {
+            $0[keyPath: newPath].isNil
+        }
+    }
+
 }
 
 /// Equality and Hashable conformance.
