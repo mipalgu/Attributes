@@ -364,4 +364,80 @@ final class ValidationFactoryTests: XCTestCase {
         }
     }
 
+    /// Test `empty` rule.
+    func testEmpty() throws {
+        let readPath = ReadOnlyPath([Int].self)
+        let factory = ValidatorFactory<[Int]>.required().empty()
+        try factory.make(path: readPath).performValidation([])
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation([1, 2, 3])) {
+            handleError($0, message: "Must be empty.")
+        }
+    }
+
+    /// Test `notEmpty` rule.
+    func testNotEmpty() throws {
+        let readPath = ReadOnlyPath([Int].self)
+        let factory = ValidatorFactory<[Int]>.required().notEmpty()
+        try factory.make(path: readPath).performValidation([1, 2, 3])
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation([])) {
+            handleError($0, message: "Cannot be empty.")
+        }
+    }
+
+    /// Test `length` rule.
+    func testLength() throws {
+        let readPath = ReadOnlyPath([Int].self)
+        let factory = ValidatorFactory<[Int]>.required().length(3)
+        try factory.make(path: readPath).performValidation([1, 2, 3])
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation([1, 2])) {
+            handleError($0, message: "Must have exactly 3 elements.")
+        }
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation([])) {
+            handleError($0, message: "Must have exactly 3 elements.")
+        }
+    }
+
+    /// Test `minLength` rule.
+    func testMinLength() throws {
+        let readPath = ReadOnlyPath([Int].self)
+        let factory = ValidatorFactory<[Int]>.required().minLength(2)
+        try factory.make(path: readPath).performValidation([1, 2])
+        try factory.make(path: readPath).performValidation([1, 2, 3])
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation([1])) {
+            handleError($0, message: "Must provide at least 2 values.")
+        }
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation([])) {
+            handleError($0, message: "Must provide at least 2 values.")
+        }
+    }
+
+    /// Test `maxLength` rule.
+    func testMaxLength() throws {
+        let readPath = ReadOnlyPath([Int].self)
+        let factory = ValidatorFactory<[Int]>.required().maxLength(3)
+        try factory.make(path: readPath).performValidation([])
+        try factory.make(path: readPath).performValidation([1])
+        try factory.make(path: readPath).performValidation([1, 2])
+        try factory.make(path: readPath).performValidation([1, 2, 3])
+        XCTAssertThrowsError(try factory.make(path: readPath).performValidation([1, 2, 3, 4])) {
+            handleError($0, message: "Must provide no more than 3 values.")
+        }
+    }
+
+    /// Handle the case where the validator throws a validation error during a collection validation.
+    /// - Parameters:
+    ///   - error: The abstract Error.
+    ///   - message: The message contained within the ``ValidationError``.
+    ///   - path: The path contained within the ``ValidationError``
+    private func handleError(
+        _ error: Error, message: String, path: AnyPath<[Int]> = AnyPath(ReadOnlyPath([Int].self))
+    ) {
+        guard let error = error as? ValidationError<[Int]> else {
+            XCTFail("Incorrect error thrown.")
+            return
+        }
+        XCTAssertEqual(error.message, message)
+        XCTAssertEqual(error.path, path)
+    }
+
 }
