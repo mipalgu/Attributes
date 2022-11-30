@@ -115,6 +115,23 @@ public struct ValidationPath<P: ReadOnlyPathProtocol>: _ValidationPath {
         )
     }
 
+    /// Append a path to this ValidationPath.
+    /// - Parameter dynamicMember: The path to append to this path.
+    /// - Returns: A new ValidationPath with dynamicMember appended.
+    public subscript<AppendedValue>(
+        dynamicMember member: KeyPath<P.Value, AppendedValue>
+    ) -> ValidationPath<ReadOnlyPath<P.Root, AppendedValue>> where AppendedValue: Nilable {
+        let newPath = path.keyPath.appending(path: member)
+        return ValidationPath<ReadOnlyPath<P.Root, AppendedValue>>(
+            path: ReadOnlyPath<Root, AppendedValue>(
+                keyPath: newPath,
+                ancestors: path.fullPath
+            ) {
+                $0[keyPath: newPath].isNil
+            }
+        )
+    }
+
 }
 
 /// Extra methods when Value conforms to Nilable.
