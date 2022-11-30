@@ -187,6 +187,22 @@ extension Path where Value: MutableCollection, Value.Index: Hashable {
 }
 
 /// Add each method.
+extension Path where Value: MutableCollection, Value.Index: Hashable, Value.Element: Nilable {
+
+    /// Allows the use of a `map` mechanism accross the paths to each element in the root collection.
+    /// - Parameter f: A function to transform the path.
+    /// - Returns: An array of transformed paths.
+    public func each<T>(_ f: @escaping (Value.Index, Path<Root, Value.Element>) -> T) -> (Root) -> [T] {
+        { root in
+            root[keyPath: self.path].indices.map {
+                f($0, self[$0])
+            }
+        }
+    }
+
+}
+
+/// Add each method.
 extension ValidationPath where P.Value: Collection, P.Value.Index: Hashable {
 
     /// Allows the use of a `map` mechanism accross the paths to each element in the root collection. This
@@ -219,6 +235,68 @@ extension ValidationPath where P.Value: Collection, P.Value.Index: Hashable {
 
 /// Add each method.
 extension ValidationPath where P.Value: MutableCollection, P.Value.Index: Hashable {
+
+    /// Allows the use of a `map` mechanism accross the paths to each element in the root collection. This
+    /// allows the chaining of validators for each element in a collection.
+    /// - Parameter builder: The validators to apply to each element.
+    /// - Returns: A single validator that will perform the validators in `builder` to each element.
+    public func each(
+        @ValidatorBuilder<Root> builder: @escaping (
+            Value.Index,
+            ValidationPath<ReadOnlyPath<Root, Value.Element>>
+        ) -> AnyValidator<Root>
+    ) -> PushValidator {
+        push { root, value in
+            let validators: [AnyValidator<Root>] = value.indices.map { index -> AnyValidator<Root> in
+                builder(
+                    index,
+                    ValidationPath<ReadOnlyPath<Root, Value.Element>>(
+                        path: ReadOnlyPath<Root, Value.Element>(
+                            keyPath: self.path.keyPath.appending(path: \.[index]),
+                            ancestors: self.path.fullPath
+                        )
+                    )
+                )
+            }
+            return try AnyValidator(validators).performValidation(root)
+        }
+    }
+
+}
+
+/// Add each method.
+extension ValidationPath where P.Value: Collection, P.Value.Index: Hashable, P.Value.Element: Nilable {
+
+    /// Allows the use of a `map` mechanism accross the paths to each element in the root collection. This
+    /// allows the chaining of validators for each element in a collection.
+    /// - Parameter builder: The validators to apply to each element.
+    /// - Returns: A single validator that will perform the validators in `builder` to each element.
+    public func each(
+        @ValidatorBuilder<Root> builder: @escaping (
+            Value.Index,
+            ValidationPath<ReadOnlyPath<Root, Value.Element>>
+        ) -> AnyValidator<Root>
+    ) -> PushValidator {
+        push { root, value in
+            let validators: [AnyValidator<Root>] = value.indices.map { index -> AnyValidator<Root> in
+                builder(
+                    index,
+                    ValidationPath<ReadOnlyPath<Root, Value.Element>>(
+                        path: ReadOnlyPath<Root, Value.Element>(
+                            keyPath: self.path.keyPath.appending(path: \.[index]),
+                            ancestors: self.path.fullPath
+                        )
+                    )
+                )
+            }
+            return try AnyValidator(validators).performValidation(root)
+        }
+    }
+
+}
+
+/// Add each method.
+extension ValidationPath where P.Value: MutableCollection, P.Value.Index: Hashable, P.Value.Element: Nilable {
 
     /// Allows the use of a `map` mechanism accross the paths to each element in the root collection. This
     /// allows the chaining of validators for each element in a collection.
