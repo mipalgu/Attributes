@@ -68,6 +68,26 @@ final class ArrayPathTests: XCTestCase {
         XCTAssertEqual(point0, expected)
     }
 
+    /// Test isNil for ReadOnlyPath array subscripts.
+    func testReadIsNilMutatingCollection() throws {
+        let path = ReadOnlyPath([Point?].self)
+        let points = [nil, nil, Point(x: 1, y: 2)]
+        XCTAssertTrue(path[0].isNil(points))
+        XCTAssertTrue(path[4].isNil(points))
+        XCTAssertTrue(path[-1].isNil(points))
+        XCTAssertFalse(path[2].isNil(points))
+    }
+
+    /// Test isNil for Path array subscripts.
+    func testPathIsNilMutatingCollection() throws {
+        let path = Path([Point?].self)
+        let points = [nil, nil, Point(x: 1, y: 2)]
+        XCTAssertTrue(path[0].isNil(points))
+        XCTAssertTrue(path[4].isNil(points))
+        XCTAssertTrue(path[-1].isNil(points))
+        XCTAssertFalse(path[2].isNil(points))
+    }
+
     /// Test subscript operator correctly appends path and updates ancestors for mutating collection.
     func testReadOnlySubscriptMutatingCollection() {
         // We get WritableKeyPath from accessing an Array through a KeyPath since Array is a

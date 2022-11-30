@@ -67,7 +67,7 @@ extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteg
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            root[keyPath: keyPath].count <= index
+            root[keyPath: keyPath].count <= index || index < 0
         }
     }
 
@@ -82,7 +82,52 @@ extension ReadOnlyPathProtocol where Value: MutableCollection, Value.Index: Bina
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            root[keyPath: keyPath].count <= index
+            root[keyPath: keyPath].count <= index || index < 0
+        }
+    }
+
+}
+
+/// Add subscript.
+extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteger, Value.Element: Nilable {
+
+    /// Creates a new path to the value located at `index` in the collection.
+    public subscript(index: Value.Index) -> ReadOnlyPath<Root, Value.Element> {
+        ReadOnlyPath<Root, Value.Element>(
+            keyPath: self.keyPath.appending(path: \.[index]),
+            ancestors: self.ancestors + [AnyPath(self)]
+        ) { root in
+            guard index >= 0 else {
+                return true
+            }
+            let collection = root[keyPath: keyPath]
+            guard collection.count > index else {
+                return true
+            }
+            return collection[index].isNil
+        }
+    }
+
+}
+
+/// Add subscript.
+extension ReadOnlyPathProtocol where
+    Value: MutableCollection, Value.Index: BinaryInteger, Value.Element: Nilable {
+
+    /// Creates a new path to the value located at `index` in the collection.
+    public subscript(index: Value.Index) -> ReadOnlyPath<Root, Value.Element> {
+        ReadOnlyPath<Root, Value.Element>(
+            keyPath: self.keyPath.appending(path: \.[index]),
+            ancestors: self.ancestors + [AnyPath(self)]
+        ) { root in
+            guard index >= 0 else {
+                return true
+            }
+            let collection = root[keyPath: keyPath]
+            guard collection.count > index else {
+                return true
+            }
+            return collection[index].isNil
         }
     }
 
@@ -97,7 +142,29 @@ extension PathProtocol where Value: MutableCollection, Value.Index: BinaryIntege
             path: self.path.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            root[keyPath: self.path].count <= index
+            root[keyPath: self.path].count <= index || index < 0
+        }
+    }
+
+}
+
+/// Add subscript.
+extension PathProtocol where Value: MutableCollection, Value.Index: BinaryInteger, Value.Element: Nilable {
+
+    /// Creates a new path to the value located at `index` in the collection.
+    public subscript(index: Value.Index) -> Path<Root, Value.Element> {
+        Path<Root, Value.Element>(
+            path: self.path.appending(path: \.[index]),
+            ancestors: self.ancestors + [AnyPath(self)]
+        ) { root in
+            guard index >= 0 else {
+                return true
+            }
+            let collection = root[keyPath: keyPath]
+            guard collection.count > index else {
+                return true
+            }
+            return collection[index].isNil
         }
     }
 
