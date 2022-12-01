@@ -56,26 +56,36 @@
  *
  */
 
+/// A property that represents a collection. A collection is used to define an array of one specific
+/// attribute.
 @propertyWrapper
 public struct CollectionProperty {
 
+    /// The project value.
     public var projectedValue: CollectionProperty {
         self
     }
 
+    /// The equivalent ``SchemaAttribute``.
     public var wrappedValue: SchemaAttribute
 
+    /// Initialise this property from it's wrapped value.
+    /// - Parameter wrappedValue: The wrapped value.
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }
 
+    /// Create a collection of boolean values.
+    /// - Parameters:
+    ///   - label: The name of the collection.
+    ///   - validatorFactories: The validators verifying the values at each element.
     public init(
         label: String,
         bools validatorFactories: ValidatorFactory<Bool> ...
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
         let validator = ValidationPath(path: path).validate {
-            $0.each { (_, elementPath) in
+            $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.boolValue)
                 })
@@ -89,13 +99,17 @@ public struct CollectionProperty {
         self.init(wrappedValue: attribute)
     }
 
+    /// Create a collection of integer values.
+    /// - Parameters:
+    ///   - label: The name of the collection.
+    ///   - validatorFactories: The validators verifying the values at each element.
     public init(
         label: String,
         integers validatorFactories: ValidatorFactory<Int> ...
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
         let validator = ValidationPath(path: path).validate {
-            $0.each { (_, elementPath) in
+            $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.integerValue)
                 })
@@ -109,13 +123,17 @@ public struct CollectionProperty {
         self.init(wrappedValue: attribute)
     }
 
+    /// Create a collection of floating point values.
+    /// - Parameters:
+    ///   - label: The name of the collection.
+    ///   - validatorFactories: The validators verifying the values at each element.
     public init(
         label: String,
         floats validatorFactories: ValidatorFactory<Double> ...
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
         let validator = ValidationPath(path: path).validate {
-            $0.each { (_, elementPath) in
+            $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.floatValue)
                 })
@@ -129,6 +147,11 @@ public struct CollectionProperty {
         self.init(wrappedValue: attribute)
     }
 
+    /// Create a collection of expression values.
+    /// - Parameters:
+    ///   - label: The name of the collection.
+    ///   - validatorFactories: The validators verifying the values at each element.
+    ///   - language: The language of the expressions.
     public init(
         label: String,
         expressions validatorFactories: ValidatorFactory<Expression> ...,
@@ -136,7 +159,7 @@ public struct CollectionProperty {
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
         let validator = ValidationPath(path: path).validate {
-            $0.each { (_, elementPath) in
+            $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.expressionValue)
                 })
@@ -150,6 +173,11 @@ public struct CollectionProperty {
         self.init(wrappedValue: attribute)
     }
 
+    /// Create a collection of enumerated values.
+    /// - Parameters:
+    ///   - label: The name of the collection.
+    ///   - validatorFactories: The validators verifying the values at each element.
+    ///   - validValues: The set of valid values for the enumeration.
     public init(
         label: String,
         enumerations validatorFactories: ValidatorFactory<String> ...,
@@ -157,7 +185,7 @@ public struct CollectionProperty {
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
         let validator = ValidationPath(path: path).validate {
-            $0.each { (_, elementPath) in
+            $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.enumeratedValue)
                 })
@@ -171,13 +199,17 @@ public struct CollectionProperty {
         self.init(wrappedValue: attribute)
     }
 
+    /// Create a collection of line values.
+    /// - Parameters:
+    ///   - label: The name of the collection.
+    ///   - validatorFactories: The validators verifying the values at each element.
     public init(
         label: String,
         lines validatorFactories: ValidatorFactory<String> ...
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
         let validator = ValidationPath(path: path).validate {
-            $0.each { (_, elementPath) in
+            $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.lineValue)
                 })
