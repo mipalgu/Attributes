@@ -54,51 +54,106 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// A struct that represents a single column in a table. Each column is represented using a
+/// ``LineAttribute``.
+/// - SeeAlso: ``LineAttribute``.
 public struct TableColumn {
 
+    /// The name of the column.
     public var label: String
 
+    /// The type of the attribute stored in the column.
     public var type: LineAttributeType
 
+    /// A validator that verifies the contents of the values within this column.
     public var validator: AnyValidator<LineAttribute>
 
+    /// Initialise with stored property values.
+    /// - Parameters:
+    ///   - label: The label.
+    ///   - type: The type.
+    ///   - validator: The validator.
     private init(label: String, type: LineAttributeType, validator: AnyValidator<LineAttribute>) {
         self.label = label
         self.type = type
         self.validator = validator
     }
 
-    public static func bool(label: String, validation validatorFactories: ValidatorFactory<Bool> ...) -> TableColumn {
+    /// Create a table column that stores boolean values.
+    /// - Parameters:
+    ///   - label: The name of the column.
+    ///   - validatorFactories: The validation rules applied to the contents of this column.
+    /// - Returns: A ``TableColumn`` for a boolean value.
+    public static func bool(
+        label: String, validation validatorFactories: ValidatorFactory<Bool> ...
+    ) -> TableColumn {
         let path = ReadOnlyPath(keyPath: \LineAttribute.self, ancestors: []).boolValue
         let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
         return Self(label: label, type: .bool, validator: validator)
     }
 
-    public static func integer(label: String, validation validatorFactories: ValidatorFactory<Int> ...) -> TableColumn {
+    /// Create a table column that stores integer values.
+    /// - Parameters:
+    ///   - label: The name of the column.
+    ///   - validatorFactories: The validation rules applied to the contents of this column.
+    /// - Returns: A ``TableColumn`` for an integer value.
+    public static func integer(
+        label: String, validation validatorFactories: ValidatorFactory<Int> ...
+    ) -> TableColumn {
         let path = ReadOnlyPath(keyPath: \LineAttribute.self, ancestors: []).integerValue
         let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
         return Self(label: label, type: .integer, validator: validator)
     }
 
-    public static func float(label: String, validation validatorFactories: ValidatorFactory<Double> ...) -> TableColumn {
+    /// Create a table column that stores floating point values.
+    /// - Parameters:
+    ///   - label: The name of the column.
+    ///   - validatorFactories: The validation rules applied to the contents of this column.
+    /// - Returns: A ``TableColumn`` for a floating point value.
+    public static func float(
+        label: String, validation validatorFactories: ValidatorFactory<Double> ...
+    ) -> TableColumn {
         let path = ReadOnlyPath(keyPath: \LineAttribute.self, ancestors: []).floatValue
         let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
         return Self(label: label, type: .float, validator: validator)
     }
 
-    public static func expression(label: String, language: Language, validation validatorFactories: ValidatorFactory<Expression> ...) -> TableColumn {
+    /// Create a table column that stores expression values.
+    /// - Parameters:
+    ///   - label: The name of the column.
+    ///   - language: The language the expression is written in.
+    ///   - validatorFactories: The validation rules applied to the contents of this column.
+    /// - Returns: A ``TableColumn`` for an expression value.
+    public static func expression(
+        label: String, language: Language, validation validatorFactories: ValidatorFactory<Expression> ...
+    ) -> TableColumn {
         let path = ReadOnlyPath(keyPath: \LineAttribute.self, ancestors: []).expressionValue
         let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
         return Self(label: label, type: .expression(language: language), validator: validator)
     }
 
-    public static func enumerated(label: String, validValues: Set<String>, validation validatorFactories: ValidatorFactory<String> ...) -> TableColumn {
+    /// Create a table column that stores enumerated values.
+    /// - Parameters:
+    ///   - label: The name of the column.
+    ///   - validValues: The valid values that restrict the possible values that can be stored in this column.
+    ///   - validatorFactories: The validation rules applied to the contents of this column.
+    /// - Returns: A ``TableColumn`` for an enumerated value.
+    public static func enumerated(
+        label: String, validValues: Set<String>, validation validatorFactories: ValidatorFactory<String> ...
+    ) -> TableColumn {
         let path = ReadOnlyPath(keyPath: \LineAttribute.self, ancestors: []).enumeratedValue
         let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
         return Self(label: label, type: .enumerated(validValues: validValues), validator: validator)
     }
 
-    public static func line(label: String, validation validatorFactories: ValidatorFactory<String> ...) -> TableColumn {
+    /// Create a table column that stores line values.
+    /// - Parameters:
+    ///   - label: The name of the column.
+    ///   - validatorFactories: The validation rules applied to the contents of this column.
+    /// - Returns: A ``TableColumn`` for a line value.
+    public static func line(
+        label: String, validation validatorFactories: ValidatorFactory<String> ...
+    ) -> TableColumn {
         let path = ReadOnlyPath(keyPath: \LineAttribute.self, ancestors: []).lineValue
         let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
         return Self(label: label, type: .line, validator: validator)
