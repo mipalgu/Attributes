@@ -60,6 +60,7 @@ import XCTest
 /// Test class for ``CollectionProperty``.
 final class CollectionPropertyTests: XCTestCase {
 
+    /// Test bool initialiser.
     func testBool() throws {
         let validator = NullValidator<Bool>()
         let property = CollectionProperty(
@@ -75,6 +76,7 @@ final class CollectionPropertyTests: XCTestCase {
         )
     }
 
+    /// Test Int initialiser.
     func testInts() throws {
         let validator = NullValidator<Int>()
         let property = CollectionProperty(
@@ -90,6 +92,81 @@ final class CollectionPropertyTests: XCTestCase {
         )
     }
 
+    /// Test float initialiser.
+    func testFloat() throws {
+        let validator = NullValidator<Double>()
+        let property = CollectionProperty(
+            label: "Property", floats: ValidatorFactory.required().push { _ in validator }
+        )
+        let value = 5.0
+        try doTestCase(
+            validator: validator,
+            property: property,
+            value: value,
+            attribute: .collection(floats: [value]),
+            type: .collection(type: .float)
+        )
+    }
+
+    /// Test line initialiser.
+    func testLine() throws {
+        let validator = NullValidator<String>()
+        let property = CollectionProperty(
+            label: "Property", lines: ValidatorFactory.required().push { _ in validator }
+        )
+        let value = "Hello World!"
+        try doTestCase(
+            validator: validator,
+            property: property,
+            value: value,
+            attribute: .collection(lines: [value]),
+            type: .collection(type: .line)
+        )
+    }
+
+    /// Test expression initialiser.
+    func testExpression() throws {
+        let validator = NullValidator<String>()
+        let property = CollectionProperty(
+            label: "Property", expressions: ValidatorFactory.required().push { _ in validator }, language: .c
+        )
+        let value = "int x;"
+        try doTestCase(
+            validator: validator,
+            property: property,
+            value: value,
+            attribute: .collection(expressions: [value], language: .c),
+            type: .collection(type: .expression(language: .c))
+        )
+    }
+
+    /// Test enumeration initialiser.
+    func testEnumeration() throws {
+        let validator = NullValidator<String>()
+        let validValues: Set<String> = ["int x;", "abc", "def"]
+        let property = CollectionProperty(
+            label: "Property",
+            enumerations: ValidatorFactory.required().push { _ in validator },
+            validValues: validValues
+        )
+        let value = "int x;"
+        try doTestCase(
+            validator: validator,
+            property: property,
+            value: value,
+            attribute: .collection(enumerated: [value], validValues: validValues),
+            type: .collection(type: .enumerated(validValues: validValues))
+        )
+    }
+
+    /// Perform test case for a CollectionProperty.
+    /// - Parameters:
+    ///   - validator: The validator used by the property.
+    ///   - label: The name of the property.
+    ///   - property: The property to test.
+    ///   - value: The value to validate.
+    ///   - attribute: The attribute value to validate.
+    ///   - type: The type of the collection.
     private func doTestCase<T>(
         validator: NullValidator<T>,
         label: String = "Property",
