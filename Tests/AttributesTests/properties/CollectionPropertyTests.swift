@@ -60,6 +60,31 @@ import XCTest
 /// Test class for ``CollectionProperty``.
 final class CollectionPropertyTests: XCTestCase {
 
+    /// Test wrapped initialiser sets wrappedValue correctly.
+    func testWrappedInitialiser() throws {
+        let validator = NullValidator<Attribute>()
+        let label = "Property"
+        let type = AttributeType.collection(type: .bool)
+        let schemaAttribute = SchemaAttribute(
+            label: label, type: type, validate: AnyValidator(validator)
+        )
+        let property = CollectionProperty(wrappedValue: schemaAttribute)
+        let value = true
+        let attribute = Attribute.collection(bools: [value])
+        let wrapped = property.wrappedValue
+        XCTAssertEqual(wrapped.label, label)
+        XCTAssertEqual(wrapped.type, type)
+        try wrapped.validate.performValidation(attribute)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, .collection(bools: [value]))
+        let wrapped2 = property.projectedValue.wrappedValue
+        XCTAssertEqual(wrapped2.label, label)
+        XCTAssertEqual(wrapped2.type, type)
+        try wrapped2.validate.performValidation(attribute)
+        XCTAssertEqual(validator.timesCalled, 2)
+        XCTAssertEqual(validator.parameters, [.collection(bools: [value]), .collection(bools: [value])])
+    }
+
     /// Test bool initialiser.
     func testBool() throws {
         let validator = NullValidator<Bool>()
