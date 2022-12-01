@@ -114,7 +114,7 @@ final class TablePropertyTests: XCTestCase {
         XCTAssertEqual(wrapped2.type, attribute.type)
         try wrapped2.validate.performValidation(tableAttribute)
         XCTAssertEqual(attributeValidator.timesCalled, 2)
-        XCTAssertEqual(attributeValidator.lastParameter, tableAttribute)
+        XCTAssertEqual(attributeValidator.parameters, [tableAttribute, tableAttribute])
     }
 
     /// Test wrapped init.
@@ -140,7 +140,7 @@ final class TablePropertyTests: XCTestCase {
         XCTAssertEqual(wrapped2.type, attribute.type)
         try wrapped2.validate.performValidation(tableAttribute)
         XCTAssertEqual(attributeValidator.timesCalled, 2)
-        XCTAssertEqual(attributeValidator.lastParameter, tableAttribute)
+        XCTAssertEqual(attributeValidator.parameters, [tableAttribute, tableAttribute])
     }
 
 }
