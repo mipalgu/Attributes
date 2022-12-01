@@ -56,28 +56,40 @@
  *
  */
 
+/// A property that represents data in a table.
 @propertyWrapper
 public struct TableProperty {
 
+    /// The project value.
     public var projectedValue: TableProperty {
         self
     }
 
+    /// The equivalent attribute.
     public var wrappedValue: SchemaAttribute
 
+    /// Initialise this property from the wrapped value.
+    /// - Parameter wrappedValue: The wrapped value.
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }
 
+    /// Intialise this property from table data.
+    /// - Parameters:
+    ///   - label: The name of the table.
+    ///   - columns: The columns in the table.
+    ///   - builder: The validator for the table.
     public init(
         label: String,
         columns: [TableColumn],
-        @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, [[LineAttribute]]>>) -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
+        @ValidatorBuilder<Attribute> validation builder: (
+            ValidationPath<ReadOnlyPath<Attribute, [[LineAttribute]]>>
+        ) -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.tableValue
         let validationPath = ValidationPath(path: path)
         let tableValidator = builder(validationPath)
-        let attribute: SchemaAttribute = SchemaAttribute(
+        let attribute = SchemaAttribute(
             label: label,
             type: .table(columns: columns.map { ($0.label, $0.type) }),
             validate: tableValidator
