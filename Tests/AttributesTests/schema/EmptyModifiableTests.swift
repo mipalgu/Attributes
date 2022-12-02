@@ -148,6 +148,15 @@ final class EmptyModifiableTests: XCTestCase {
         }
         XCTAssertEqual(error.message, "Invalid source index.")
         XCTAssertEqual(error.path, AnyPath(attributePath[-1]))
+        XCTAssertEqual(modifiable.attributes, attributes)
+        XCTAssertEqual(modifiable.metaData, metaData)
+        let allErrors = modifiable.errorBag.allErrors
+        guard let firstError = allErrors.first else {
+            XCTFail("Empty errors.")
+            return
+        }
+        XCTAssertEqual(error.message, firstError.message)
+        XCTAssertEqual(error.path, firstError.path)
     }
 
     /// Test move returns correct error when destination index is invalid.
@@ -158,6 +167,34 @@ final class EmptyModifiableTests: XCTestCase {
         }
         XCTAssertEqual(error.message, "Invalid destination index.")
         XCTAssertEqual(error.path, AnyPath(attributePath[-1]))
+        XCTAssertEqual(modifiable.attributes, attributes)
+        XCTAssertEqual(modifiable.metaData, metaData)
+        let allErrors = modifiable.errorBag.allErrors
+        guard let firstError = allErrors.first else {
+            XCTFail("Empty errors.")
+            return
+        }
+        XCTAssertEqual(error.message, firstError.message)
+        XCTAssertEqual(error.path, firstError.path)
+    }
+
+    /// Test moveItem with destination larger than count.
+    func testMoveItemFarDestination() throws {
+        guard case .failure(let error) = modifiable.moveItems(table: attributePath, from: [0], to: 100) else {
+            XCTFail("Successful call for invalid destination.")
+            return
+        }
+        XCTAssertEqual(error.message, "Invalid destination index.")
+        XCTAssertEqual(error.path, AnyPath(attributePath[100]))
+        XCTAssertEqual(modifiable.attributes, attributes)
+        XCTAssertEqual(modifiable.metaData, metaData)
+        let allErrors = modifiable.errorBag.allErrors
+        guard let firstError = allErrors.first else {
+            XCTFail("Empty errors.")
+            return
+        }
+        XCTAssertEqual(error.message, firstError.message)
+        XCTAssertEqual(error.path, firstError.path)
     }
 
     /// Test delete correctly removes item.
@@ -178,6 +215,15 @@ final class EmptyModifiableTests: XCTestCase {
         }
         XCTAssertEqual(error.message, "Invalid index.")
         XCTAssertEqual(error.path, AnyPath(attributePath[-1]))
+        XCTAssertEqual(modifiable.attributes, attributes)
+        XCTAssertEqual(modifiable.metaData, metaData)
+        let allErrors = modifiable.errorBag.allErrors
+        guard let firstError = allErrors.first else {
+            XCTFail("Empty errors.")
+            return
+        }
+        XCTAssertEqual(error.message, firstError.message)
+        XCTAssertEqual(error.path, firstError.path)
     }
 
     /// Test delete removes multiple elements correctly.
@@ -198,6 +244,15 @@ final class EmptyModifiableTests: XCTestCase {
         }
         XCTAssertEqual(error.message, "Invalid item index.")
         XCTAssertEqual(error.path, AnyPath(attributePath[-1]))
+        XCTAssertEqual(modifiable.attributes, attributes)
+        XCTAssertEqual(modifiable.metaData, metaData)
+        let allErrors = modifiable.errorBag.allErrors
+        guard let firstError = allErrors.first else {
+            XCTFail("Empty errors.")
+            return
+        }
+        XCTAssertEqual(error.message, firstError.message)
+        XCTAssertEqual(error.path, firstError.path)
     }
 
     /// Test modify mutates element correctly.
@@ -220,11 +275,23 @@ final class EmptyModifiableTests: XCTestCase {
         }
         XCTAssertEqual(error.message, "Invalid path.")
         XCTAssertEqual(error.path, AnyPath(attributePath[-1]))
+        XCTAssertEqual(modifiable.attributes, attributes)
+        XCTAssertEqual(modifiable.metaData, metaData)
+        let allErrors = modifiable.errorBag.allErrors
+        guard let firstError = allErrors.first else {
+            XCTFail("Empty errors.")
+            return
+        }
+        XCTAssertEqual(error.message, firstError.message)
+        XCTAssertEqual(error.path, firstError.path)
     }
 
     /// Test validate doesn't throw an error.
     func testValidate() {
         XCTAssertNoThrow(try modifiable.validate())
+        XCTAssertEqual(modifiable.attributes, attributes)
+        XCTAssertEqual(modifiable.metaData, metaData)
+        XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
     }
 
 }
