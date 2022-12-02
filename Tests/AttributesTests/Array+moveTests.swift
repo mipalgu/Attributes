@@ -81,4 +81,18 @@ final class ArrayMoveTests: XCTestCase {
         XCTAssertEqual(array, [1, 3, 5, 0, 2, 4, 6, 7])
     }
 
+    /// Test move sub-array to the end of the array.
+    func testMoveToCount() {
+        var array = [0, 1, 2, 3, 4, 5, 6, 7]
+        array.move(fromOffsets: [1, 3, 5], toOffset: array.count)
+        XCTAssertEqual(array, [0, 2, 4, 6, 7, 1, 3, 5])
+    }
+
+    /// Test move sub-array to front using index 0.
+    func testMoveToFront() {
+        var array = [0, 1, 2, 3, 4, 5, 6, 7]
+        array.move(fromOffsets: [1, 3, 5], toOffset: 0)
+        XCTAssertEqual(array, [1, 3, 5, 0, 2, 4, 6, 7])
+    }
+
 }
