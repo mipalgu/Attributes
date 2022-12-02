@@ -86,6 +86,7 @@ final class EmptyModifiableTests: XCTestCase {
     /// Modifiable under test.
     lazy var modifiable = EmptyModifiable(attributes: attributes, metaData: metaData, errorBag: errorBag)
 
+    /// A path tot he attributes array.
     let attributePath = Path(EmptyModifiable.self).attributes
 
     /// Initialise modifiable before every test.
@@ -117,6 +118,7 @@ final class EmptyModifiableTests: XCTestCase {
         XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
     }
 
+    /// Test add items append correctly.
     func testAddItem() throws {
         let newGroup = AttributeGroup(name: "New Group!")
         XCTAssertFalse(try modifiable.addItem(newGroup, to: attributePath).get())
@@ -125,6 +127,7 @@ final class EmptyModifiableTests: XCTestCase {
         XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
     }
 
+    /// Test moveItem moves items correctly.
     func testMoveItem() throws {
         let newGroup = AttributeGroup(name: "New Group!")
         XCTAssertFalse(try modifiable.addItem(newGroup, to: attributePath).get())
@@ -135,6 +138,93 @@ final class EmptyModifiableTests: XCTestCase {
         XCTAssertEqual(modifiable.attributes, [newGroup] + attributes)
         XCTAssertEqual(modifiable.metaData, metaData)
         XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
+    }
+
+    /// Test move returns correct error when source indexes are invalid.
+    func testMoveItemInvalidSourceIndexes() {
+        guard case .failure(let error) = modifiable.moveItems(table: attributePath, from: [-1], to: 2) else {
+            XCTFail("Successful call for invalid indexes.")
+            return
+        }
+        XCTAssertEqual(error.message, "Invalid source index.")
+        XCTAssertEqual(error.path, AnyPath(attributePath[-1]))
+    }
+
+    /// Test move returns correct error when destination index is invalid.
+    func testMoveItemInvalidDestination() {
+        guard case .failure(let error) = modifiable.moveItems(table: attributePath, from: [0], to: -1) else {
+            XCTFail("Successful call for invalid indexes.")
+            return
+        }
+        XCTAssertEqual(error.message, "Invalid destination index.")
+        XCTAssertEqual(error.path, AnyPath(attributePath[-1]))
+    }
+
+    /// Test delete correctly removes item.
+    func testDelete() throws {
+        let newGroup = AttributeGroup(name: "New Group!")
+        XCTAssertFalse(try modifiable.addItem(newGroup, to: attributePath).get())
+        XCTAssertFalse(try modifiable.deleteItem(table: attributePath, atIndex: 0).get())
+        XCTAssertEqual(modifiable.attributes, [newGroup])
+        XCTAssertEqual(modifiable.metaData, metaData)
+        XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
+    }
+
+    /// Test delete returns correct error when index is invalid.
+    func testDeleteInvalidIndex() throws {
+        guard case .failure(let error) = modifiable.deleteItem(table: attributePath, atIndex: -1) else {
+            XCTFail("Succeeded for invalid call.")
+            return
+        }
+        XCTAssertEqual(error.message, "Invalid index.")
+        XCTAssertEqual(error.path, AnyPath(attributePath[-1]))
+    }
+
+    /// Test delete removes multiple elements correctly.
+    func testDeleteMultiple() throws {
+        let newGroup = AttributeGroup(name: "New Group!")
+        XCTAssertFalse(try modifiable.addItem(newGroup, to: attributePath).get())
+        XCTAssertFalse(try modifiable.deleteItems(table: attributePath, items: [0, 1]).get())
+        XCTAssertTrue(modifiable.attributes.isEmpty)
+        XCTAssertEqual(modifiable.metaData, metaData)
+        XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
+    }
+
+    /// Test deleteItems returns correct error when source index is invalid.
+    func testDeleteMultipleInvalidSources() {
+        guard case .failure(let error) = modifiable.deleteItems(table: attributePath, items: [-1]) else {
+            XCTFail("Successful call for invalid index.")
+            return
+        }
+        XCTAssertEqual(error.message, "Invalid item index.")
+        XCTAssertEqual(error.path, AnyPath(attributePath[-1]))
+    }
+
+    /// Test modify mutates element correctly.
+    func testModify() throws {
+        let newGroup = AttributeGroup(name: "New Group!")
+        XCTAssertFalse(try modifiable.modify(attribute: attributePath[0], value: newGroup).get())
+        XCTAssertEqual(modifiable.attributes, [newGroup])
+        XCTAssertEqual(modifiable.metaData, metaData)
+        XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
+    }
+
+    /// Test modify returns correct error when invalid index is given.
+    func testModifyInvalidIndex() {
+        let newGroup = AttributeGroup(name: "New Group!")
+        guard
+            case .failure(let error) = modifiable.modify(attribute: attributePath[-1], value: newGroup)
+        else {
+            XCTFail("Successful call for invalid index.")
+            return
+        }
+        XCTAssertEqual(error.message, "Invalid path.")
+        XCTAssertEqual(error.path, AnyPath(attributePath[-1]))
+    }
+
+    /// Test validate doesn't throw an error.
+    func testValidate() {
+        XCTAssertNoThrow(try modifiable.validate())
     }
 
 }
