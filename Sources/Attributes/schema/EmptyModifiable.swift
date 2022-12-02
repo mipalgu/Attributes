@@ -90,9 +90,6 @@ public struct EmptyModifiable: Modifiable {
         _ item: T, to attribute: Path
     ) -> Result<Bool, AttributeError<EmptyModifiable>> where
         EmptyModifiable == Path.Root, Path: PathProtocol, Path.Value == [T] {
-        guard !attribute.isNil(self) else {
-            return .failure(AttributeError(message: "Invalid path.", path: attribute))
-        }
         self[keyPath: attribute.path].append(item)
         return .success(false)
     }
@@ -102,12 +99,14 @@ public struct EmptyModifiable: Modifiable {
     ) -> Result<Bool, AttributeError<Self>> where
         EmptyModifiable == Path.Root, Path: PathProtocol, Path.Value == [T] {
         if let badIndex = source.first(where: { attribute[$0].isNil(self) }) {
-            return .failure(AttributeError(message: "Invalid source index.", path: attribute[badIndex]))
+            let error = AttributeError(message: "Invalid source index.", path: attribute[badIndex])
+            errorBag.insert(error)
+            return .failure(error)
         }
-        guard destination >= 0 else {
-            return .failure(
-                AttributeError(message: "Invalid destination index.", path: attribute[destination])
-            )
+        guard destination >= 0, destination <= self[keyPath: attribute.path].count else {
+            let error = AttributeError(message: "Invalid destination index.", path: attribute[destination])
+            errorBag.insert(error)
+            return .failure(error)
         }
         self[keyPath: attribute.path].move(fromOffsets: source, toOffset: destination)
         return .success(false)
@@ -119,7 +118,9 @@ public struct EmptyModifiable: Modifiable {
         EmptyModifiable == Path.Root, Path: PathProtocol, Path.Value == [T] {
         let path = attribute[index]
         guard !path.isNil(self) else {
-            return .failure(AttributeError(message: "Invalid index.", path: path))
+            let error = AttributeError(message: "Invalid index.", path: path)
+            errorBag.insert(error)
+            return .failure(error)
         }
         self[keyPath: attribute.path].remove(at: index)
         return .success(false)
@@ -131,7 +132,9 @@ public struct EmptyModifiable: Modifiable {
         EmptyModifiable == Path.Root, Path: PathProtocol, Path.Value == [T] {
         let indexes = items.sorted().reversed()
         if let badIndex = indexes.first(where: { attribute[$0].isNil(self) }) {
-            return .failure(AttributeError(message: "Invalid item index.", path: attribute[badIndex]))
+            let error = AttributeError(message: "Invalid item index.", path: attribute[badIndex])
+            errorBag.insert(error)
+            return .failure(error)
         }
         indexes.forEach {
             self[keyPath: attribute.path].remove(at: $0)
@@ -143,7 +146,9 @@ public struct EmptyModifiable: Modifiable {
         attribute: Path, value: Path.Value
     ) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path: PathProtocol {
         guard !attribute.isNil(self) else {
-            return .failure(AttributeError(message: "Invalid path.", path: attribute))
+            let error = AttributeError(message: "Invalid path.", path: attribute)
+            errorBag.insert(error)
+            return .failure(error)
         }
         self[keyPath: attribute.path] = value
         return self.modifyTriggers(&self)
