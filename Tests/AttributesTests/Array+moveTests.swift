@@ -67,4 +67,18 @@ final class ArrayMoveTests: XCTestCase {
         XCTAssertEqual(array, [0, 2, 1, 3, 5, 4, 6, 7])
     }
 
+    /// Test move for destination larger than count.
+    func testMoveLargeDestination() {
+        var array = [0, 1, 2, 3, 4, 5, 6, 7]
+        array.move(fromOffsets: [1, 3, 5], toOffset: 1000)
+        XCTAssertEqual(array, [0, 2, 4, 6, 7, 1, 3, 5])
+    }
+
+    /// Test move for destination smaller than the first index.
+    func testMoveSmallDestination() {
+        var array = [0, 1, 2, 3, 4, 5, 6, 7]
+        array.move(fromOffsets: [1, 3, 5], toOffset: -1000)
+        XCTAssertEqual(array, [1, 3, 5, 0, 2, 4, 6, 7])
+    }
+
 }
