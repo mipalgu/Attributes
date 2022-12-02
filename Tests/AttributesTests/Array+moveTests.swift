@@ -60,38 +60,44 @@ import XCTest
 /// Test class for move function in Array.
 final class ArrayMoveTests: XCTestCase {
 
+    /// The array under test.
+    var array = [0, 1, 2, 3, 4, 5, 6, 7]
+
+    /// The indexes to move.
+    let offsets: IndexSet = [1, 3, 5]
+
+    /// Initialise array before every test.
+    override func setUp() {
+        array = [0, 1, 2, 3, 4, 5, 6, 7]
+    }
+
     /// Test move function.
     func testMove() {
-        var array = [0, 1, 2, 3, 4, 5, 6, 7]
-        array.move(fromOffsets: [1, 3, 5], toOffset: 4)
+        array.move(fromOffsets: offsets, toOffset: 4)
         XCTAssertEqual(array, [0, 2, 1, 3, 5, 4, 6, 7])
     }
 
     /// Test move for destination larger than count.
     func testMoveLargeDestination() {
-        var array = [0, 1, 2, 3, 4, 5, 6, 7]
-        array.move(fromOffsets: [1, 3, 5], toOffset: 1000)
+        array.move(fromOffsets: offsets, toOffset: 1000)
         XCTAssertEqual(array, [0, 2, 4, 6, 7, 1, 3, 5])
     }
 
     /// Test move for destination smaller than the first index.
     func testMoveSmallDestination() {
-        var array = [0, 1, 2, 3, 4, 5, 6, 7]
-        array.move(fromOffsets: [1, 3, 5], toOffset: -1000)
+        array.move(fromOffsets: offsets, toOffset: -1000)
         XCTAssertEqual(array, [1, 3, 5, 0, 2, 4, 6, 7])
     }
 
     /// Test move sub-array to the end of the array.
     func testMoveToCount() {
-        var array = [0, 1, 2, 3, 4, 5, 6, 7]
-        array.move(fromOffsets: [1, 3, 5], toOffset: array.count)
+        array.move(fromOffsets: offsets, toOffset: array.count)
         XCTAssertEqual(array, [0, 2, 4, 6, 7, 1, 3, 5])
     }
 
     /// Test move sub-array to front using index 0.
     func testMoveToFront() {
-        var array = [0, 1, 2, 3, 4, 5, 6, 7]
-        array.move(fromOffsets: [1, 3, 5], toOffset: 0)
+        array.move(fromOffsets: offsets, toOffset: 0)
         XCTAssertEqual(array, [1, 3, 5, 0, 2, 4, 6, 7])
     }
 
