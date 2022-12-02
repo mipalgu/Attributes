@@ -57,22 +57,31 @@
 import Attributes
 import Foundation
 
+/// A mock complex.
 struct MockComplex: ComplexProtocol, Identifiable {
 
-    let id = UUID()
+    /// The root.
+    typealias Root = EmptyModifiable
 
-    var path: Attributes.Path<MockModifiable, Attributes.Attribute>
-
-    typealias Root = MockModifiable
-
+    /// The attribute root.
     typealias AttributeRoot = Attribute
 
-    typealias SearchPath = Path<MockModifiable, Attribute>
+    /// The search path.
+    typealias SearchPath = Path<EmptyModifiable, Attribute>
 
-    var triggers: AnyTrigger<MockModifiable> = AnyTrigger(MockTrigger<MockModifiable>())
+    /// The id.
+    let id = UUID()
 
+    /// The path.
+    var path: Attributes.Path<EmptyModifiable, Attributes.Attribute>
+
+    /// The triggers.
+    var triggers: AnyTrigger<EmptyModifiable> = AnyTrigger(MockTrigger<EmptyModifiable>())
+
+    /// The group validators.
     var groupValidation: AnyValidator<Attribute> = AnyValidator(NullValidator<Attribute>())
 
-    var rootValidation: AnyValidator<MockModifiable> = AnyValidator(NullValidator<MockModifiable>())
+    /// The root validator.
+    var rootValidation: AnyValidator<EmptyModifiable> = AnyValidator(NullValidator<EmptyModifiable>())
 
 }
