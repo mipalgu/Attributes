@@ -72,41 +72,83 @@ public struct EmptyModifiable: Modifiable {
 
     private let modifyTriggers: (inout EmptyModifiable) -> Result<Bool, AttributeError<EmptyModifiable>>
 
-    public init(attributes: [AttributeGroup] = [], metaData: [AttributeGroup] = [], errorBag: ErrorBag<EmptyModifiable> = ErrorBag(), modifyTriggers: @escaping (inout EmptyModifiable) -> Result<Bool, AttributeError<EmptyModifiable>> = { _ in .success(false) }) {
+    public init(
+        attributes: [AttributeGroup] = [],
+        metaData: [AttributeGroup] = [],
+        errorBag: ErrorBag<EmptyModifiable> = ErrorBag(),
+        modifyTriggers: @escaping (
+            inout EmptyModifiable
+        ) -> Result<Bool, AttributeError<EmptyModifiable>> = { _ in .success(false) }
+    ) {
         self.attributes = attributes
         self.metaData = metaData
         self.errorBag = errorBag
         self.modifyTriggers = modifyTriggers
     }
 
-    public mutating func addItem<Path, T>(_ item: T, to attribute: Path) -> Result<Bool, AttributeError<EmptyModifiable>> where EmptyModifiable == Path.Root, Path : PathProtocol, Path.Value == [T] {
+    public mutating func addItem<Path, T>(
+        _ item: T, to attribute: Path
+    ) -> Result<Bool, AttributeError<EmptyModifiable>> where
+        EmptyModifiable == Path.Root, Path: PathProtocol, Path.Value == [T] {
+        guard !attribute.isNil(self) else {
+            return .failure(AttributeError(message: "Invalid path.", path: attribute))
+        }
         self[keyPath: attribute.path].append(item)
         return .success(false)
     }
 
-    public mutating func moveItems<Path, T>(table attribute: Path, from source: IndexSet, to destination: Int) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path : PathProtocol, Path.Value == [T] {
+    public mutating func moveItems<Path, T>(
+        table attribute: Path, from source: IndexSet, to destination: Int
+    ) -> Result<Bool, AttributeError<Self>> where
+        EmptyModifiable == Path.Root, Path: PathProtocol, Path.Value == [T] {
+        if let badIndex = source.first(where: { attribute[$0].isNil(self) }) {
+            return .failure(AttributeError(message: "Invalid source index.", path: attribute[badIndex]))
+        }
+        guard destination >= 0 else {
+            return .failure(
+                AttributeError(message: "Invalid destination index.", path: attribute[destination])
+            )
+        }
         self[keyPath: attribute.path].move(fromOffsets: source, toOffset: destination)
         return .success(false)
     }
 
-    public mutating func deleteItem<Path, T>(table attribute: Path, atIndex index: Int) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path : PathProtocol, Path.Value == [T] {
+    public mutating func deleteItem<Path, T>(
+        table attribute: Path, atIndex index: Int
+    ) -> Result<Bool, AttributeError<Self>> where
+        EmptyModifiable == Path.Root, Path: PathProtocol, Path.Value == [T] {
+        let path = attribute[index]
+        guard !path.isNil(self) else {
+            return .failure(AttributeError(message: "Invalid index.", path: path))
+        }
         self[keyPath: attribute.path].remove(at: index)
         return .success(false)
     }
 
-    public mutating func deleteItems<Path, T>(table attribute: Path, items: IndexSet) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path : PathProtocol, Path.Value == [T] {
-        items.sorted().reversed().forEach {
+    public mutating func deleteItems<Path, T>(
+        table attribute: Path, items: IndexSet
+    ) -> Result<Bool, AttributeError<Self>> where
+        EmptyModifiable == Path.Root, Path: PathProtocol, Path.Value == [T] {
+        let indexes = items.sorted().reversed()
+        if let badIndex = indexes.first(where: { attribute[$0].isNil(self) }) {
+            return .failure(AttributeError(message: "Invalid item index.", path: attribute[badIndex]))
+        }
+        indexes.forEach {
             self[keyPath: attribute.path].remove(at: $0)
         }
         return .success(false)
     }
 
-    public mutating func modify<Path>(attribute: Path, value: Path.Value) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path : PathProtocol {
+    public mutating func modify<Path>(
+        attribute: Path, value: Path.Value
+    ) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path: PathProtocol {
+        guard !attribute.isNil(self) else {
+            return .failure(AttributeError(message: "Invalid path.", path: attribute))
+        }
         self[keyPath: attribute.path] = value
         return self.modifyTriggers(&self)
     }
 
     public func validate() throws {}
-
 
 }
