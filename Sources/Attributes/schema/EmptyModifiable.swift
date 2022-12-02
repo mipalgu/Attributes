@@ -58,20 +58,31 @@
 
 import Foundation
 
-/// A useful utility struct which enables quick testing of modifiable
+/// A useful utility struct that enables quick testing of modifiable
 /// structs that use an attributes and meta data array.
 public struct EmptyModifiable: Modifiable {
 
+    /// The path to this object.
     public static var path: Path<EmptyModifiable, EmptyModifiable> = Path(path: \.self, ancestors: [])
 
+    /// All attributes that can be modified.
     public var attributes: [AttributeGroup]
 
+    /// Additional metadata.
     public var metaData: [AttributeGroup]
 
+    /// The errors encountered when using this object.
     public var errorBag: ErrorBag<EmptyModifiable>
 
+    /// A function to modify the triggers.
     private let modifyTriggers: (inout EmptyModifiable) -> Result<Bool, AttributeError<EmptyModifiable>>
 
+    /// Initialise the stored properties of this object.
+    /// - Parameters:
+    ///   - attributes: The attributes that can be modified/mutated.
+    ///   - metaData: Any metadata.
+    ///   - errorBag: The errors encountered when using this object.
+    ///   - modifyTriggers: A function to update the triggers when a value changes.
     public init(
         attributes: [AttributeGroup] = [],
         metaData: [AttributeGroup] = [],
@@ -86,6 +97,11 @@ public struct EmptyModifiable: Modifiable {
         self.modifyTriggers = modifyTriggers
     }
 
+    /// Add a new item to this object.
+    /// - Parameters:
+    ///   - item: The new item to add.
+    ///   - attribute: A path to the array to append to.
+    /// - Returns: Whether the operation was successful.
     public mutating func addItem<Path, T>(
         _ item: T, to attribute: Path
     ) -> Result<Bool, AttributeError<EmptyModifiable>> where
@@ -94,6 +110,12 @@ public struct EmptyModifiable: Modifiable {
         return .success(false)
     }
 
+    /// Move the items at some location to a new destination.
+    /// - Parameters:
+    ///   - attribute: The path to the array containing the items to move.
+    ///   - source: The indexes to move in the array.
+    ///   - destination: The new destination index of the items.
+    /// - Returns: Whether the operation was successful.
     public mutating func moveItems<Path, T>(
         table attribute: Path, from source: IndexSet, to destination: Int
     ) -> Result<Bool, AttributeError<Self>> where
@@ -112,6 +134,11 @@ public struct EmptyModifiable: Modifiable {
         return .success(false)
     }
 
+    /// Delete an item.
+    /// - Parameters:
+    ///   - attribute: A path to the array that contains the items to remove.
+    ///   - index: The index of the item to delete.
+    /// - Returns: Whether the operation was successful.
     public mutating func deleteItem<Path, T>(
         table attribute: Path, atIndex index: Int
     ) -> Result<Bool, AttributeError<Self>> where
@@ -126,6 +153,11 @@ public struct EmptyModifiable: Modifiable {
         return .success(false)
     }
 
+    /// Delete multiple items.
+    /// - Parameters:
+    ///   - attribute: The path to the array containing the items to delete.
+    ///   - items: The indexes of the items to delete.
+    /// - Returns: Whether the operation was successful.
     public mutating func deleteItems<Path, T>(
         table attribute: Path, items: IndexSet
     ) -> Result<Bool, AttributeError<Self>> where
@@ -142,6 +174,11 @@ public struct EmptyModifiable: Modifiable {
         return .success(false)
     }
 
+    /// Overwrite an item with a new item.
+    /// - Parameters:
+    ///   - attribute: The path to the item to mutate.
+    ///   - value: The new item.
+    /// - Returns: Whether the operation was successful.
     public mutating func modify<Path>(
         attribute: Path, value: Path.Value
     ) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path: PathProtocol {
@@ -154,6 +191,8 @@ public struct EmptyModifiable: Modifiable {
         return self.modifyTriggers(&self)
     }
 
+    /// Validate the items contained within this object. This is a mock implementation that doesn't
+    /// perform any operations.
     public func validate() throws {}
 
 }
