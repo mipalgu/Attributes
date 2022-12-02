@@ -56,17 +56,30 @@
  *
  */
 
+/// A group of common attributes. This struct can be used to represent a group
+/// of attributes. These attributes can be made available/unavailable (shown or not shown
+/// in an editor) or you can perform CRUD operations.
 @dynamicMemberLookup
 public struct AttributeGroup: Hashable, Codable {
 
+    /// The name of the group.
     public var name: String
 
+    /// The attributes that are available.
     public var fields: [Field]
 
+    /// All attributes (available and unavailable).
     public var attributes: [Label: Attribute]
 
+    /// Any additional metadata pertaining to the attributes.
     public var metaData: [Label: Attribute]
 
+    /// Initialise this struct by setting the stored properties.
+    /// - Parameters:
+    ///   - name: The name of the group.
+    ///   - fields: The attributes that are currently available.
+    ///   - attributes: All of the currently existing attributes.
+    ///   - metaData: The metadata associated with the attributes.
     public init(
         name: String,
         fields: [Field] = [],
@@ -79,7 +92,11 @@ public struct AttributeGroup: Hashable, Codable {
         self.metaData = metaData
     }
 
+    /// Access the attributes by using a lookup.
+    /// - Parameter member: The label of the attribute to find.
+    /// - Returns: The attribute with label `member`.
     subscript(dynamicMember member: String) -> Attribute {
+        // swiftlint:disable:next force_unwrapping
         self.attributes[member]!
     }
 
