@@ -73,15 +73,15 @@ struct MockComplex: ComplexProtocol, Identifiable {
     let id = UUID()
 
     /// The path.
-    var path: Attributes.Path<EmptyModifiable, Attributes.Attribute>
+    var path: Path<EmptyModifiable, Attribute>
 
     /// The triggers.
-    var triggers: AnyTrigger<EmptyModifiable> = AnyTrigger(MockTrigger<EmptyModifiable>())
+    var triggers: AnyTrigger<EmptyModifiable>
 
     /// The group validators.
-    var groupValidation: AnyValidator<Attribute> = AnyValidator(NullValidator<Attribute>())
+    var groupValidation: AnyValidator<Attribute>
 
     /// The root validator.
-    var rootValidation: AnyValidator<EmptyModifiable> = AnyValidator(NullValidator<EmptyModifiable>())
+    var rootValidation: AnyValidator<EmptyModifiable>
 
 }
