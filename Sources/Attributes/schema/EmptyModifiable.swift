@@ -70,13 +70,13 @@ public struct EmptyModifiable: Modifiable {
 
     public var errorBag: ErrorBag<EmptyModifiable>
 
-    private let modifyTriggsy: (inout EmptyModifiable) -> Result<Bool, AttributeError<EmptyModifiable>>
+    private let modifyTriggers: (inout EmptyModifiable) -> Result<Bool, AttributeError<EmptyModifiable>>
 
-    public init(attributes: [AttributeGroup] = [], metaData: [AttributeGroup] = [], errorBag: ErrorBag<EmptyModifiable> = ErrorBag(), modifyTriggsy: @escaping (inout EmptyModifiable) -> Result<Bool, AttributeError<EmptyModifiable>> = { _ in .success(false) }) {
+    public init(attributes: [AttributeGroup] = [], metaData: [AttributeGroup] = [], errorBag: ErrorBag<EmptyModifiable> = ErrorBag(), modifyTriggers: @escaping (inout EmptyModifiable) -> Result<Bool, AttributeError<EmptyModifiable>> = { _ in .success(false) }) {
         self.attributes = attributes
         self.metaData = metaData
         self.errorBag = errorBag
-        self.modifyTriggsy = modifyTriggsy
+        self.modifyTriggers = modifyTriggers
     }
 
     public mutating func addItem<Path, T>(_ item: T, to attribute: Path) -> Result<Bool, AttributeError<EmptyModifiable>> where EmptyModifiable == Path.Root, Path : PathProtocol, Path.Value == [T] {
@@ -103,7 +103,7 @@ public struct EmptyModifiable: Modifiable {
 
     public mutating func modify<Path>(attribute: Path, value: Path.Value) -> Result<Bool, AttributeError<Self>> where EmptyModifiable == Path.Root, Path : PathProtocol {
         self[keyPath: attribute.path] = value
-        return self.modifyTriggsy(&self)
+        return self.modifyTriggers(&self)
     }
 
     public func validate() throws {}
