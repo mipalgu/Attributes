@@ -58,28 +58,42 @@
 
 import Foundation
 
+/// Provides a common means of accessing and mutating data represented using attributes.
 public protocol Modifiable {
 
+    /// A path to self.
     static var path: Path<Self, Self> { get }
 
+    /// The attributes to access and mutate.
     var attributes: [AttributeGroup] { get }
 
+    /// An object storing the errors that occured when performing the mutating functions.
     var errorBag: ErrorBag<Self> { get }
 
     /// Add a new item to a table/collection attribute.
-    mutating func addItem<Path: PathProtocol, T>(_ item: T, to attribute: Path) -> Result<Bool, AttributeError<Self>> where Path.Root == Self, Path.Value == [T]
+    mutating func addItem<Path: PathProtocol, T>(
+        _ item: T, to attribute: Path
+    ) -> Result<Bool, AttributeError<Self>> where Path.Root == Self, Path.Value == [T]
 
     /// Move the position of items in a table/collection attribute.
-    mutating func moveItems<Path: PathProtocol, T>(table attribute: Path, from source: IndexSet, to destination: Int) -> Result<Bool, AttributeError<Self>> where Path.Root == Self, Path.Value == [T]
+    mutating func moveItems<Path: PathProtocol, T>(
+        table attribute: Path, from source: IndexSet, to destination: Int
+    ) -> Result<Bool, AttributeError<Self>> where Path.Root == Self, Path.Value == [T]
 
     /// Delete a specific item in a table/collection attribute.
-    mutating func deleteItem<Path: PathProtocol, T>(table attribute: Path, atIndex index: Int) -> Result<Bool, AttributeError<Self>> where Path.Root == Self, Path.Value == [T]
+    mutating func deleteItem<Path: PathProtocol, T>(
+        table attribute: Path, atIndex index: Int
+    ) -> Result<Bool, AttributeError<Self>> where Path.Root == Self, Path.Value == [T]
 
     /// Delete specific items in a table/collection attribute.
-    mutating func deleteItems<Path: PathProtocol, T>(table attribute: Path, items: IndexSet) -> Result<Bool, AttributeError<Self>> where Path.Root == Self, Path.Value == [T]
+    mutating func deleteItems<Path: PathProtocol, T>(
+        table attribute: Path, items: IndexSet
+    ) -> Result<Bool, AttributeError<Self>> where Path.Root == Self, Path.Value == [T]
 
     /// Modify a specific attributes value.
-    mutating func modify<Path: PathProtocol>(attribute: Path, value: Path.Value) -> Result<Bool, AttributeError<Self>> where Path.Root == Self
+    mutating func modify<Path: PathProtocol>(
+        attribute: Path, value: Path.Value
+    ) -> Result<Bool, AttributeError<Self>> where Path.Root == Self
 
     /// Are there any errors with the modification?
     func validate() throws
