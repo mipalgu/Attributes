@@ -86,6 +86,8 @@ final class EmptyModifiableTests: XCTestCase {
     /// Modifiable under test.
     lazy var modifiable = EmptyModifiable(attributes: attributes, metaData: metaData, errorBag: errorBag)
 
+    let attributePath = Path(EmptyModifiable.self).attributes
+
     /// Initialise modifiable before every test.
     override func setUp() {
         attributes = [
@@ -111,6 +113,26 @@ final class EmptyModifiableTests: XCTestCase {
     /// Test init sets stored properties correctly.
     func testInit() {
         XCTAssertEqual(modifiable.attributes, attributes)
+        XCTAssertEqual(modifiable.metaData, metaData)
+        XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
+    }
+
+    func testAddItem() throws {
+        let newGroup = AttributeGroup(name: "New Group!")
+        XCTAssertFalse(try modifiable.addItem(newGroup, to: attributePath).get())
+        XCTAssertEqual(modifiable.attributes, attributes + [newGroup])
+        XCTAssertEqual(modifiable.metaData, metaData)
+        XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
+    }
+
+    func testMoveItem() throws {
+        let newGroup = AttributeGroup(name: "New Group!")
+        XCTAssertFalse(try modifiable.addItem(newGroup, to: attributePath).get())
+        XCTAssertEqual(modifiable.attributes, attributes + [newGroup])
+        XCTAssertFalse(
+            try modifiable.moveItems(table: attributePath, from: [0], to: 2).get()
+        )
+        XCTAssertEqual(modifiable.attributes, [newGroup] + attributes)
         XCTAssertEqual(modifiable.metaData, metaData)
         XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
     }
