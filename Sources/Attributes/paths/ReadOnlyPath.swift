@@ -144,9 +144,7 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
         return ReadOnlyPath<Root, AppendedValue>(
             keyPath: newPath,
             ancestors: fullPath
-        ) {
-            ancestors.last?.isNil($0) ?? false || $0[keyPath: newPath].isNil
-        }
+        )
     }
 
 }

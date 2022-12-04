@@ -126,6 +126,14 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertFalse(path.isNil([[Point(x: 1, y: 2)], [Point(x: 3, y: 4)]]))
     }
 
+    /// Test isNil for multiple optional paths.
+    func testIsNilForAppendedOptionalPath() {
+        let path = ReadOnlyPath(Optional<OptionalPoint>.self).wrappedValue.x.wrappedValue
+        XCTAssertTrue(path.isNil(OptionalPoint()))
+        XCTAssertTrue(path.isNil(nil))
+        XCTAssertFalse(path.isNil(OptionalPoint(x: 1, y: 2)))
+    }
+
     /// Test type initialiser.
     func testTypeInit() {
         let keyPath = \Point.self
@@ -156,6 +164,15 @@ final class ReadOnlyPathTests: XCTestCase {
         let newPath = ReadOnlyPath<Point, Int>(keyPath: \.x, ancestors: [AnyPath(path)])
         let fullPath = newPath.ancestors + [AnyPath(newPath)]
         XCTAssertEqual(newPath.fullPath, fullPath)
+    }
+
+    /// Test hashable conformance.
+    func testHash() {
+        let val = ReadOnlyPath(Point.self).x
+        let val2 = ReadOnlyPath(Point.self).x
+        let values: Set<ReadOnlyPath<Point, Int>> = [val, val2]
+        XCTAssertTrue(values.contains(val))
+        XCTAssertEqual(values.count, 1)
     }
 
 }

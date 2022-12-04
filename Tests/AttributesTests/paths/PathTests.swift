@@ -132,6 +132,14 @@ final class PathTests: XCTestCase {
         XCTAssertTrue(newPath.isNil([OptionalPoint()]))
     }
 
+    /// Test isNil for multiple optional paths.
+    func testIsNilForAppendedOptionalPath() {
+        let path = Path(Optional<OptionalPoint>.self).wrappedValue.x.wrappedValue
+        XCTAssertTrue(path.isNil(OptionalPoint()))
+        XCTAssertTrue(path.isNil(nil))
+        XCTAssertFalse(path.isNil(OptionalPoint(x: 1, y: 2)))
+    }
+
     // func testIsNilWithNilAncestorAfterChangingRoot() {
     //     let path = Path([Point].self)[0].x
     //     let path2 = Path([[Point]].self)[1]
@@ -244,6 +252,15 @@ final class PathTests: XCTestCase {
         let newPath = xPath.changeRoot(path: point0)
         let expected = Path(path: \[Point][0].x, ancestors: [AnyPath(pointArray), AnyPath(point0)])
         XCTAssertEqual(newPath, expected)
+    }
+
+    /// Test hashable conformance.
+    func testHash() {
+        let val = Path(Point.self).x
+        let val2 = Path(Point.self).x
+        let values: Set<Path<Point, Int>> = [val, val2]
+        XCTAssertTrue(values.contains(val))
+        XCTAssertEqual(values.count, 1)
     }
 
 }

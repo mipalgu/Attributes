@@ -172,7 +172,7 @@ public struct Path<Root, Value>: PathProtocol {
     ) -> ReadOnlyPath<Root, AppendedValue> where AppendedValue: Nilable {
         let newPath = path.appending(path: member)
         return ReadOnlyPath<Root, AppendedValue>(keyPath: newPath, ancestors: fullPath) { root in
-            ancestors.last?.isNil(root) ?? false || root[keyPath: newPath].isNil
+            self.isNil(root) || root[keyPath: newPath].isNil
         }
     }
 
@@ -194,9 +194,7 @@ public struct Path<Root, Value>: PathProtocol {
         dynamicMember member: WritableKeyPath<Value, AppendedValue>
     ) -> Path<Root, AppendedValue> where AppendedValue: Nilable {
         let newPath = path.appending(path: member)
-        return Path<Root, AppendedValue>(path: newPath, ancestors: fullPath) { root in
-            ancestors.last?.isNil(root) ?? false || root[keyPath: newPath].isNil
-        }
+        return Path<Root, AppendedValue>(path: newPath, ancestors: fullPath)
     }
 
 }
