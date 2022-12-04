@@ -139,6 +139,15 @@ final class EmptyModifiableTests: XCTestCase {
         }
         XCTAssertEqual(error.message, "Invalid path.")
         XCTAssertEqual(error.path, AnyPath(attributePath[5].fields))
+        XCTAssertEqual(modifiable.attributes, attributes)
+        XCTAssertEqual(modifiable.metaData, metaData)
+        let allErrors = modifiable.errorBag.allErrors
+        guard let firstError = allErrors.first else {
+            XCTFail("Empty errors.")
+            return
+        }
+        XCTAssertEqual(error.message, firstError.message)
+        XCTAssertEqual(error.path, firstError.path)
     }
 
     /// Test moveItem moves items correctly.
