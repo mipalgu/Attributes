@@ -119,6 +119,13 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertTrue(newPath.isNil(nil))
     }
 
+    /// Test isNil for nested arrays.
+    func testIsNilForArrayAncestor() {
+        let path = ReadOnlyPath([[Point]].self)[1][0]
+        XCTAssertTrue(path.isNil([[Point(x: 1, y: 2)]]))
+        XCTAssertFalse(path.isNil([[Point(x: 1, y: 2)], [Point(x: 3, y: 4)]]))
+    }
+
     /// Test type initialiser.
     func testTypeInit() {
         let keyPath = \Point.self

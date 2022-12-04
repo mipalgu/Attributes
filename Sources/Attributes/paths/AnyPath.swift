@@ -241,13 +241,14 @@ public struct AnyPath<Root> {
         ) else {
             fatalError("Failed to create new path")
         }
+        let newAncestors = self.ancestors.map { $0.changeRoot(path: path) }
         return AnyPath<Prefix.Root>(
             newPath,
-            ancestors: path.ancestors + self.ancestors.map { $0.changeRoot(path: path) },
+            ancestors: path.ancestors + newAncestors,
             targetType: targetType,
             isOptional: isOptional,
             isNil: { root in
-                path.ancestors.last?.isNil(root) ?? false || _isNil(root[keyPath: path.keyPath])
+                path.isNil(root) || self.isNil(root[keyPath: path.keyPath])
             },
             isSame: { path in path == newPath }
         )
@@ -272,7 +273,7 @@ public struct AnyPath<Root> {
             ancestors: ancestors,
             targetType: Any.self,
             isOptional: path.isOptional,
-            isNil: { ancestors.last?.isNil($0) ?? false || path.isNil($0[keyPath: keyPath]) },
+            isNil: { self.isNil($0) || path.isNil($0[keyPath: keyPath]) },
             isSame: { $0 == newPartialKeyPath }
         )
     }

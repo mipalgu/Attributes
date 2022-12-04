@@ -117,6 +117,32 @@ final class PathTests: XCTestCase {
         XCTAssertTrue(newPath.isNil(nil))
     }
 
+    /// Test isNil for nested arrays.
+    func testIsNilForArrayAncestor() {
+        let path = Path([[Point]].self)[1][0]
+        XCTAssertTrue(path.isNil([[Point(x: 1, y: 2)]]))
+        XCTAssertFalse(path.isNil([[Point(x: 1, y: 2)], [Point(x: 3, y: 4)]]))
+    }
+
+    /// Test isNil for new root.
+    func testIsNilForChangedRoot() {
+        let path = Path(OptionalPoint.self).x
+        let rootPath = Path([OptionalPoint].self)[0]
+        let newPath = path.changeRoot(path: rootPath)
+        XCTAssertTrue(newPath.isNil([OptionalPoint()]))
+    }
+
+    // func testIsNilWithNilAncestorAfterChangingRoot() {
+    //     let path = Path([Point].self)[0].x
+    //     let path2 = Path([[Point]].self)[1]
+    //     let newPath = path.changeRoot(path: path2)
+    //     let root = [[Point(x: 1, y: 2)]]
+    //     let isNil = newPath.isNil(root)
+    //     XCTAssertTrue(isNil)
+    //     let root2 = root + [[Point(x: 3, y: 4)]]
+    //     XCTAssertFalse(newPath.isNil(root2))
+    // }
+
     /// Test type initialiser.
     func testTypeInit() {
         let keyPath = \Point.self

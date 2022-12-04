@@ -142,23 +142,7 @@ public struct Path<Root, Value>: PathProtocol {
         }
         let newPath = path.path.appending(path: self.path)
         return Path<Prefix.Root, Value>(path: newPath, ancestors: ancestors) {
-            ancestors.last?.isNil($0) ?? false || path.isNil($0)
-        }
-    }
-
-    /// Change the Root of this path. This function is equivalent to prepending a path to self.
-    /// This method acts as a pure function by creating a new path with the result.
-    /// - Parameter path: The path to prepend to self.
-    /// - Returns: A new path pointing from the path Root to self's Value.
-    public func changeRoot<Prefix: PathProtocol>(
-        path: Prefix
-    ) -> Path<Prefix.Root, Value> where Prefix.Value == Root, Value: Nilable {
-        let ancestors = path.fullPath + self.ancestors.dropFirst().map {
-            $0.changeRoot(path: path.readOnly)
-        }
-        let newPath = path.path.appending(path: self.path)
-        return Path<Prefix.Root, Value>(path: newPath, ancestors: ancestors) {
-            path.isNil($0) || ancestors.last?.isNil($0) ?? false || $0[keyPath: newPath].isNil
+            path.isNil($0) || self.isNil($0[keyPath: path.keyPath])
         }
     }
 
