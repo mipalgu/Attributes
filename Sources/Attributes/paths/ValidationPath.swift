@@ -121,14 +121,10 @@ public struct ValidationPath<P: ReadOnlyPathProtocol>: _ValidationPath {
     public subscript<AppendedValue>(
         dynamicMember member: KeyPath<P.Value, AppendedValue>
     ) -> ValidationPath<ReadOnlyPath<P.Root, AppendedValue>> where AppendedValue: Nilable {
-        let newPath = path.keyPath.appending(path: member)
-        return ValidationPath<ReadOnlyPath<P.Root, AppendedValue>>(
+        ValidationPath<ReadOnlyPath<P.Root, AppendedValue>>(
             path: ReadOnlyPath<Root, AppendedValue>(
-                keyPath: newPath,
-                ancestors: path.fullPath
-            ) {
-                path.fullPath.last?.isNil($0) ?? false || $0[keyPath: newPath].isNil
-            }
+                keyPath: path.keyPath.appending(path: member), ancestors: path.fullPath
+            )
         )
     }
 
