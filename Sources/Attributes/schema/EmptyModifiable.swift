@@ -106,6 +106,11 @@ public struct EmptyModifiable: Modifiable {
         _ item: T, to attribute: Path
     ) -> Result<Bool, AttributeError<EmptyModifiable>> where
         EmptyModifiable == Path.Root, Path: PathProtocol, Path.Value == [T] {
+        guard !attribute.isNil(self) else {
+            let error = AttributeError(message: "Invalid path.", path: attribute)
+            errorBag.insert(error)
+            return .failure(error)
+        }
         self[keyPath: attribute.path].append(item)
         return .success(false)
     }
