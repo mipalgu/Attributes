@@ -67,7 +67,7 @@ extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteg
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            self.isNil(root) || root[keyPath: keyPath].count <= index || index < 0
+            self.isNil(root) || index < 0 || root[keyPath: keyPath].count <= index
         }
     }
 
@@ -82,7 +82,7 @@ extension ReadOnlyPathProtocol where Value: MutableCollection, Value.Index: Bina
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            self.isNil(root) || root[keyPath: keyPath].count <= index || index < 0
+            self.isNil(root) || index < 0 || root[keyPath: keyPath].count <= index
         }
     }
 
@@ -142,7 +142,7 @@ extension PathProtocol where Value: MutableCollection, Value.Index: BinaryIntege
             path: self.path.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            self.isNil(root) || root[keyPath: self.path].count <= index || index < 0
+            self.isNil(root) || index < 0 || root[keyPath: self.path].count <= index
         }
     }
 
