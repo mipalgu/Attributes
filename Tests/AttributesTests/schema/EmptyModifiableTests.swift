@@ -127,6 +127,20 @@ final class EmptyModifiableTests: XCTestCase {
         XCTAssertTrue(modifiable.errorBag.allErrors.isEmpty)
     }
 
+    /// Test addItem fails when pointing to a nil path.
+    func testAddItemNilPath() throws {
+        guard
+            case .failure(let error) = modifiable.addItem(
+                Field(name: "New", type: .line), to: attributePath[5].fields
+            )
+        else {
+            XCTFail("Add item passed for empty attributes array.")
+            return
+        }
+        XCTAssertEqual(error.message, "Invalid path.")
+        XCTAssertEqual(error.path, AnyPath(attributePath[5].fields))
+    }
+
     /// Test moveItem moves items correctly.
     func testMoveItem() throws {
         let newGroup = AttributeGroup(name: "New Group!")
