@@ -152,6 +152,22 @@ final class PathTests: XCTestCase {
         XCTAssertFalse(newPath.isNil(root2))
     }
 
+    /// Test isNil for optional append.
+    func testIsNilForOptionalAppend() {
+        let path = Path([Point].self).first
+        XCTAssertTrue(path.isNil([]))
+    }
+
+    /// Test isNil for optional append containing nil ancestor.
+    func testIsNilForOptionalAppendWithNilAncestor() {
+        let path = Path([[Point]].self)[1].first
+        XCTAssertTrue(path.isNil([]))
+        XCTAssertTrue(path.isNil([[]]))
+        XCTAssertTrue(path.isNil([[Point(x: 1, y: 2)], []]))
+        XCTAssertTrue(path.isNil([[], []]))
+        XCTAssertFalse(path.isNil([[], [Point(x: 1, y: 2)]]))
+    }
+
     /// Test type initialiser.
     func testTypeInit() {
         let keyPath = \Point.self
