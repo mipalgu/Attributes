@@ -134,6 +134,20 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertFalse(path.isNil(OptionalPoint(x: 1, y: 2)))
     }
 
+    /// Check isNil works when converting Path.
+    func testIsNilWithNilAncestorAfterChangingRoot() {
+        let path = Path([Point].self)[0].x
+        let path2 = Path([[Point]].self)[1]
+        let newPath = path.changeRoot(path: path2)
+        let root = [[Point(x: 1, y: 2)]]
+        let root2 = root + [[Point(x: 3, y: 4)]]
+        let readPath = ReadOnlyPath(keyPath: newPath.keyPath, ancestors: newPath.ancestors) {
+            newPath.isNil($0)
+        }
+        XCTAssertTrue(readPath.isNil(root))
+        XCTAssertFalse(readPath.isNil(root2))
+    }
+
     /// Test type initialiser.
     func testTypeInit() {
         let keyPath = \Point.self

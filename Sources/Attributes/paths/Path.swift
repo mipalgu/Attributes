@@ -84,7 +84,7 @@ public struct Path<Root, Value>: PathProtocol {
     init(path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>], isNil: @escaping (Root) -> Bool) {
         self.path = path
         self.ancestors = ancestors.reversed().drop { $0.partialKeyPath == path }.reversed()
-        self._isNil = { root in ancestors.last?.isNil(root) ?? false || isNil(root) }
+        self._isNil = isNil
     }
 
     /// Initialise this object with a path that points to a non-optional value.

@@ -77,7 +77,7 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
     init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>], isNil: @escaping (Root) -> Bool) {
         self.ancestors = ancestors.reversed().drop { $0.partialKeyPath == keyPath }.reversed()
         self.keyPath = keyPath
-        self._isNil = { root in ancestors.last?.isNil(root) ?? false || isNil(root) }
+        self._isNil = isNil
     }
 
     /// Initialise this path from a keyPath that does not point to an Optional value.
