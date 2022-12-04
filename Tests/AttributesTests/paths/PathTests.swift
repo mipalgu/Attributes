@@ -280,4 +280,30 @@ final class PathTests: XCTestCase {
         XCTAssertEqual(values.count, 1)
     }
 
+    /// Test validate creates correct validator.
+    func testValidate() throws {
+        let path = Path(Point.self)
+        let validator = NullValidator<Point>()
+        let newValidator = path.validate { _ in validator }
+        let root = Point(x: 1, y: 2)
+        try newValidator.performValidation(root)
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, root)
+    }
+
+    /// Test trigger creates correct trigger.
+    func testTrigger() throws {
+        let path = Path(Point.self)
+        let trigger = MockTrigger<Point>(result: .success(true))
+        let newTrigger = path.trigger {
+            $0
+            trigger
+        }
+        var root = Point(x: 1, y: 2)
+        XCTAssertTrue(try newTrigger.performTrigger(&root, for: AnyPath(path)).get())
+        XCTAssertEqual(trigger.timesCalled, 1)
+        XCTAssertEqual(trigger.pathPassed, AnyPath(path))
+        XCTAssertEqual(trigger.rootPassed, root)
+    }
+
 }
