@@ -142,7 +142,7 @@ public struct Path<Root, Value>: PathProtocol {
         }
         let newPath = path.path.appending(path: self.path)
         return Path<Prefix.Root, Value>(path: newPath, ancestors: ancestors) {
-            path.isNil($0) || ancestors.last?.isNil($0) ?? false
+            ancestors.last?.isNil($0) ?? false || path.isNil($0)
         }
     }
 
