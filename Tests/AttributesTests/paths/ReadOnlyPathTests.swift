@@ -164,6 +164,13 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertFalse(path.isNil([[], [Point(x: 1, y: 2)]]))
     }
 
+    /// Test isNil function works when using a keypath to an optional value.
+    func testIsNilOptionalKeyPathCreationWithoutAncestors() {
+        let path = ReadOnlyPath(keyPath: \Optional<Point>.self, ancestors: [])
+        XCTAssertTrue(path.isNil(nil))
+        XCTAssertFalse(path.isNil(Point(x: 1, y: 2)))
+    }
+
     /// Test type initialiser.
     func testTypeInit() {
         let keyPath = \Point.self
