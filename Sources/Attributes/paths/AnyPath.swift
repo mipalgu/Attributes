@@ -272,7 +272,7 @@ public struct AnyPath<Root> {
             ancestors: ancestors,
             targetType: Any.self,
             isOptional: path.isOptional,
-            isNil: { path.isNil($0[keyPath: keyPath]) },
+            isNil: { ancestors.last?.isNil($0) ?? false || path.isNil($0[keyPath: keyPath]) },
             isSame: { $0 == newPartialKeyPath }
         )
     }

@@ -67,7 +67,7 @@ extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteg
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            root[keyPath: keyPath].count <= index || index < 0
+            ancestors.last?.isNil(root) ?? false || root[keyPath: keyPath].count <= index || index < 0
         }
     }
 
@@ -82,7 +82,7 @@ extension ReadOnlyPathProtocol where Value: MutableCollection, Value.Index: Bina
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            root[keyPath: keyPath].count <= index || index < 0
+            ancestors.last?.isNil(root) ?? false || root[keyPath: keyPath].count <= index || index < 0
         }
     }
 
@@ -97,7 +97,7 @@ extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteg
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            guard index >= 0 else {
+            guard index >= 0, !(ancestors.last?.isNil(root) ?? false) else {
                 return true
             }
             let collection = root[keyPath: keyPath]
@@ -120,7 +120,7 @@ extension ReadOnlyPathProtocol where
             keyPath: self.keyPath.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            guard index >= 0 else {
+            guard index >= 0, !(ancestors.last?.isNil(root) ?? false) else {
                 return true
             }
             let collection = root[keyPath: keyPath]
@@ -142,7 +142,7 @@ extension PathProtocol where Value: MutableCollection, Value.Index: BinaryIntege
             path: self.path.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            root[keyPath: self.path].count <= index || index < 0
+            ancestors.last?.isNil(root) ?? false || root[keyPath: self.path].count <= index || index < 0
         }
     }
 
@@ -157,7 +157,7 @@ extension PathProtocol where Value: MutableCollection, Value.Index: BinaryIntege
             path: self.path.appending(path: \.[index]),
             ancestors: self.ancestors + [AnyPath(self)]
         ) { root in
-            guard index >= 0 else {
+            guard index >= 0, !(ancestors.last?.isNil(root) ?? false) else {
                 return true
             }
             let collection = root[keyPath: keyPath]

@@ -92,7 +92,7 @@ public struct Path<Root, Value>: PathProtocol {
     ///   - path: The path this object is initialised from.
     ///   - ancestors: The ancestors of path.
     init(path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>]) {
-        self.init(path: path, ancestors: ancestors) { _ in false }
+        self.init(path: path, ancestors: ancestors) { root in ancestors.last?.isNil(root) ?? false }
     }
 
     /// Initialise this object from a path that points to an optional value.
@@ -102,7 +102,9 @@ public struct Path<Root, Value>: PathProtocol {
     init(
         path: WritableKeyPath<Root, Value>, ancestors: [AnyPath<Root>]
     ) where Value: Nilable {
-        self.init(path: path, ancestors: ancestors) { root in root[keyPath: path].isNil }
+        self.init(path: path, ancestors: ancestors) { root in
+            ancestors.last?.isNil(root) ?? false || root[keyPath: path].isNil
+        }
     }
 
     /// Initialise self from the type of Value. This initialiser sets value as the Root and
@@ -129,7 +131,26 @@ public struct Path<Root, Value>: PathProtocol {
         let ancestors = path.fullPath + self.ancestors.dropFirst().map {
             $0.changeRoot(path: path.readOnly)
         }
-        return Path<Prefix.Root, Value>(path: path.path.appending(path: self.path), ancestors: ancestors)
+        let newPath = path.path.appending(path: self.path)
+        return Path<Prefix.Root, Value>(path: newPath, ancestors: ancestors) {
+            path.isNil($0) || ancestors.last?.isNil($0) ?? false
+        }
+    }
+
+    /// Change the Root of this path. This function is equivalent to prepending a path to self.
+    /// This method acts as a pure function by creating a new path with the result.
+    /// - Parameter path: The path to prepend to self.
+    /// - Returns: A new path pointing from the path Root to self's Value.
+    public func changeRoot<Prefix: PathProtocol>(
+        path: Prefix
+    ) -> Path<Prefix.Root, Value> where Prefix.Value == Root, Value: Nilable {
+        let ancestors = path.fullPath + self.ancestors.dropFirst().map {
+            $0.changeRoot(path: path.readOnly)
+        }
+        let newPath = path.path.appending(path: self.path)
+        return Path<Prefix.Root, Value>(path: newPath, ancestors: ancestors) {
+            path.isNil($0) || ancestors.last?.isNil($0) ?? false || $0[keyPath: newPath].isNil
+        }
     }
 
     /// Checks whether the value pointed to by this path is nil in a given object.
@@ -157,8 +178,8 @@ public struct Path<Root, Value>: PathProtocol {
         dynamicMember member: KeyPath<Value, AppendedValue>
     ) -> ReadOnlyPath<Root, AppendedValue> where AppendedValue: Nilable {
         let newPath = path.appending(path: member)
-        return ReadOnlyPath<Root, AppendedValue>(keyPath: newPath, ancestors: fullPath) {
-            $0[keyPath: newPath].isNil
+        return ReadOnlyPath<Root, AppendedValue>(keyPath: newPath, ancestors: fullPath) { root in
+            ancestors.last?.isNil(root) ?? false || root[keyPath: newPath].isNil
         }
     }
 
@@ -180,8 +201,8 @@ public struct Path<Root, Value>: PathProtocol {
         dynamicMember member: WritableKeyPath<Value, AppendedValue>
     ) -> Path<Root, AppendedValue> where AppendedValue: Nilable {
         let newPath = path.appending(path: member)
-        return Path<Root, AppendedValue>(path: newPath, ancestors: fullPath) {
-            $0[keyPath: newPath].isNil
+        return Path<Root, AppendedValue>(path: newPath, ancestors: fullPath) { root in
+            ancestors.last?.isNil(root) ?? false || root[keyPath: newPath].isNil
         }
     }
 

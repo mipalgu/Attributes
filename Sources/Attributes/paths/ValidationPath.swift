@@ -127,7 +127,7 @@ public struct ValidationPath<P: ReadOnlyPathProtocol>: _ValidationPath {
                 keyPath: newPath,
                 ancestors: path.fullPath
             ) {
-                $0[keyPath: newPath].isNil
+                path.fullPath.last?.isNil($0) ?? false || $0[keyPath: newPath].isNil
             }
         )
     }

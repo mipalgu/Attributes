@@ -85,7 +85,7 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
     ///   - keyPath: The keyPath that represents a values location within a Root.
     ///   - ancestors: The ancestors of the keyPath.
     init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) {
-        self.init(keyPath: keyPath, ancestors: ancestors) { _ in false }
+        self.init(keyPath: keyPath, ancestors: ancestors) { root in ancestors.last?.isNil(root) ?? false }
     }
 
     /// Initialise this path from a keyPath that points to an Optional value.
@@ -93,7 +93,9 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
     ///   - keyPath: The keyPath to initialise this object from.
     ///   - ancestors: The ancestors of this keyPath.
     init(keyPath: KeyPath<Root, Value>, ancestors: [AnyPath<Root>]) where Value: Nilable {
-        self.init(keyPath: keyPath, ancestors: ancestors) { root in root[keyPath: keyPath].isNil }
+        self.init(keyPath: keyPath, ancestors: ancestors) { root in
+            ancestors.last?.isNil(root) ?? false || root[keyPath: keyPath].isNil
+        }
     }
 
     /// Initialise this object from a type. This path will use this type as the value and Root.
@@ -135,7 +137,7 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
             keyPath: newPath,
             ancestors: fullPath
         ) {
-            $0[keyPath: newPath].isNil
+            ancestors.last?.isNil($0) ?? false || $0[keyPath: newPath].isNil
         }
     }
 
