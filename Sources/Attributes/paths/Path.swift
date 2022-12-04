@@ -114,6 +114,15 @@ public struct Path<Root, Value>: PathProtocol {
         self.init(path: \.self, ancestors: [])
     }
 
+    /// Initialise self from the type of Value. This initialiser sets value as the Root and
+    /// the destination of the key path. This path is basically equivalent to \Value.self.
+    /// - Parameter type: The type that this path points to.
+    public init(_ type: Value.Type) where Root == Value, Value: Nilable {
+        self.init(path: \.self, ancestors: []) {
+            $0.isNil
+        }
+    }
+
     /// Append a path to this Path.
     /// - Parameter path: The path to append to self.
     /// - Returns: A new path pointing from Root to the given paths values.

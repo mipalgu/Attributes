@@ -104,6 +104,14 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
         self.init(keyPath: \.self, ancestors: [])
     }
 
+    /// Initialise this object from a type. This path will use this type as the value and Root.
+    /// - Parameter type: The type to initialise this object from.
+    public init(_ type: Value.Type) where Root == Value, Value: Nilable {
+        self.init(keyPath: \.self, ancestors: []) {
+            $0.isNil
+        }
+    }
+
     /// Check whether the value pointed to by this path is nil in a given root object.
     /// - Parameter root: The root that contains the value.
     /// - Returns: Whether value is nil in root.

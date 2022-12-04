@@ -111,6 +111,14 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertTrue(path.isNil(OptionalPoint()))
     }
 
+    /// Test isNil function when ancestor is nil.
+    func testIsNilForNilAncestor() {
+        let path = ReadOnlyPath(Optional<OptionalPoint>.self)
+        XCTAssertTrue(path.isNil(nil))
+        let newPath = path.wrappedValue.x
+        XCTAssertTrue(newPath.isNil(nil))
+    }
+
     /// Test type initialiser.
     func testTypeInit() {
         let keyPath = \Point.self
