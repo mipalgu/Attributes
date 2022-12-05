@@ -60,31 +60,50 @@ import XCTest
 /// Test class for ``Attributable`` default implementations.
 final class AttributableTests: XCTestCase {
 
-    var trigger = MockTrigger<EmptyModifiable>()
+    let properties: [SchemaAttribute] = [
+        SchemaAttribute(label: "first_name", type: .line),
+        SchemaAttribute(label: "last_name", type: .line),
+        SchemaAttribute(label: "age", type: .integer)
+    ]
 
-    var groupValidator = NullValidator<Attribute>()
+    let path = Path(EmptyModifiable.self)
 
-    var rootValidator = NullValidator<EmptyModifiable>()
-
-    let attributePath = Path(EmptyModifiable.self).attributes[0].attributes["A"].wrappedValue
-
-    lazy var complex = MockComplex(
-        path: attributePath,
-        triggers: AnyTrigger(trigger),
-        groupValidation: AnyValidator(groupValidator),
-        rootValidation: AnyValidator(rootValidator)
-    )
+    var person = AttributablePerson()
 
     override func setUp() {
-        trigger = MockTrigger<EmptyModifiable>()
-        groupValidator = NullValidator<Attribute>()
-        rootValidator = NullValidator<EmptyModifiable>()
-        complex = MockComplex(
-            path: attributePath,
-            triggers: AnyTrigger(trigger),
-            groupValidation: AnyValidator(groupValidator),
-            rootValidation: AnyValidator(rootValidator)
-        )
+        person = AttributablePerson()
+    }
+
+    func testProperties() {
+        let sortedProperties = properties.sorted()
+        let personProperties = person.properties.sorted()
+        XCTAssertEqual(sortedProperties.count, personProperties.count)
+        let indices = sortedProperties.count > personProperties.count ? sortedProperties.indices :
+            personProperties.indices
+        indices.forEach {
+            let p0 = sortedProperties[$0]
+            let p1 = personProperties[$0]
+            XCTAssertEqual(p0.label, p1.label)
+            XCTAssertEqual(p0.type, p1.type)
+        }
+    }
+
+    func testAvailable() {
+        XCTAssertEqual(person.available, Set(properties.map(\.label)))
+    }
+
+    func testNullTriggerByDefault() throws {
+        let before = person
+        XCTAssertFalse(try person.triggers.performTrigger(&person.data, for: AnyPath(path)).get())
+        XCTAssertEqual(person, before)
+    }
+
+}
+
+extension SchemaAttribute: Comparable {
+
+    public static func < (lhs: Attributes.SchemaAttribute, rhs: Attributes.SchemaAttribute) -> Bool {
+        lhs.label < rhs.label
     }
 
 }

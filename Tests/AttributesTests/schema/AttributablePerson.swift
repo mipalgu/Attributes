@@ -56,29 +56,122 @@
 
 import Attributes
 
+/// A mock struct for a person using schema attributes.
 struct AttributablePerson: Attributable {
 
+    /// Underlying data is an empty modifiable.
     typealias Root = EmptyModifiable
 
+    /// Attribute is the AttributeRoot.
     typealias AttributeRoot = Attribute
 
-    public let path = EmptyModifiable.path.attributes[0].attributes["person"].wrappedValue
-
+    /// Path to fields.
     var pathToFields: Path<Attribute, [Field]> {
         Path(Attribute.self).blockAttribute.complexFields
     }
 
+    /// Path to attributes.
     var pathToAttributes: Path<Attribute, [String: Attribute]> {
         Path(Attribute.self).blockAttribute.complexValue
     }
 
+    /// The data.
+    var data: EmptyModifiable
+
+    /// The first name type information.
     @LineProperty(label: "first_name")
     var firstName
 
+    /// The last name type information.
     @LineProperty(label: "last_name")
     var lastName
 
+    /// The age type information.
     @IntegerProperty(label: "age")
     var age
+
+    /// Path to data.
+    let path = EmptyModifiable.path.attributes[0].attributes["person"].wrappedValue
+
+    /// Initialise data with default values.
+    init() {
+        let personFields = [
+            Field(name: "first_name", type: .line),
+            Field(name: "last_name", type: .line),
+            Field(name: "age", type: .integer)
+        ]
+        self.data = EmptyModifiable(
+            attributes: [
+                AttributeGroup(
+                    name: "Details",
+                    fields: [Field(name: "person", type: .complex(layout: personFields))],
+                    attributes: ["person": .complex([:], layout: personFields)],
+                    metaData: [:]
+                )
+            ],
+            metaData: [],
+            errorBag: ErrorBag()
+        )
+    }
+
+    /// Initialise data from preconfigured modifiable.
+    /// - Parameter data: The data.
+    init(data: EmptyModifiable) {
+        self.data = data
+    }
+
+}
+
+/// Equality and Hashable Conformance.
+extension ErrorBag: Equatable, Hashable where Root: Equatable, Root: Hashable {
+
+    /// Hashable.
+    public static func == (lhs: ErrorBag, rhs: ErrorBag) -> Bool {
+        lhs.allErrors == rhs.allErrors
+    }
+
+    /// Equality
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.allErrors)
+    }
+
+}
+
+/// Equality and Hashable Conformance.
+extension EmptyModifiable: Equatable, Hashable {
+
+    /// Equality
+    public static func == (lhs: Attributes.EmptyModifiable, rhs: Attributes.EmptyModifiable) -> Bool {
+        lhs.attributes == rhs.attributes && lhs.errorBag == rhs.errorBag && lhs.metaData == rhs.metaData
+    }
+
+    /// Hashable.
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.attributes)
+        hasher.combine(self.errorBag)
+        hasher.combine(self.metaData)
+    }
+
+}
+
+/// Equality and Hashable Conformance.
+extension AttributablePerson: Equatable, Hashable {
+
+    /// Equality
+    static func == (lhs: AttributablePerson, rhs: AttributablePerson) -> Bool {
+        lhs.properties == rhs.properties && lhs.data == rhs.data && lhs.available == rhs.available &&
+            lhs.path == rhs.path && lhs.pathToAttributes == rhs.pathToAttributes &&
+            lhs.pathToFields == rhs.pathToFields
+    }
+
+    /// Hashable.
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.properties)
+        hasher.combine(self.available)
+        hasher.combine(self.data)
+        hasher.combine(self.path)
+        hasher.combine(self.pathToAttributes)
+        hasher.combine(self.pathToFields)
+    }
 
 }
