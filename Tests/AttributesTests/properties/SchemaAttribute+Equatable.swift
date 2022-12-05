@@ -57,33 +57,18 @@
 import Attributes
 import Foundation
 
-/// Equality conformance when the validator is a MockValidator.
-extension SchemaAttribute: Equatable {
+/// Equatable and Hashable conformance.
+extension SchemaAttribute: Equatable, Hashable {
 
-    /// Equality operation.
-    public static func == (lhs: SchemaAttribute, rhs: SchemaAttribute) -> Bool {
-        guard let lhsUUID = getUUID(in: lhs), let rhsUUID = getUUID(in: rhs) else {
-            return false
-        }
-        return lhs.label == rhs.label && lhs.type == rhs.type && lhsUUID == rhsUUID
+    /// Equality.
+    public static func == (lhs: Attributes.SchemaAttribute, rhs: Attributes.SchemaAttribute) -> Bool {
+        lhs.label == rhs.label && lhs.type == rhs.type
     }
 
-    /// Find the UUID of the validator in SchemaAttribute if that validator is a MockValidator.
-    /// - Parameter schema: The schema containing the validator.
-    /// - Returns: The UUID if it exists, otherwise nil.
-    private static func getUUID(in schema: SchemaAttribute) -> UUID? {
-        do {
-            try schema.validate.performValidation(.bool(true))
-        } catch {
-            guard let error = error as? MockError else {
-                return nil
-            }
-            switch error {
-            case .id(let firstUUID):
-                return firstUUID
-            }
-        }
-        return nil
+    /// Hashable.
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(self.label)
+        hasher.combine(self.type)
     }
 
 }
