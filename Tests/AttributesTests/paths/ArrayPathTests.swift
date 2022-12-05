@@ -66,6 +66,9 @@ final class ArrayPathTests: XCTestCase {
         let point0 = pointArray[0]
         let expected = getReadPath(to: NonMutatingPoint.self)
         XCTAssertEqual(point0, expected)
+        let root = NonMutatingPoint(x: 1, y: 2)
+        XCTAssertFalse(point0.isNil(root))
+        XCTAssertTrue(pointArray[5].isNil(root))
     }
 
     /// Test isNil for ReadOnlyPath array subscripts.
