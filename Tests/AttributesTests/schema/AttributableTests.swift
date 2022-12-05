@@ -60,20 +60,25 @@ import XCTest
 /// Test class for ``Attributable`` default implementations.
 final class AttributableTests: XCTestCase {
 
+    /// The persons properties.
     let properties: [SchemaAttribute] = [
         SchemaAttribute(label: "first_name", type: .line),
         SchemaAttribute(label: "last_name", type: .line),
         SchemaAttribute(label: "age", type: .integer)
     ]
 
+    /// Path from the data.
     let path = Path(EmptyModifiable.self)
 
+    /// The person under test.
     var person = AttributablePerson()
 
+    /// Initialise the person before every test.
     override func setUp() {
         person = AttributablePerson()
     }
 
+    /// Test properties getter matches expected.
     func testProperties() {
         let sortedProperties = properties.sorted()
         let personProperties = person.properties.sorted()
@@ -88,22 +93,16 @@ final class AttributableTests: XCTestCase {
         }
     }
 
+    /// Test available getter matches expected.
     func testAvailable() {
         XCTAssertEqual(person.available, Set(properties.map(\.label)))
     }
 
+    /// Test default trigger performs no function.
     func testNullTriggerByDefault() throws {
         let before = person
         XCTAssertFalse(try person.triggers.performTrigger(&person.data, for: AnyPath(path)).get())
         XCTAssertEqual(person, before)
-    }
-
-}
-
-extension SchemaAttribute: Comparable {
-
-    public static func < (lhs: Attributes.SchemaAttribute, rhs: Attributes.SchemaAttribute) -> Bool {
-        lhs.label < rhs.label
     }
 
 }

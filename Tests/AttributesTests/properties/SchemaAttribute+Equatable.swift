@@ -72,3 +72,13 @@ extension SchemaAttribute: Equatable, Hashable {
     }
 
 }
+
+/// Comparable conformance.
+extension SchemaAttribute: Comparable {
+
+    /// Compare via labels.
+    public static func < (lhs: Attributes.SchemaAttribute, rhs: Attributes.SchemaAttribute) -> Bool {
+        lhs.label < rhs.label
+    }
+
+}
