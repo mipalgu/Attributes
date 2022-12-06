@@ -57,7 +57,7 @@
 @testable import Attributes
 import XCTest
 
-/// Test class for AnySearchablePath.
+/// Test class for ``AnySearchablePath``.
 final class AnySearchablePathTests: XCTestCase {
 
     /// Test isAncestorOrSame calls the underlying paths function.
