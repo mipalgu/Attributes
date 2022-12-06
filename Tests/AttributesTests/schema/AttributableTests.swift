@@ -105,4 +105,86 @@ final class AttributableTests: XCTestCase {
         XCTAssertEqual(person, before)
     }
 
+    /// Test group validator passes by default.
+    func testNullGroupValidatorByDefault() throws {
+        guard let attribute = person.data.attributes[0].attributes["person"] else {
+            XCTFail("Attribute not set in person.")
+            return
+        }
+        XCTAssertNoThrow(try person.groupValidation.performValidation(attribute))
+    }
+
+    /// Test root validator passes by default.
+    func testRootValidatorPassedByDefault() throws {
+        XCTAssertNoThrow(try person.rootValidation.performValidation(person.data))
+    }
+
+    /// Test properties validator passes by default.
+    func testPropertiesValidatorPassesByDefault() throws {
+        guard let attribute = person.data.attributes[0].attributes["person"] else {
+            XCTFail("Attribute not set in person.")
+            return
+        }
+        XCTAssertNoThrow(try person.propertiesValidator.performValidation(attribute))
+    }
+
+    /// Test additional properties has no effect on default validation.
+    func testPropertiesValidatorPassesForUnknownAttribute() throws {
+        guard let attribute = person.data.attributes[0].attributes["person"] else {
+            XCTFail("Attribute not set in person.")
+            return
+        }
+        var newAttribute = attribute.complexValue
+        newAttribute["unknown"] = .line("Fake attribute")
+        person.data.attributes[0].attributes["person"] = .complex(
+            newAttribute, layout: attribute.complexFields
+        )
+        XCTAssertNoThrow(try person.propertiesValidator.performValidation(attribute))
+    }
+
+    /// Test path returns correct path.
+    func testPathReturnsCorrectSearchablePath() {
+        let path = person.path(for: SchemaAttribute(label: "first_name", type: .line))
+        let expected = Path(EmptyModifiable.self)
+            .attributes[0].attributes["person"].wrappedValue.complexValue["first_name"].wrappedValue
+        XCTAssertTrue(path.isAncestorOrSame(of: AnyPath(expected), in: person.data))
+        let paths = path.paths(in: person.data)
+        XCTAssertEqual(paths.count, 1)
+        guard let first = paths.first else {
+            XCTFail("Invalid paths")
+            return
+        }
+        let result = person.data[keyPath: first.keyPath]
+        let expectedData = person.data[keyPath: expected.keyPath]
+        XCTAssertEqual(result, expectedData)
+    }
+
+    /// Test `findProperty` returns correct property.
+    func testFindProperty() {
+        let path = AnyPath(
+            Path(EmptyModifiable.self)
+                .attributes[0].attributes["person"].wrappedValue.complexValue["first_name"].wrappedValue
+        )
+        let property = person.findProperty(path: path, in: person.data)
+        XCTAssertEqual(property, SchemaAttribute(label: "first_name", type: .line))
+    }
+
+    /// Test `findProperty` returns nil for invalid property.
+    func testFindPropertyReturnsNil() {
+        let path = AnyPath(
+            Path(EmptyModifiable.self)
+                .attributes[0].attributes["person"].wrappedValue.complexValue["unknown"].wrappedValue
+        )
+        XCTAssertNil(person.findProperty(path: path, in: person.data))
+    }
+
+    /// Test `findProperty` returns nil for block property.
+    func testFindPropertyReturnsNilForBlock() {
+        let path = AnyPath(
+            Path(EmptyModifiable.self)
+                .attributes[0].attributes["person"].wrappedValue
+        )
+        XCTAssertNil(person.findProperty(path: path, in: person.data))
+    }
+
 }

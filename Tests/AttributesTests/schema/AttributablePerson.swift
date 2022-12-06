@@ -105,7 +105,16 @@ struct AttributablePerson: Attributable {
                 AttributeGroup(
                     name: "Details",
                     fields: [Field(name: "person", type: .complex(layout: personFields))],
-                    attributes: ["person": .complex([:], layout: personFields)],
+                    attributes: [
+                        "person": .complex(
+                            [
+                                "first_name": .line("John"),
+                                "last_name": .line("Smith"),
+                                "age": .integer(21)
+                            ],
+                            layout: personFields
+                        )
+                    ],
                     metaData: [:]
                 )
             ],
