@@ -64,7 +64,8 @@ final class AttributableTests: XCTestCase {
     let properties: [SchemaAttribute] = [
         SchemaAttribute(label: "first_name", type: .line),
         SchemaAttribute(label: "last_name", type: .line),
-        SchemaAttribute(label: "age", type: .integer)
+        SchemaAttribute(label: "age", type: .integer),
+        SchemaAttribute(label: "is_male", type: .bool)
     ]
 
     /// Path from the data.
@@ -78,7 +79,8 @@ final class AttributableTests: XCTestCase {
         let personFields = [
             Field(name: "first_name", type: .line),
             Field(name: "last_name", type: .line),
-            Field(name: "age", type: .integer)
+            Field(name: "age", type: .integer),
+            Field(name: "is_male", type: .bool)
         ]
         let modifiable = EmptyModifiable(
             attributes: [
@@ -90,7 +92,8 @@ final class AttributableTests: XCTestCase {
                             [
                                 "first_name": .line("John"),
                                 "last_name": .line("Smith"),
-                                "age": .integer(21)
+                                "age": .integer(21),
+                                "is_male": .bool(true)
                             ],
                             layout: personFields
                         )
@@ -211,6 +214,29 @@ final class AttributableTests: XCTestCase {
                 .attributes[0].attributes["person"].wrappedValue
         )
         XCTAssertNil(person.findProperty(path: path, in: person.data))
+    }
+
+    /// Test whenChanged creates correct trigger.
+    func testWhenChangedPerformsCallback() throws {
+        let trigger = person.WhenChanged(SchemaAttribute(label: "first_name", type: .line)).makeUnavailable(
+            field: Field(name: "last_name", type: .line),
+            fields: Path(EmptyModifiable.self).attributes[0].attributes["person"].wrappedValue.complexFields
+        )
+        XCTAssertTrue(
+            try trigger.performTrigger(&person.data, for: AnyPath(Path(EmptyModifiable.self))).get()
+        )
+        guard let fields = person.data.attributes.first?.attributes["person"]?.complexFields else {
+            XCTFail("Cannot get fields")
+            return
+        }
+        XCTAssertEqual(
+            fields,
+            [
+                Field(name: "first_name", type: .line),
+                Field(name: "age", type: .integer),
+                Field(name: "is_male", type: .bool)
+            ]
+        )
     }
 
 }

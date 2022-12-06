@@ -90,6 +90,10 @@ struct AttributablePerson: Attributable {
     @IntegerProperty(label: "age")
     var age
 
+    /// Whether this person is male.
+    @BoolProperty(label: "is_male")
+    var isMale
+
     /// Path to data.
     let path = EmptyModifiable.path.attributes[0].attributes["person"].wrappedValue
 
@@ -98,7 +102,8 @@ struct AttributablePerson: Attributable {
         let personFields = [
             Field(name: "first_name", type: .line),
             Field(name: "last_name", type: .line),
-            Field(name: "age", type: .integer)
+            Field(name: "age", type: .integer),
+            Field(name: "is_male", type: .bool)
         ]
         self.data = EmptyModifiable(
             attributes: [
@@ -110,7 +115,8 @@ struct AttributablePerson: Attributable {
                             [
                                 "first_name": .line("John"),
                                 "last_name": .line("Smith"),
-                                "age": .integer(21)
+                                "age": .integer(21),
+                                "is_male": .bool(true)
                             ],
                             layout: personFields
                         )
