@@ -75,7 +75,33 @@ final class AttributableTests: XCTestCase {
 
     /// Initialise the person before every test.
     override func setUp() {
-        person = AttributablePerson()
+        let personFields = [
+            Field(name: "first_name", type: .line),
+            Field(name: "last_name", type: .line),
+            Field(name: "age", type: .integer)
+        ]
+        let modifiable = EmptyModifiable(
+            attributes: [
+                AttributeGroup(
+                    name: "Details",
+                    fields: [Field(name: "person", type: .complex(layout: personFields))],
+                    attributes: [
+                        "person": .complex(
+                            [
+                                "first_name": .line("John"),
+                                "last_name": .line("Smith"),
+                                "age": .integer(21)
+                            ],
+                            layout: personFields
+                        )
+                    ],
+                    metaData: [:]
+                )
+            ],
+            metaData: [],
+            errorBag: ErrorBag()
+        )
+        person = AttributablePerson(data: modifiable)
     }
 
     /// Test properties getter matches expected.
