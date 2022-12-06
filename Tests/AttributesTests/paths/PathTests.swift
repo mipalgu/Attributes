@@ -238,6 +238,20 @@ final class PathTests: XCTestCase {
         XCTAssertTrue(pointPath.isAncestorOrSame(of: AnyPath(path), in: point))
     }
 
+    /// Test isAncestorOrSame for child.
+    func testIsAncestorOrSameForChild() {
+        let pointPath = Path(Point.self)
+        let path = Path(Point.self).x.bigEndian
+        XCTAssertTrue(pointPath.isAncestorOrSame(of: AnyPath(path), in: point))
+    }
+
+    /// Test isAncestorOrSame returns false for parent path.
+    func testIsAncestorOrSameForParent() {
+        let xPath = Path(Point.self).x
+        let pointPath = Path(Point.self)
+        XCTAssertFalse(xPath.isAncestorOrSame(of: AnyPath(pointPath), in: point))
+    }
+
     /// Test same path in isAncestorOrSame function.
     func testIsSame() {
         let path = Path(path: \Point.x, ancestors: [AnyPath(Path(Point.self))])
