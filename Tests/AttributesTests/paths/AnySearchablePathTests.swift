@@ -71,11 +71,33 @@ final class AnySearchablePathTests: XCTestCase {
         XCTAssertTrue(mock.ancestor.verify(input: parameters, output: result))
     }
 
+    /// Test isAncestorOrSame calls the underlying paths function.
+    func testIsAncestorOrSameAny() {
+        let mock = MockCollectionSearchPath<Point, Int>()
+        let p1 = AnyPath(Path(Point.self))
+        let point = Point(x: 3, y: 4)
+        let parameters = MockCollectionSearchPath<Point, Int>.AncestorParameters(path: p1, root: point)
+        let result = AnySearchablePath(mock).isAncestorOrSame(of: p1, in: point)
+        XCTAssertTrue(result)
+        XCTAssertTrue(mock.ancestor.verify(input: parameters, output: result))
+    }
+
+    /// Test isAncestorOrSame calls the underlying paths function.
+    func testIsAncestorOrSameForSame() {
+        let mock = MockCollectionSearchPath<Point, Int>()
+        let p1 = AnyPath(Path(Point.self).x)
+        let point = Point(x: 3, y: 4)
+        let parameters = MockCollectionSearchPath<Point, Int>.AncestorParameters(path: p1, root: point)
+        let result = AnySearchablePath(mock).isAncestorOrSame(of: p1, in: point)
+        XCTAssertTrue(result)
+        XCTAssertTrue(mock.ancestor.verify(input: parameters, output: result))
+    }
+
     /// Test paths function calls the underlying path's paths function.
     func testPaths() {
         let mock = MockCollectionSearchPath<Point, Int>()
         let point = Point(x: 3, y: 4)
-        let result = mock.paths(in: point)
+        let result = AnySearchablePath(mock).paths(in: point)
         XCTAssertTrue(result.isEmpty)
         XCTAssertTrue(mock.paths.verify(input: point, output: []))
     }
