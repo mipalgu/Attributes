@@ -97,38 +97,6 @@ struct AttributablePerson: Attributable {
     /// Path to data.
     let path = EmptyModifiable.path.attributes[0].attributes["person"].wrappedValue
 
-    /// Initialise data with default values.
-    init() {
-        let personFields = [
-            Field(name: "first_name", type: .line),
-            Field(name: "last_name", type: .line),
-            Field(name: "age", type: .integer),
-            Field(name: "is_male", type: .bool)
-        ]
-        self.data = EmptyModifiable(
-            attributes: [
-                AttributeGroup(
-                    name: "Details",
-                    fields: [Field(name: "person", type: .complex(layout: personFields))],
-                    attributes: [
-                        "person": .complex(
-                            [
-                                "first_name": .line("John"),
-                                "last_name": .line("Smith"),
-                                "age": .integer(21),
-                                "is_male": .bool(true)
-                            ],
-                            layout: personFields
-                        )
-                    ],
-                    metaData: [:]
-                )
-            ],
-            metaData: [],
-            errorBag: ErrorBag()
-        )
-    }
-
     /// Initialise data from preconfigured modifiable.
     /// - Parameter data: The data.
     init(data: EmptyModifiable) {

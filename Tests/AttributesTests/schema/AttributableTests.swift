@@ -60,6 +60,13 @@ import XCTest
 /// Test class for ``Attributable`` default implementations.
 final class AttributableTests: XCTestCase {
 
+    /// The fields in the person complex attribute.
+    let personFields = [
+        Field(name: "first_name", type: .line),
+        Field(name: "last_name", type: .line),
+        Field(name: "is_male", type: .bool)
+    ]
+
     /// The persons properties.
     let properties: [SchemaAttribute] = [
         SchemaAttribute(label: "first_name", type: .line),
@@ -72,16 +79,33 @@ final class AttributableTests: XCTestCase {
     let path = Path(EmptyModifiable.self)
 
     /// The person under test.
-    var person = AttributablePerson()
+    lazy var person = AttributablePerson(
+        data: EmptyModifiable(
+            attributes: [
+                AttributeGroup(
+                    name: "Details",
+                    fields: [Field(name: "person", type: .complex(layout: personFields))],
+                    attributes: [
+                        "person": .complex(
+                            [
+                                "first_name": .line("John"),
+                                "last_name": .line("Smith"),
+                                "age": .integer(21),
+                                "is_male": .bool(true)
+                            ],
+                            layout: personFields
+                        )
+                    ],
+                    metaData: [:]
+                )
+            ],
+            metaData: [],
+            errorBag: ErrorBag()
+        )
+    )
 
     /// Initialise the person before every test.
     override func setUp() {
-        let personFields = [
-            Field(name: "first_name", type: .line),
-            Field(name: "last_name", type: .line),
-            Field(name: "age", type: .integer),
-            Field(name: "is_male", type: .bool)
-        ]
         let modifiable = EmptyModifiable(
             attributes: [
                 AttributeGroup(
@@ -233,10 +257,32 @@ final class AttributableTests: XCTestCase {
             fields,
             [
                 Field(name: "first_name", type: .line),
-                Field(name: "age", type: .integer),
                 Field(name: "is_male", type: .bool)
             ]
         )
+    }
+
+    func testWhenTrueMakeAvailable() throws {
+        let trigger = person.WhenTrue(
+            SchemaAttribute(label: "is_male", type: .bool),
+            makeAvailable: SchemaAttribute(label: "age", type: .integer)
+        )
+        XCTAssertTrue(
+            try trigger.performTrigger(
+                &person.data,
+                for: AnyPath(
+                    Path(EmptyModifiable.self)
+                        .attributes[0].attributes["person"].wrappedValue.complexValue["is_male"].wrappedValue
+                )
+            )
+            .get()
+        )
+        guard let fields = person.data.attributes.first?.attributes["person"]?.complexFields else {
+            XCTFail("Cannot get fields")
+            return
+        }
+        let expectedFields = personFields + [Field(name: "age", type: .integer)]
+        XCTAssertEqual(fields, expectedFields)
     }
 
 }
