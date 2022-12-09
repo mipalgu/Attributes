@@ -56,24 +56,66 @@
  *
  */
 
+/// A protocol for defining an ``Attributable`` that represents data using a `complex`
+/// ``Attribute``. This protocol allows a cleaner implementation by providing default
+/// paths to the respective complex data (both fields and values). To implement
+/// this protocol, the user need only provide a container that stores the data
+/// and the path to the complex attribute stored within it by setting the
+/// `path` property of the conforming type. Once these paths are set up, the user
+/// must provide the properties within the complex attribute as local properties
+/// of the conforming type using the property wrappers for the respective attributes.
+/// 
+/// Consider a `Person` whom is representeed as a *complex attribute*. A person may contain
+/// 3 properties - namely *first_name*, *last_name*, and *age*. You may conform this *Person*
+/// to this protocol by adopting the structure below.
+/// ```swift
+/// struct Person: ComplexProtocol {
+///
+///     typealias Root = EmptyModifiable 
+/// 
+///     let path = Path(EmptyModifiable.self).attributes[0].attributes["person"].wrappedValue
+/// 
+///     var data: EmptyModifiable
+/// 
+///     @LineProperty(label: "first_name")
+///     var firstName
+/// 
+///     @LineProperty(label: "last_name")
+///     var lastName
+/// 
+///     @IntegerProperty(label: "age")
+///     var age
+/// 
+/// }
+/// ```
+/// Note that the `Person` struct is using an ``EmptyModifiable`` to store it's data in the *person*
+/// attribute. Each of the properties are defined with default validation and triggers as not to complicate
+/// this small example. In summary, the struct above denotes a *Person* as a *complex attribute* that
+/// contains two line attributes (*first_name* & *last_name), and an integer attribute (*age*).
 public protocol ComplexProtocol: Attributable where AttributeRoot == Attribute {
 
+    /// All of the triggers for each attribute contained within this complex.
     var triggers: AnyTrigger<Root> { get }
 
+    /// The validators for the attributes contained within this complex.
     @ValidatorBuilder<Attribute>
     var groupValidation: AnyValidator<AttributeRoot> { get }
 
+    ///  The validator for the root object that contains the complex attribute.
     @ValidatorBuilder<Root>
     var rootValidation: AnyValidator<Root> { get }
 
 }
 
+/// Default implementations.
 public extension ComplexProtocol {
 
+    /// The path to the complex attributes fields.
     var pathToFields: Path<Attribute, [Field]> {
         Path<Attribute, Attribute>(path: \.self, ancestors: []).blockAttribute.complexFields
     }
 
+    /// The path to the complex attributes values.
     var pathToAttributes: Path<Attribute, [String: Attribute]> {
         Path<Attribute, Attribute>(path: \.self, ancestors: []).blockAttribute.complexValue
     }
