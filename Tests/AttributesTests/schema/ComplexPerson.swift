@@ -92,3 +92,20 @@ struct ComplexPerson: ComplexProtocol, Identifiable {
     let path = Path(EmptyModifiable.self).attributes[0].attributes["person"].wrappedValue
 
 }
+
+/// Equality and Hashable conformance.
+extension ComplexPerson: Equatable, Hashable {
+
+    /// Equality.
+    static func == (lhs: ComplexPerson, rhs: ComplexPerson) -> Bool {
+        lhs.id == rhs.id && lhs.properties == rhs.properties && lhs.path == rhs.path
+    }
+
+    /// Hashable.
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(properties)
+        hasher.combine(path)
+    }
+
+}
