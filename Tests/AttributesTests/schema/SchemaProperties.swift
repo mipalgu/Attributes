@@ -79,6 +79,12 @@ struct SchemaProperties: Attributable {
     @CollectionProperty(label: "collection", bools: ValidatorFactory<Bool>.required())
     var collection
 
+    @ComplexProperty(base: ComplexPerson(), label: "complex")
+    var complex
+
+    @ComplexCollectionProperty(base: ComplexPerson(), label: "complex_collection")
+    var complexCollection
+
     @EnumerableCollectionProperty(label: "enumerable_collection", validValues: ["A", "B", "C"])
     var enumerableCollection
 
@@ -105,8 +111,5 @@ struct SchemaProperties: Attributable {
 
     @TextProperty(label: "text")
     var text
-
-    @ComplexProperty(base: ComplexPerson(), label: "person")
-    var complex
 
 }

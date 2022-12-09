@@ -285,4 +285,34 @@ final class AttributableTests: XCTestCase {
         XCTAssertEqual(fields, expectedFields)
     }
 
+    /// Test properties computed property works for all attributes.
+    func testAllProperties() {
+        let properties = SchemaProperties().properties
+        let fields = [
+            Field(name: "first_name", type: .line),
+            Field(name: "last_name", type: .line),
+            Field(name: "age", type: .integer),
+            Field(name: "is_male", type: .bool)
+        ]
+        let validValues: Set<String> = ["A", "B", "C"]
+        let expected = [
+            SchemaAttribute(label: "bool", type: .bool),
+            SchemaAttribute(label: "code", type: .code(language: .swift)),
+            SchemaAttribute(label: "collection", type: .collection(type: .bool)),
+            SchemaAttribute(label: "complex", type: .complex(layout: fields)),
+            SchemaAttribute(label: "complex_collection", type: .collection(type: .complex(layout: fields))),
+            SchemaAttribute(
+                label: "enumerable_collection", type: .enumerableCollection(validValues: validValues)
+            ),
+            SchemaAttribute(label: "enumerated", type: .enumerated(validValues: validValues)),
+            SchemaAttribute(label: "expression", type: .expression(language: .swift)),
+            SchemaAttribute(label: "float", type: .float),
+            SchemaAttribute(label: "integer", type: .integer),
+            SchemaAttribute(label: "line", type: .line),
+            SchemaAttribute(label: "table", type: .table(columns: [("bool", LineAttributeType.bool)])),
+            SchemaAttribute(label: "text", type: .text)
+        ]
+        XCTAssertEqual(properties, expected)
+    }
+
 }
