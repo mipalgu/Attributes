@@ -106,4 +106,7 @@ struct SchemaProperties: Attributable {
     @TextProperty(label: "text")
     var text
 
+    @ComplexProperty(base: ComplexPerson(), label: "person")
+    var complex
+
 }
