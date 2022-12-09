@@ -146,4 +146,44 @@ final class ComplexPropertyTests: XCTestCase {
         property = ComplexProperty(base: person, label: "person")
     }
 
+    /// Test init sets stored properties correctly.
+    func testInitStoredProperties() {
+        XCTAssertEqual(property.wrappedValue, person)
+        XCTAssertEqual(property.label, "person")
+        let projectedValue = property.projectedValue
+        XCTAssertEqual(projectedValue.wrappedValue, person)
+        XCTAssertEqual(projectedValue.label, "person")
+    }
+
+    /// Test schema attribute is created correctly.
+    func testSchemaAttribute() {
+        guard let attribute = property.schemaAttribute as? SchemaAttribute else {
+            XCTFail("Failed to cast Any to SchemaAttribute.")
+            return
+        }
+        XCTAssertEqual(attribute.label, "person")
+        XCTAssertEqual(
+            attribute.type,
+            .complex(
+                layout: [
+                    Field(name: "first_name", type: .line),
+                    Field(name: "last_name", type: .line),
+                    Field(name: "age", type: .integer),
+                    Field(name: "is_male", type: .bool)
+                ]
+            )
+        )
+    }
+
+    /// Test triggers pass by default.
+    func testTriggersPassByDefault() throws {
+        guard let trigger = property.allTriggers as? AnyTrigger<EmptyModifiable> else {
+            XCTFail("Failed to get trigger.")
+            return
+        }
+        let before = data
+        XCTAssertFalse(try trigger.performTrigger(&data, for: AnyPath(Path(EmptyModifiable.self))).get())
+        XCTAssertEqual(data, before)
+    }
+
 }
