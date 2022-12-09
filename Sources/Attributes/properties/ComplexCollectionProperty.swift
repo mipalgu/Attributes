@@ -56,17 +56,29 @@
  *
  */
 
+/// Property wrapper that defines type information for a collection attribute
+/// where the elements are complex attributes. Each element within the collection
+/// must contain the same form equivalent to type information defined in an
+/// instance of ``ComplexProtocol``. This type information forms the `Base` of
+/// this property wrapper.
 @propertyWrapper
 public struct ComplexCollectionProperty<Base: ComplexProtocol> {
 
+    /// The projected value.
     public var projectedValue: ComplexCollectionProperty<Base> {
         self
     }
 
+    /// The type information for each element within the collection.
     public var wrappedValue: Base
 
+    /// The name of the collection.
     public var label: String
 
+    /// Initialise this property with the element type information and name.
+    /// - Parameters:
+    ///   - base: The type information for each element within the collection.
+    ///   - label: The name of the attribute.
     public init(base: Base, label: String) {
         self.wrappedValue = base
         self.label = label
@@ -74,17 +86,24 @@ public struct ComplexCollectionProperty<Base: ComplexProtocol> {
 
 }
 
+/// ``SchemaAttributeConvertible`` conformance.
 extension ComplexCollectionProperty: SchemaAttributeConvertible {
 
+    /// All the triggers for the collection attribute.
     var allTriggers: Any {
         wrappedValue.allTriggers
     }
 
+    /// The equivalent schema attribute for this collection of complex attributes.
     var schemaAttribute: Any {
         let fields = wrappedValue.properties.map {
             Field(name: $0.label, type: $0.type)
         }
-        return SchemaAttribute(label: label, type: .collection(type: .complex(layout: fields)), validate: AnyValidator([wrappedValue.propertiesValidator, wrappedValue.groupValidation]))
+        return SchemaAttribute(
+            label: label,
+            type: .collection(type: .complex(layout: fields)),
+            validate: AnyValidator([wrappedValue.propertiesValidator, wrappedValue.groupValidation])
+        )
     }
 
 }
