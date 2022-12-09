@@ -56,59 +56,79 @@
 
 import Attributes
 
+/// Container for testing all attribute types.
 struct SchemaProperties: Attributable {
 
-    let path = Path(EmptyModifiable.self).attributes[0].attributes["bool"].wrappedValue
-
-    let pathToFields = Path(Attribute.self).complexFields
-
-    let pathToAttributes = Path(Attribute.self).complexValue
-
+    /// No data.
     typealias Root = EmptyModifiable
 
+    /// Attribute root.
     typealias AttributeRoot = Attribute
 
+    /// Search path.
     typealias SearchPath = Path<EmptyModifiable, Attribute>
 
+    /// Mock path, not used.
+    let path = Path(EmptyModifiable.self).attributes[0].attributes["bool"].wrappedValue
+
+    /// Mock path, not used.
+    let pathToFields = Path(Attribute.self).complexFields
+
+    /// Mock path, not used.
+    let pathToAttributes = Path(Attribute.self).complexValue
+
+    /// A bool property.
     @BoolProperty(label: "bool")
     var bool
 
+    /// A code property.
     @CodeProperty(label: "code", language: .swift)
     var code
 
+    /// A collection property.
     @CollectionProperty(label: "collection", bools: ValidatorFactory<Bool>.required())
     var collection
 
+    /// A complex property.
     @ComplexProperty(base: ComplexPerson(), label: "complex")
     var complex
 
+    /// A complex collection property.
     @ComplexCollectionProperty(base: ComplexPerson(), label: "complex_collection")
     var complexCollection
 
+    /// An enumerable collection property.
     @EnumerableCollectionProperty(label: "enumerable_collection", validValues: ["A", "B", "C"])
     var enumerableCollection
 
+    /// An enumerated property.
     @EnumeratedProperty(label: "enumerated", validValues: ["A", "B", "C"])
     var enumerated
 
+    /// An expression property.
     @ExpressionProperty(label: "expression", language: .swift)
     var expression
 
+    /// A float property.
     @FloatProperty(label: "float")
     var float
 
+    /// An integer property.
     @IntegerProperty(label: "integer")
     var integer
 
+    /// A line property.
     @LineProperty(label: "line")
     var line
 
+    /// A table property.
     @TableProperty(
         label: "table",
         columns: [TableColumn.bool(label: "bool", validation: ValidatorFactory<Bool>.required())]
     )
     var table
 
+    /// A text property.
     @TextProperty(label: "text")
     var text
 
