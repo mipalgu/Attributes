@@ -56,17 +56,27 @@
  *
  */
 
+/// A property wrapper that defines type information for a complex attribute. This struct
+/// acts as a wrapper around a ``ComplexProtocol`` type that defines that type information
+/// for a complex attribute.
 @propertyWrapper
 public struct ComplexProperty<Base: ComplexProtocol> {
 
+    /// The projected value is `self`.
     public var projectedValue: ComplexProperty<Base> {
         self
     }
 
+    /// The underlying type information of the complex attribute.
     public var wrappedValue: Base
 
+    /// The name of the complex attribute.
     public var label: String
 
+    /// Initialise from the wraped value and name.
+    /// - Parameters:
+    ///   - base: The type information for the complex attribute.
+    ///   - label: The name of the complex attribute.
     public init(base: Base, label: String) {
         self.wrappedValue = base
         self.label = label
@@ -74,17 +84,24 @@ public struct ComplexProperty<Base: ComplexProtocol> {
 
 }
 
+/// ``SchemaAttributeConvertible`` conformance.
 extension ComplexProperty: SchemaAttributeConvertible {
 
+    /// The underlying triggers contained within the `wrappedValue`.
     var allTriggers: Any {
         wrappedValue.allTriggers
     }
 
+    /// The equivalent ``SchemaAttribute``.
     var schemaAttribute: Any {
         let fields = wrappedValue.properties.map {
             Field(name: $0.label, type: $0.type)
         }
-        return SchemaAttribute(label: label, type: .complex(layout: fields), validate: AnyValidator([wrappedValue.propertiesValidator, wrappedValue.groupValidation]))
+        return SchemaAttribute(
+            label: label,
+            type: .complex(layout: fields),
+            validate: AnyValidator([wrappedValue.propertiesValidator, wrappedValue.groupValidation])
+        )
     }
 
 }
