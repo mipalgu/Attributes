@@ -262,6 +262,7 @@ final class AttributableTests: XCTestCase {
         )
     }
 
+    /// Test fields become available when a bool is true.
     func testWhenTrueMakeAvailable() throws {
         let trigger = person.WhenTrue(
             SchemaAttribute(label: "is_male", type: .bool),
