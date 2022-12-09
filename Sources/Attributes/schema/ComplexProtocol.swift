@@ -75,8 +75,6 @@
 /// 
 ///     let path = Path(EmptyModifiable.self).attributes[0].attributes["person"].wrappedValue
 /// 
-///     var data: EmptyModifiable
-/// 
 ///     @LineProperty(label: "first_name")
 ///     var firstName
 /// 
