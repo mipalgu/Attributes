@@ -55,9 +55,10 @@
 // 
 
 import Attributes
+import Foundation
 
 /// A person struct represented as a Complex.
-struct ComplexPerson: ComplexProtocol {
+struct ComplexPerson: ComplexProtocol, Identifiable {
 
     /// The search path.
     typealias SearchPath = Path<EmptyModifiable, Attribute>
@@ -67,9 +68,6 @@ struct ComplexPerson: ComplexProtocol {
 
     /// The attribute root.
     typealias AttributeRoot = Attribute
-
-    /// The data for this person.
-    var data: EmptyModifiable
 
     /// The first name type information.
     @LineProperty(label: "first_name")
@@ -86,6 +84,9 @@ struct ComplexPerson: ComplexProtocol {
     /// Whether this person is male.
     @BoolProperty(label: "is_male")
     var isMale
+
+    /// The instance ID.
+    let id = UUID()
 
     /// The path to the data represented by this struct.
     let path = Path(EmptyModifiable.self).attributes[0].attributes["person"].wrappedValue

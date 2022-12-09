@@ -61,45 +61,7 @@ import XCTest
 final class ComplexTests: XCTestCase {
 
     /// The person under test.
-    let person = ComplexPerson(
-        data: EmptyModifiable(
-            attributes: [
-                AttributeGroup(
-                    name: "Details",
-                    fields: [
-                        Field(
-                            name: "person",
-                            type: .complex(
-                                layout: [
-                                    Field(name: "first_name", type: .line),
-                                    Field(name: "last_name", type: .line),
-                                    Field(name: "is_male", type: .bool)
-                                ]
-                            )
-                        )
-                    ],
-                    attributes: [
-                        "person": .complex(
-                            [
-                                "first_name": .line("John"),
-                                "last_name": .line("Smith"),
-                                "age": .integer(21),
-                                "is_male": .bool(true)
-                            ],
-                            layout: [
-                                Field(name: "first_name", type: .line),
-                                Field(name: "last_name", type: .line),
-                                Field(name: "is_male", type: .bool)
-                            ]
-                        )
-                    ],
-                    metaData: [:]
-                )
-            ],
-            metaData: [],
-            errorBag: ErrorBag()
-        )
-    )
+    let person = ComplexPerson()
 
     /// Check path to fields matches a complex attribute.
     func testPathToFields() {
