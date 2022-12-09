@@ -105,6 +105,7 @@ final class ComplexPropertyTests: XCTestCase {
     /// The property under test.
     lazy var property = ComplexProperty(base: person, label: "person")
 
+    /// Initialise data before every test.
     override func setUp() {
         data = EmptyModifiable(
             attributes: [
