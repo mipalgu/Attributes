@@ -54,10 +54,13 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
+/// Protocol for defining types that can be converted into a ``SchemaAttribute``.
 protocol SchemaAttributeConvertible {
 
+    /// The triggeres for the attribute.
     var allTriggers: Any { get }
 
+    /// The equivalent ``SchemaAttribute``.
     var schemaAttribute: Any { get }
 
 }
