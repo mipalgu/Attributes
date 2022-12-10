@@ -72,6 +72,23 @@ let package = Package(
 - ``ValidationPath``
 - ``ValidationPathProtocol``
 
+### Properties
+
+- ``BoolProperty``
+- ``CodeProperty``
+- ``CollectionProperty``
+- ``ComplexCollectionProperty``
+- ``ComplexProperty``
+- ``EnumerableCollectionProperty``
+- ``ExpressionProperty``
+- ``FloatProperty``
+- ``IntegerProperty``
+- ``LineProperty``
+- ``SchemaAttributeConvertible``
+- ``TableColumn``
+- ``TableProperty``
+- ``TextProperty``
+
 ### Triggers
 
 - ``AnyTrigger``
