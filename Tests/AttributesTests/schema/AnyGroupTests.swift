@@ -60,12 +60,36 @@ import XCTest
 /// Test class for ``AnyGroup``.
 final class AnyGroupTests: XCTestCase {
 
+    /// Test data.
+    var data = EmptyModifiable(
+        attributes: [AttributeGroup(name: "Attributes")],
+        metaData: [],
+        errorBag: ErrorBag()
+    ) { _ in
+        .success(false)
+    }
+
+    /// Path to the root.
+    let path = AnyPath(Path(EmptyModifiable.self))
+
     /// Typed group.
     var mock = MockGroup()
+
+    /// The group under test.
+    var group: AnyGroup<EmptyModifiable> {
+        AnyGroup(mock)
+    }
 
     /// Create group before every test.
     override func setUp() {
         mock = MockGroup()
+        data = EmptyModifiable(
+            attributes: [AttributeGroup(name: "Attributes")],
+            metaData: [],
+            errorBag: ErrorBag()
+        ) { _ in
+            .success(false)
+        }
     }
 
     /// Test properties are set correctly.
@@ -79,6 +103,60 @@ final class AnyGroupTests: XCTestCase {
         XCTAssertEqual(group.pathToFields, mock.pathToFields)
         XCTAssertEqual(group.pathToAttributes, mock.pathToAttributes)
         XCTAssertEqual(group.properties, mock.properties)
+    }
+
+    /// Test triggers property matches mock trigger.
+    func testTriggersMatch() throws {
+        XCTAssertFalse(try group.triggers.performTrigger(&data, for: path).get())
+        let mockTrigger = mock.mockTriggers
+        XCTAssertEqual(mockTrigger.timesCalled, 1)
+        XCTAssertEqual(mockTrigger.pathPassed, path)
+        XCTAssertEqual(mockTrigger.rootPassed, data)
+    }
+
+    /// Test allTriggers property matches mock trigger.
+    func testAllTriggersMatch() throws {
+        XCTAssertFalse(try group.allTriggers.performTrigger(&data, for: path).get())
+        let mockTrigger = mock.mockTriggers
+        XCTAssertEqual(mockTrigger.timesCalled, 1)
+        XCTAssertEqual(mockTrigger.pathPassed, path)
+        XCTAssertEqual(mockTrigger.rootPassed, data)
+    }
+
+    /// Test groupValidation matches mock validator.
+    func testGroupValidation() throws {
+        try group.groupValidation.performValidation(data.attributes[0])
+        let validator = mock.groupValidator
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, data.attributes[0])
+    }
+
+    /// Test rootValidation matches mock validator.
+    func testRootValidation() throws {
+        try group.rootValidation.performValidation(data)
+        let validator = mock.rootValidator
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, data)
+    }
+
+    /// Test propertiesValidator matches mock validator.
+    func testPropertyValidator() throws {
+        try group.propertiesValidator.performValidation(data.attributes[0])
+        let validator = mock.propertyValidator
+        XCTAssertEqual(validator.timesCalled, 1)
+        XCTAssertEqual(validator.lastParameter, data.attributes[0])
+    }
+
+    /// Test path access correct member.
+    func testPathAccessesSameMember() {
+        let paths = group.path.paths(in: data)
+        XCTAssertEqual(paths.count, 1)
+        guard let groupPath = paths.first else {
+            XCTFail("failed to get path.")
+            return
+        }
+        let member = data[keyPath: groupPath.keyPath]
+        XCTAssertEqual(member, data.attributes[0])
     }
 
 }

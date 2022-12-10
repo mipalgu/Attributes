@@ -55,10 +55,9 @@
 // 
 
 import Attributes
-import Foundation
 
 /// A struct for a mock group.
-struct MockGroup: GroupProtocol, Identifiable {
+class MockGroup: GroupProtocol, Identifiable {
 
     /// Root is an ``EmptyModifiable``.
     typealias Root = EmptyModifiable
@@ -69,14 +68,24 @@ struct MockGroup: GroupProtocol, Identifiable {
     /// Search path.
     typealias SearchPath = Path<EmptyModifiable, AttributeGroup>
 
-    /// The instance ID.
-    let id = UUID()
-
     /// Path to first attribute group.
     let path = Path(EmptyModifiable.self).attributes[0]
 
     /// Mock triggers.
-    let triggers = MockTrigger<EmptyModifiable>()
+    let mockTriggers = MockTrigger<EmptyModifiable>()
+
+    /// The triggers.
+    var triggers: AnyTrigger<EmptyModifiable> {
+        AnyTrigger(mockTriggers)
+    }
+
+    /// The mock validator for the properties.
+    let propertyValidator = NullValidator<AttributeGroup>()
+
+    /// The Type-erased properties validator.
+    var propertiesValidator: AnyValidator<AttributeGroup> {
+        AnyValidator(propertyValidator)
+    }
 
     /// Mock group validator.
     let groupValidator = NullValidator<AttributeGroup>()
@@ -101,7 +110,7 @@ extension MockGroup: Equatable {
 
     /// Equality implementation.
     static func == (lhs: MockGroup, rhs: MockGroup) -> Bool {
-        lhs.id == rhs.id && lhs.path == rhs.path && lhs.properties == rhs.properties
+        lhs === rhs
     }
 
 }
