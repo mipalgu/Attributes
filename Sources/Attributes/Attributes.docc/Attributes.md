@@ -80,6 +80,7 @@ let package = Package(
 - ``ComplexCollectionProperty``
 - ``ComplexProperty``
 - ``EnumerableCollectionProperty``
+- ``EnumeratedProperty``
 - ``ExpressionProperty``
 - ``FloatProperty``
 - ``IntegerProperty``
