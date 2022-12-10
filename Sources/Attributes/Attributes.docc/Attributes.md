@@ -45,6 +45,10 @@ let package = Package(
 
 ## Topics
 
+### Essentials
+
+- <doc:GettingStarted>
+
 ### Attributes
 - ``Attribute``
 - ``AttributeType``
