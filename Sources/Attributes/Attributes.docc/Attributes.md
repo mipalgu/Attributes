@@ -48,6 +48,7 @@ let package = Package(
 ### Essentials
 
 - <doc:GettingStarted>
+- <doc:AttributeTypes>
 
 ### Attributes
 - ``Attribute``
