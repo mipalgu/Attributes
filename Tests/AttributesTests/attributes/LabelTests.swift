@@ -66,4 +66,10 @@ final class LabelTests: XCTestCase {
         XCTAssertEqual(label.pretty, "Hello World")
     }
 
+    /// Test pretty for empty string.
+    func testPrettyEmpty() {
+        let label: Label = ""
+        XCTAssertEqual(label.pretty, "")
+    }
+
 }
