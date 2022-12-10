@@ -7,42 +7,6 @@
             "program": "${workspaceFolder:Attributes}/.build/debug/AttributesPackageTests.xctest",
             "cwd": "${workspaceFolder:Attributes}",
             "preLaunchTask": "swift: Build All"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug Attributes",
-            "program": "${workspaceFolder:Attributes}/.build/debug/gimp-client",
-            "args": [],
-            "cwd": "${workspaceFolder:Attributes}",
-            "preLaunchTask": "swift: Build Debug Run"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Release Attributes",
-            "program": "${workspaceFolder:Attributes}/.build/release/gimp-client",
-            "args": [],
-            "cwd": "${workspaceFolder:Attributes}",
-            "preLaunchTask": "swift: Build Release Run"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug Run",
-            "program": "${workspaceFolder:Attributes}/.build/debug/Run",
-            "args": [],
-            "cwd": "${workspaceFolder:Attributes}",
-            "preLaunchTask": "swift: Build Debug Run"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Release Run",
-            "program": "${workspaceFolder:Attributes}/.build/release/Run",
-            "args": [],
-            "cwd": "${workspaceFolder:Attributes}",
-            "preLaunchTask": "swift: Build Release Run"
         }
     ]
 }
