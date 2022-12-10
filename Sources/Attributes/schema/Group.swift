@@ -56,23 +56,31 @@
  *
  */
 
+/// A protocol for converting to a type-erased group.
 protocol ConvertibleToGroup {
 
+    /// The type-erased group equivalent.
     var anyGroup: Any { get }
 
 }
 
+/// A property wrapper for defining groups of attributes.
 @propertyWrapper
 public struct Group<GroupType: GroupProtocol>: ConvertibleToGroup {
 
+    /// The projected value.
     public var projectedValue: Group<GroupType> { self }
 
+    /// The underlying group.
     public var wrappedValue: GroupType
 
+    /// A type-erased group.
     public var anyGroup: Any {
-        return AnyGroup<GroupType.Root>(wrappedValue)
+        AnyGroup<GroupType.Root>(wrappedValue)
     }
 
+    /// Initialise this property wrapper from the underlying type.
+    /// - Parameter group: The underlying group.
     public init(wrappedValue group: GroupType) {
         self.wrappedValue = group
     }
