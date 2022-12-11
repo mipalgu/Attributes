@@ -199,7 +199,7 @@ final class AttributableTests: XCTestCase {
     func testPathReturnsCorrectSearchablePath() {
         let path = person.path(for: SchemaAttribute(label: "first_name", type: .line))
         let expected = Path(EmptyModifiable.self)
-            .attributes[0].attributes["person"].wrappedValue.complexValue["first_name"].wrappedValue
+            .attributes[0].attributes["person"].wrappedValue.blockAttribute.complexValue["first_name"].wrappedValue
         XCTAssertTrue(path.isAncestorOrSame(of: AnyPath(expected), in: person.data))
         let paths = path.paths(in: person.data)
         XCTAssertEqual(paths.count, 1)
@@ -216,7 +216,7 @@ final class AttributableTests: XCTestCase {
     func testFindProperty() {
         let path = AnyPath(
             Path(EmptyModifiable.self)
-                .attributes[0].attributes["person"].wrappedValue.complexValue["first_name"].wrappedValue
+                .attributes[0].attributes["person"].wrappedValue.blockAttribute.complexValue["first_name"].wrappedValue
         )
         let property = person.findProperty(path: path, in: person.data)
         XCTAssertEqual(property, SchemaAttribute(label: "first_name", type: .line))
@@ -226,7 +226,7 @@ final class AttributableTests: XCTestCase {
     func testFindPropertyReturnsNil() {
         let path = AnyPath(
             Path(EmptyModifiable.self)
-                .attributes[0].attributes["person"].wrappedValue.complexValue["unknown"].wrappedValue
+                .attributes[0].attributes["person"].wrappedValue.blockAttribute.complexValue["unknown"].wrappedValue
         )
         XCTAssertNil(person.findProperty(path: path, in: person.data))
     }
@@ -273,7 +273,7 @@ final class AttributableTests: XCTestCase {
                 &person.data,
                 for: AnyPath(
                     Path(EmptyModifiable.self)
-                        .attributes[0].attributes["person"].wrappedValue.complexValue["is_male"].wrappedValue
+                        .attributes[0].attributes["person"].wrappedValue.blockAttribute.complexValue["is_male"].wrappedValue
                 )
             )
             .get()
