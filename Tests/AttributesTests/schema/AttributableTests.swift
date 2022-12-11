@@ -75,7 +75,11 @@ final class AttributableTests: XCTestCase {
         SchemaAttribute(label: "first_name", type: .line),
         SchemaAttribute(label: "last_name", type: .line),
         SchemaAttribute(label: "age", type: .integer),
-        SchemaAttribute(label: "is_male", type: .bool)
+        SchemaAttribute(label: "is_male", type: .bool),
+        SchemaAttribute(
+            label: "friends",
+            type: .table(columns: [("first_name", .line), ("last_name", .line)])
+        )
     ]
 
     /// Path from the data.
@@ -94,7 +98,11 @@ final class AttributableTests: XCTestCase {
                                 "first_name": .line("John"),
                                 "last_name": .line("Smith"),
                                 "age": .integer(21),
-                                "is_male": .bool(true)
+                                "is_male": .bool(true),
+                                "friends": .table(
+                                    [[.line("Jane"), .line("Smith")]],
+                                    columns: [("first_name", .line), ("last_name", .line)]
+                                )
                             ],
                             layout: personFields
                         )
@@ -120,7 +128,11 @@ final class AttributableTests: XCTestCase {
                                 "first_name": .line("John"),
                                 "last_name": .line("Smith"),
                                 "age": .integer(21),
-                                "is_male": .bool(true)
+                                "is_male": .bool(true),
+                                "friends": .table(
+                                    [[.line("Jane"), .line("Smith")]],
+                                    columns: [("first_name", .line), ("last_name", .line)]
+                                )
                             ],
                             layout: personFields
                         )

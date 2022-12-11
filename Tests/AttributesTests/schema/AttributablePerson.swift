@@ -94,6 +94,16 @@ struct AttributablePerson: Attributable {
     @BoolProperty(label: "is_male")
     var isMale
 
+    /// This persons friends.
+    @TableProperty(
+        label: "friends",
+        columns: [
+            TableColumn.line(label: "first_name", validation: ValidatorFactory.required()),
+            TableColumn.line(label: "last_name", validation: ValidatorFactory.required())
+        ]
+    )
+    var friends
+
     /// Path to data.
     let path = EmptyModifiable.path.attributes[0].attributes["person"].wrappedValue
 
