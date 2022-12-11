@@ -413,14 +413,21 @@ final class AttributableTriggerTests: XCTestCase {
         XCTAssertEqual(person.data.attributes.first?.attributes["person"]?.complexFields, personFields)
     }
 
-    // /// Test whenChanged function for table.
-    // func testWhenChangedTable() throws {
-    //     let path = Path([LineAttribute].self)
-    //     let mockTrigger = MockTrigger<EmptyModifiable>()
-    //     let dataPath = Path(EmptyModifiable.self).attributes[0].attributes["person"].wrappedValue.complexValue[4].tableValues[0]
-    //     let trigger = person.WhenChanged(path, in: SchemaAttribute(label: "friends", type: .table(columns: [("first_name", .line), ("last_name", .line)]))) {
-    //         mockTrigger.performTrigger(&$0, for: path.toNewRoot(path: dataPath))
-    //     }
-    // }
+    /// Test whenChanged function for table.
+    func testWhenChangedTable() throws {
+        let path = Path([LineAttribute].self)
+        let trigger = person.WhenChanged(
+            path,
+            in: SchemaAttribute(
+                label: "friends",
+                type: .table(columns: [("first_name", .line), ("last_name", .line)])
+            )
+        ) { _ in
+            .success(false)
+        }
+        XCTAssertFalse(
+            try trigger.performTrigger(&person.data, for: AnyPath(Path(EmptyModifiable.self))).get()
+        )
+    }
 
 }
