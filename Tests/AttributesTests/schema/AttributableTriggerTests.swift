@@ -416,6 +416,15 @@ final class AttributableTriggerTests: XCTestCase {
     /// Test whenChanged function for table.
     func testWhenChangedTable() throws {
         let path = Path([LineAttribute].self)
+        let dataPath: Path<EmptyModifiable, [LineAttribute]> = Path(EmptyModifiable.self)
+            .attributes[0]
+            .attributes["person"]
+            .wrappedValue
+            .blockAttribute
+            .complexValue["friends"]
+            .wrappedValue
+            .blockAttribute
+            .tableValue[0]
         let trigger = person.WhenChanged(
             path,
             in: SchemaAttribute(
@@ -423,10 +432,26 @@ final class AttributableTriggerTests: XCTestCase {
                 type: .table(columns: [("first_name", .line), ("last_name", .line)])
             )
         ) { _ in
-            .success(false)
+            .success(true)
         }
         XCTAssertFalse(
-            try trigger.performTrigger(&person.data, for: AnyPath(Path(EmptyModifiable.self))).get()
+            try trigger.performTrigger(&person.data, for: AnyPath(dataPath)).get()
+        )
+        let columns: [(String, LineAttributeType)] = [("first_name", .line), ("last_name", .line)]
+        let newTable = Attribute.table(
+            [[.line("New"), .line("Person")]], columns: columns
+        )
+        guard var complexValues = person.data.attributes[0].attributes["person"]?.complexValue else {
+            XCTFail("No complex values!")
+            return
+        }
+        complexValues["friends"] = newTable
+        person.data.attributes[0].attributes["person"] = .complex(
+            complexValues,
+            layout: personFields + [Field(name: "friends", type: .table(columns: columns))]
+        )
+        XCTAssertTrue(
+            try trigger.performTrigger(&person.data, for: AnyPath(dataPath)).get()
         )
     }
 
