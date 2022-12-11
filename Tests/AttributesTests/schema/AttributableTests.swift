@@ -194,7 +194,12 @@ final class AttributableTests: XCTestCase {
     func testPathReturnsCorrectSearchablePath() {
         let path = person.path(for: SchemaAttribute(label: "first_name", type: .line))
         let expected = Path(EmptyModifiable.self)
-            .attributes[0].attributes["person"].wrappedValue.blockAttribute.complexValue["first_name"].wrappedValue
+            .attributes[0]
+            .attributes["person"]
+            .wrappedValue
+            .blockAttribute
+            .complexValue["first_name"]
+            .wrappedValue
         XCTAssertTrue(path.isAncestorOrSame(of: AnyPath(expected), in: person.data))
         let paths = path.paths(in: person.data)
         XCTAssertEqual(paths.count, 1)
@@ -211,7 +216,12 @@ final class AttributableTests: XCTestCase {
     func testFindProperty() {
         let path = AnyPath(
             Path(EmptyModifiable.self)
-                .attributes[0].attributes["person"].wrappedValue.blockAttribute.complexValue["first_name"].wrappedValue
+                .attributes[0]
+                .attributes["person"]
+                .wrappedValue
+                .blockAttribute
+                .complexValue["first_name"]
+                .wrappedValue
         )
         let property = person.findProperty(path: path, in: person.data)
         XCTAssertEqual(property, SchemaAttribute(label: "first_name", type: .line))
@@ -221,7 +231,12 @@ final class AttributableTests: XCTestCase {
     func testFindPropertyReturnsNil() {
         let path = AnyPath(
             Path(EmptyModifiable.self)
-                .attributes[0].attributes["person"].wrappedValue.blockAttribute.complexValue["unknown"].wrappedValue
+                .attributes[0]
+                .attributes["person"]
+                .wrappedValue
+                .blockAttribute
+                .complexValue["unknown"]
+                .wrappedValue
         )
         XCTAssertNil(person.findProperty(path: path, in: person.data))
     }
@@ -268,7 +283,12 @@ final class AttributableTests: XCTestCase {
                 &person.data,
                 for: AnyPath(
                     Path(EmptyModifiable.self)
-                        .attributes[0].attributes["person"].wrappedValue.blockAttribute.complexValue["is_male"].wrappedValue
+                        .attributes[0]
+                        .attributes["person"]
+                        .wrappedValue
+                        .blockAttribute
+                        .complexValue["is_male"]
+                        .wrappedValue
                 )
             )
             .get()
@@ -278,6 +298,130 @@ final class AttributableTests: XCTestCase {
             return
         }
         let expectedFields = [Field(name: "age", type: .integer)] + personFields
+        XCTAssertEqual(fields, expectedFields)
+    }
+
+    /// Checks whether the WhenTrue trigger works when a false value is present.
+    func testWhenTrueMakeAvailableWithFalseValue() throws {
+        let trigger = person.WhenTrue(
+            SchemaAttribute(label: "is_male", type: .bool),
+            makeAvailable: SchemaAttribute(label: "age", type: .integer)
+        )
+        guard var attribute = person.data.attributes[0].attributes["person"]?.complexValue else {
+            XCTFail("Cannot get attribute.")
+            return
+        }
+        attribute["is_male"] = .bool(false)
+        person.data.attributes[0].attributes["person"] = .complex(attribute, layout: personFields)
+        XCTAssertFalse(
+            try trigger.performTrigger(
+                &person.data,
+                for: AnyPath(
+                    Path(EmptyModifiable.self)
+                        .attributes[0]
+                        .attributes["person"]
+                        .wrappedValue
+                        .blockAttribute
+                        .complexValue["is_male"]
+                        .wrappedValue
+                )
+            )
+            .get()
+        )
+        XCTAssertEqual(person.data.attributes.first?.attributes["person"]?.complexValue, attribute)
+        XCTAssertEqual(person.data.attributes.first?.attributes["person"]?.complexFields, personFields)
+    }
+
+    /// Test fields become available when a bool is false.
+    func testWhenFalseMakeAvailable() throws {
+        let trigger = person.WhenFalse(
+            SchemaAttribute(label: "is_male", type: .bool),
+            makeAvailable: SchemaAttribute(label: "age", type: .integer)
+        )
+        guard var attribute = person.data.attributes[0].attributes["person"]?.complexValue else {
+            XCTFail("Cannot get attribute.")
+            return
+        }
+        attribute["is_male"] = .bool(false)
+        person.data.attributes[0].attributes["person"] = .complex(attribute, layout: personFields)
+        XCTAssertTrue(
+            try trigger.performTrigger(
+                &person.data,
+                for: AnyPath(
+                    Path(EmptyModifiable.self)
+                        .attributes[0]
+                        .attributes["person"]
+                        .wrappedValue
+                        .blockAttribute
+                        .complexValue["is_male"]
+                        .wrappedValue
+                )
+            )
+            .get()
+        )
+        guard let fields = person.data.attributes.first?.attributes["person"]?.complexFields else {
+            XCTFail("Cannot get fields")
+            return
+        }
+        let expectedFields = [Field(name: "age", type: .integer)] + personFields
+        XCTAssertEqual(fields, expectedFields)
+    }
+
+    /// Checks whether the WhenFalse trigger works when a true value is present.
+    func testWhenFalseMakeAvailableWithTrueValue() throws {
+        let trigger = person.WhenFalse(
+            SchemaAttribute(label: "is_male", type: .bool),
+            makeAvailable: SchemaAttribute(label: "age", type: .integer)
+        )
+        guard let attribute = person.data.attributes[0].attributes["person"]?.complexValue else {
+            XCTFail("Cannot get attribute.")
+            return
+        }
+        XCTAssertFalse(
+            try trigger.performTrigger(
+                &person.data,
+                for: AnyPath(
+                    Path(EmptyModifiable.self)
+                        .attributes[0]
+                        .attributes["person"]
+                        .wrappedValue
+                        .blockAttribute
+                        .complexValue["is_male"]
+                        .wrappedValue
+                )
+            )
+            .get()
+        )
+        XCTAssertEqual(person.data.attributes.first?.attributes["person"]?.complexValue, attribute)
+        XCTAssertEqual(person.data.attributes.first?.attributes["person"]?.complexFields, personFields)
+    }
+
+    /// Test fields become unavailable when a bool is true.
+    func testWhenTrueMakeUnavailable() throws {
+        let trigger = person.WhenTrue(
+            SchemaAttribute(label: "is_male", type: .bool),
+            makeUnavailable: SchemaAttribute(label: "first_name", type: .line)
+        )
+        XCTAssertTrue(
+            try trigger.performTrigger(
+                &person.data,
+                for: AnyPath(
+                    Path(EmptyModifiable.self)
+                        .attributes[0]
+                        .attributes["person"]
+                        .wrappedValue
+                        .blockAttribute
+                        .complexValue["is_male"]
+                        .wrappedValue
+                )
+            )
+            .get()
+        )
+        guard let fields = person.data.attributes.first?.attributes["person"]?.complexFields else {
+            XCTFail("Cannot get fields")
+            return
+        }
+        let expectedFields = [Field(name: "last_name", type: .line), Field(name: "is_male", type: .bool)]
         XCTAssertEqual(fields, expectedFields)
     }
 
