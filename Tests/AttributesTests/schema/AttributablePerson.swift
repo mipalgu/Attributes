@@ -142,7 +142,7 @@ extension AttributablePerson: Equatable, Hashable {
 
     /// Equality
     static func == (lhs: AttributablePerson, rhs: AttributablePerson) -> Bool {
-        lhs.properties == rhs.properties && lhs.data == rhs.data && lhs.available == rhs.available &&
+        lhs.properties == rhs.properties && lhs.data == rhs.data &&
             lhs.path == rhs.path && lhs.pathToAttributes == rhs.pathToAttributes &&
             lhs.pathToFields == rhs.pathToFields
     }
@@ -150,7 +150,6 @@ extension AttributablePerson: Equatable, Hashable {
     /// Hashable.
     public func hash(into hasher: inout Hasher) {
         hasher.combine(self.properties)
-        hasher.combine(self.available)
         hasher.combine(self.data)
         hasher.combine(self.path)
         hasher.combine(self.pathToAttributes)

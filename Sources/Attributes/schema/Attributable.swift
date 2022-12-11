@@ -69,8 +69,6 @@ public protocol Attributable {
 
     var pathToAttributes: Path<AttributeRoot, [String: Attribute]> { get }
 
-    var available: Set<String> { get }
-
     var properties: [SchemaAttribute] { get }
 
     var propertiesValidator: AnyValidator<AttributeRoot> { get }
@@ -92,10 +90,6 @@ public extension Attributable {
 
     typealias ComplexProperty<Base> = Attributes.ComplexProperty<Base> where
         Base: ComplexProtocol, Base.Root == AttributeRoot
-
-    var available: Set<String> {
-        Set(properties.map(\.label))
-    }
 
     var triggers: AnyTrigger<Root> {
         AnyTrigger<Root>()
@@ -161,13 +155,9 @@ public extension Attributable {
         }
     }
 
-    var propertiesValidator: AnyValidator<AttributeRoot>  {
-        let available = self.available
+    var propertiesValidator: AnyValidator<AttributeRoot> {
         let propertyValidators: [AnyValidator<AttributeRoot>] = properties.compactMap {
-            if !available.contains($0.label) {
-                return nil
-            }
-            return $0.validate.toNewRoot(path: pathToAttributes[$0.label].wrappedValue)
+            $0.validate.toNewRoot(path: pathToAttributes[$0.label].wrappedValue)
         }
         return AnyValidator(propertyValidators)
     }

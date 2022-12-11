@@ -146,11 +146,6 @@ final class AttributableTests: XCTestCase {
         }
     }
 
-    /// Test available getter matches expected.
-    func testAvailable() {
-        XCTAssertEqual(person.available, Set(properties.map(\.label)))
-    }
-
     /// Test default trigger performs no function.
     func testNullTriggerByDefault() throws {
         let before = person
