@@ -282,7 +282,7 @@ final class AttributableTests: XCTestCase {
             XCTFail("Cannot get fields")
             return
         }
-        let expectedFields = personFields + [Field(name: "age", type: .integer)]
+        let expectedFields = [Field(name: "age", type: .integer)] + personFields
         XCTAssertEqual(fields, expectedFields)
     }
 
