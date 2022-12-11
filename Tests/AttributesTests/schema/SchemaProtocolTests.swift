@@ -60,12 +60,129 @@ import XCTest
 /// Test class for ``SchemaProtocol`` default implementations.
 final class SchemaProtocolTests: XCTestCase {
 
+    /// The fields in the person complex attribute.
+    let personFields = [
+        Field(name: "first_name", type: .line),
+        Field(name: "last_name", type: .line),
+        Field(name: "age", type: .integer),
+        Field(name: "is_male", type: .bool),
+        Field(name: "friends", type: .table(columns: [("first_name", .line), ("last_name", .line)]))
+    ]
+
+    /// Test data.
+    lazy var data = EmptyModifiable(
+        attributes: [
+            AttributeGroup(
+                name: "Details",
+                fields: [Field(name: "person", type: .complex(layout: personFields))],
+                attributes: [
+                    "person": .complex(
+                        [
+                            "first_name": .line("John"),
+                            "last_name": .line("Smith"),
+                            "age": .integer(21),
+                            "is_male": .bool(true),
+                            "friends": .table(
+                                [[.line("Jane"), .line("Smith")]],
+                                columns: [("first_name", .line), ("last_name", .line)]
+                            )
+                        ],
+                        layout: personFields
+                    )
+                ],
+                metaData: [:]
+            )
+        ],
+        metaData: [],
+        errorBag: ErrorBag()
+    )
+
     /// The schema under test.
     var schema = TestSchema()
 
     /// Reset schema before every test.
     override func setUp() {
+        data = EmptyModifiable(
+            attributes: [
+                AttributeGroup(
+                    name: "Details",
+                    fields: [Field(name: "person", type: .complex(layout: personFields))],
+                    attributes: [
+                        "person": .complex(
+                            [
+                                "first_name": .line("John"),
+                                "last_name": .line("Smith"),
+                                "age": .integer(21),
+                                "is_male": .bool(true),
+                                "friends": .table(
+                                    [[.line("Jane"), .line("Smith")]],
+                                    columns: [("first_name", .line), ("last_name", .line)]
+                                )
+                            ],
+                            layout: personFields
+                        )
+                    ],
+                    metaData: [:]
+                ),
+                AttributeGroup(name: "Group 2")
+            ],
+            metaData: [],
+            errorBag: ErrorBag()
+        )
         schema = TestSchema()
+    }
+
+    /// Test groups gets property groups correctly.
+    func testGroups() {
+        let groups = schema.groups.compactMap {
+            $0.base as? MockGroup
+        }
+        let expected = [schema.mock1, schema.mock2]
+        XCTAssertEqual(groups, expected)
+    }
+
+    /// Test trigger gets triggers in groups.
+    func testTrigger() throws {
+        let path = AnyPath(Path(EmptyModifiable.self))
+        XCTAssertFalse(try schema.trigger.performTrigger(&data, for: path).get())
+        let trigger1 = schema.mock1.mockTriggers
+        let trigger2 = schema.mock2.mockTriggers
+        XCTAssertEqual(trigger1.timesCalled, 1)
+        XCTAssertEqual(trigger2.timesCalled, 1)
+        XCTAssertEqual(trigger1.pathPassed, path)
+        XCTAssertEqual(trigger2.pathPassed, path)
+        XCTAssertEqual(trigger1.rootPassed, data)
+        XCTAssertEqual(trigger2.rootPassed, data)
+    }
+
+    // /// Test find property retrieves correct property for path.
+    // func testFindProperty() {
+    //     let path: Path<EmptyModifiable, Attribute> = Path(EmptyModifiable.self)
+    //         .attributes[0]
+    //         .attributes["person"]
+    //         .wrappedValue
+    //         .blockAttribute
+    //         .complexValue["first_name"]
+    //         .wrappedValue
+    //     let property = schema.findProperty(path: path, in: data)
+    //     XCTAssertEqual(property, SchemaAttribute(label: "first_name", type: .line))
+    // }
+
+    /// Test makeValidator uses all validators within all groups.
+    func testMakeValidator() throws {
+        let validator = schema.makeValidator(root: data)
+        try validator.performValidation(data)
+        [schema.mock1, schema.mock2].enumerated().forEach {
+            let groupValidator = $1.groupValidator
+            let rootValidator = $1.rootValidator
+            let propertyValidator = $1.propertyValidator
+            XCTAssertEqual(groupValidator.timesCalled, 1)
+            XCTAssertEqual(groupValidator.lastParameter, data.attributes[$0])
+            XCTAssertEqual(rootValidator.timesCalled, 1)
+            XCTAssertEqual(rootValidator.lastParameter, data)
+            XCTAssertEqual(propertyValidator.timesCalled, 1)
+            XCTAssertEqual(propertyValidator.lastParameter, data.attributes[$0])
+        }
     }
 
 }

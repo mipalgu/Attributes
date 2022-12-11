@@ -70,4 +70,7 @@ struct TestSchema: SchemaProtocol {
     @Group
     var mock2 = MockGroup()
 
+    /// Fake data to create null test point when using reflection.
+    let null = 0
+
 }
