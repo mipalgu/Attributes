@@ -65,7 +65,7 @@ public typealias Label = String
 extension Label {
 
     /// Make the `pretty` version of Label.
-    public var pretty: String {
+    @inlinable public var pretty: String {
         let str = self.replacingOccurrences(of: "_", with: " ")
         let words = str.components(separatedBy: " ")
         return words.map {

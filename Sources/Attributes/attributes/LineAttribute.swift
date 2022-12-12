@@ -86,7 +86,7 @@ public enum LineAttribute: Hashable, Identifiable {
     }
 
     /// The equivalent LineAttributeType for self.
-    public var type: LineAttributeType {
+    @inlinable public var type: LineAttributeType {
         switch self {
         case .bool:
             return .bool
@@ -105,7 +105,7 @@ public enum LineAttribute: Hashable, Identifiable {
 
     /// The Bool value of self.
     /// - Warning: This creates a runtime error when self != .bool.
-    public var boolValue: Bool {
+    @inlinable public var boolValue: Bool {
         get {
             switch self {
             case .bool(let value):
@@ -128,7 +128,7 @@ public enum LineAttribute: Hashable, Identifiable {
 
     /// The integer value of self.
     /// - Warning: This creates a runtime error when self != .integer.
-    public var integerValue: Int {
+    @inlinable public var integerValue: Int {
         get {
             switch self {
             case .integer(let value):
@@ -156,7 +156,7 @@ public enum LineAttribute: Hashable, Identifiable {
 
     /// The Double value of self.
     /// - Warning: This creates a runtime error when self != .float.
-    public var floatValue: Double {
+    @inlinable public var floatValue: Double {
         get {
             switch self {
             case .float(let value):
@@ -181,7 +181,7 @@ public enum LineAttribute: Hashable, Identifiable {
 
     /// The Expression value of self.
     /// - Warning: This creates a runtime error when self != .expression.
-    public var expressionValue: Expression {
+    @inlinable public var expressionValue: Expression {
         get {
             switch self {
             case .expression(let value, _):
@@ -212,7 +212,7 @@ public enum LineAttribute: Hashable, Identifiable {
 
     /// The Enumerated String value of self.
     /// - Warning: This creates a runtime error when self != .enumerated.
-    public var enumeratedValue: String {
+    @inlinable public var enumeratedValue: String {
         get {
             switch self {
             case .enumerated(let value, _):
@@ -243,7 +243,7 @@ public enum LineAttribute: Hashable, Identifiable {
 
     /// The Enumerated valid values Set<String> value of self.
     /// - Warning: This creates a runtime error when self != .enumerated.
-    public var enumeratedValidValues: Set<String> {
+    @inlinable public var enumeratedValidValues: Set<String> {
         get {
             switch self {
             case .enumerated(_, let validValues):
@@ -274,7 +274,7 @@ public enum LineAttribute: Hashable, Identifiable {
 
     /// The String value of self.
     /// - Warning: This creates a runtime error when self != .line.
-    public var lineValue: String {
+    @inlinable public var lineValue: String {
         get {
             switch self {
             case .line(let value):
@@ -298,7 +298,7 @@ public enum LineAttribute: Hashable, Identifiable {
     }
 
     /// A string representation of self.
-    public var strValue: String {
+    @inlinable public var strValue: String {
         switch self {
         case .bool(let value):
             return String(describing: value)
@@ -320,6 +320,7 @@ public enum LineAttribute: Hashable, Identifiable {
     /// - Parameters:
     ///   - type: The type of the attribute.
     ///   - value: The value of the attribute.
+    @inlinable
     public init?(type: LineAttributeType, value: String) {
         switch type {
         case .bool:
@@ -355,7 +356,7 @@ public enum LineAttribute: Hashable, Identifiable {
 extension LineAttribute: XMIConvertible {
 
     /// The XMI name of this attribute.
-    public var xmiName: String? {
+    @inlinable public var xmiName: String? {
         switch self {
         case .bool:
             return "BoolAttribute"
