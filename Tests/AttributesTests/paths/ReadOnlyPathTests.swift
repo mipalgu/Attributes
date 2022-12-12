@@ -212,4 +212,24 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertEqual(values.count, 1)
     }
 
+    /// Test path init.
+    func testPathInit() {
+        let path = Path(Point.self).x
+        let readPath = ReadOnlyPath(path: path)
+        XCTAssertEqual(path.keyPath, readPath.keyPath)
+        XCTAssertEqual(path.ancestors, readPath.ancestors)
+        XCTAssertFalse(readPath.isNil(point))
+    }
+
+    /// Test copied isNil function still works.
+    func testPathInitOptionalValue() {
+        let path = Path(OptionalPoint.self).x
+        let readPath = ReadOnlyPath(path: path)
+        XCTAssertEqual(path.keyPath, readPath.keyPath)
+        XCTAssertEqual(path.ancestors, readPath.ancestors)
+        XCTAssertTrue(readPath.isNil(optionalPoint))
+        let point2 = OptionalPoint(x: 5, y: 6)
+        XCTAssertFalse(readPath.isNil(point2))
+    }
+
 }

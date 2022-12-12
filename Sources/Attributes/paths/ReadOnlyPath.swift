@@ -112,6 +112,13 @@ public struct ReadOnlyPath<Root, Value>: ReadOnlyPathProtocol {
         }
     }
 
+    /// Create a read only path from a ``PathProtocol`` implementation. This initialiser turns
+    /// a mutable path into one that is non-mutable.
+    /// - Parameter path: The path to convert.
+    public init<P>(path: P) where P: PathProtocol, P.Root == Root, P.Value == Value {
+        self.init(keyPath: path.keyPath, ancestors: path.ancestors, isNil: path.isNil)
+    }
+
     /// Check whether the value pointed to by this path is nil in a given root object.
     /// - Parameter root: The root that contains the value.
     /// - Returns: Whether value is nil in root.
