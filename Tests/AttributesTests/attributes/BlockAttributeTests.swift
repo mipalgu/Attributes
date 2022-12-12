@@ -57,6 +57,8 @@
 @testable import Attributes
 import XCTest
 
+// swiftlint:disable type_body_length
+
 /// Test class for BlockAttribute.
 final class BlockAttributeTests: XCTestCase {
 
@@ -401,3 +403,5 @@ final class BlockAttributeTests: XCTestCase {
     }
 
 }
+
+// swiftlint:enable type_body_length

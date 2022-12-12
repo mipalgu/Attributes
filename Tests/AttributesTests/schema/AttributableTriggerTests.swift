@@ -57,6 +57,8 @@
 @testable import Attributes
 import XCTest
 
+// swiftlint:disable type_body_length
+
 /// Test class for ``Attributable`` trigger functions.
 final class AttributableTriggerTests: XCTestCase {
 
@@ -439,3 +441,5 @@ final class AttributableTriggerTests: XCTestCase {
     }
 
 }
+
+// swiftlint:enable type_body_length

@@ -56,6 +56,8 @@
  *
  */
 
+// swiftlint:disable type_body_length
+
 /// A `resultBuilder` for defining multiple validators.
 @resultBuilder
 public struct ValidatorBuilder<Root> {
@@ -418,3 +420,5 @@ public struct ValidatorBuilder<Root> {
     }
 
 }
+
+// swiftlint:enable type_body_length

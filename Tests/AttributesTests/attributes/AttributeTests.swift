@@ -281,6 +281,8 @@ final class AttributeTests: XCTestCase {
         )
     }
 
+    // swiftlint:disable function_body_length
+
     /// Test complex collection static functions.
     func testComplexCollectionStaticFunctions() {
         let lineCollection = Attribute.block(.collection([.line("x")], display: nil, type: .line))
@@ -341,6 +343,8 @@ final class AttributeTests: XCTestCase {
             )
         )
     }
+
+    // swiftlint:enable function_body_length
 
     /// Test getters for simple types.
     func testSimpleGetters() {
