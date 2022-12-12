@@ -102,6 +102,7 @@ public struct CustomTrigger<Path: ReadOnlyPathProtocol>: TriggerProtocol {
     ///   - path: The path to a property that may trigger this object.
     ///   - root: The root object containing the property pointed to by path.
     /// - Returns: Whether this trigger fires from path.
+    @inlinable
     public func isTriggerForPath(_ path: AnyPath<Root>, in root: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }

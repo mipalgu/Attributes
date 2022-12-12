@@ -92,7 +92,7 @@ public struct WhenChanged<
     ///   - root: The root object.
     ///   - path: The path to the value within `root` that is causing this trigger
     /// to fire.
-    /// - Returns: The result from the `trigger`'s `performTrigger` function. 
+    /// - Returns: The result from the `trigger`'s `performTrigger` function.
     public func performTrigger(
         _ root: inout Path.Root, for path: AnyPath<Root>
     ) -> Result<Bool, AttributeError<Path.Root>> {
@@ -107,6 +107,7 @@ public struct WhenChanged<
     ///   - path: The path to check.
     ///   - _: Unused. Preserved for protocol conformance.
     /// - Returns: Whether `path` causes this trigger to fire.
+    @inlinable
     public func isTriggerForPath(_ path: AnyPath<Path.Root>, in _: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }

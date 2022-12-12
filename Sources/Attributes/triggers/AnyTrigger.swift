@@ -87,13 +87,18 @@ public struct AnyTrigger<Root>: TriggerProtocol {
 
     /// Copy a type-erased trigger.
     /// - Parameter trigger: The trigger to copy.
+    @inlinable
     public init(_ trigger: AnyTrigger<Root>) {
         self = trigger
     }
 
     /// Initialise a type-erased trigger from a ``TriggerBuilder``.
     /// - Parameter builder: The builder that creates the triggers used by this type-erased trigger.
-    public init(@TriggerBuilder<Root> builder: () -> AnyTrigger<Root>) {
+    @inlinable
+    public init(
+        @TriggerBuilder<Root>
+        builder: () -> AnyTrigger<Root>
+    ) {
         self.init(builder())
     }
 
@@ -147,6 +152,7 @@ extension AnyTrigger: ExpressibleByArrayLiteral {
 
     /// Initialise this trigger from a variadic list of other type-erased triggers.
     /// - Parameter triggers: The triggers used by this type-erased trigger.
+    @inlinable
     public init(arrayLiteral triggers: ArrayLiteralElement...) {
         self.init(triggers)
     }

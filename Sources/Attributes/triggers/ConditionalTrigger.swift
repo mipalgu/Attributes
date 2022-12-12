@@ -60,15 +60,16 @@
 public struct ConditionalTrigger<Trigger: TriggerProtocol>: TriggerProtocol {
 
     /// A function that evaluates the condition.
-    let condition: (Root) -> Bool
+    @usableFromInline let condition: (Root) -> Bool
 
     /// The trigger to execute when the condition is true.
-    let trigger: Trigger
+    @usableFromInline let trigger: Trigger
 
     /// Create a ConditionalTrigger with a condition function and a trigger to execute.
     /// - Parameters:
     ///   - condition: The function that determines the condition.
     ///   - trigger: The trigger that is executed when condition evaluates to true.
+    @inlinable
     public init(condition: @escaping (Root) -> Bool, trigger: Trigger) {
         self.condition = condition
         self.trigger = trigger
@@ -82,6 +83,7 @@ public struct ConditionalTrigger<Trigger: TriggerProtocol>: TriggerProtocol {
     ///   - path: The path to the value in root triggering the action.
     /// - Returns: A result specifying whether the trigger was successful and a Bool indicating
     ///            to redraw.
+    @inlinable
     public func performTrigger(
         _ root: inout Trigger.Root, for path: AnyPath<Trigger.Root>
     ) -> Result<Bool, AttributeError<Trigger.Root>> {
@@ -96,6 +98,7 @@ public struct ConditionalTrigger<Trigger: TriggerProtocol>: TriggerProtocol {
     ///   - path: The path that points to the value contained in the root object.
     ///   - root: The root object to evaluate.
     /// - Returns: Whether this trigger is used for the value specified.
+    @inlinable
     public func isTriggerForPath(_ path: AnyPath<Trigger.Root>, in root: Trigger.Root) -> Bool {
         trigger.isTriggerForPath(path, in: root)
     }

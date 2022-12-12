@@ -70,25 +70,25 @@ public struct MakeAvailableTrigger<
     public typealias Root = Fields.Root
 
     /// An AnyPath version of the source.
-    public var path: AnyPath<Root> {
+    @inlinable public var path: AnyPath<Root> {
         AnyPath(source)
     }
 
     /// The field to make available in the object.
-    let field: Field
+    @usableFromInline let field: Field
 
     /// The position to place the new field in the object. The trigger will find the first Field matching
     /// a name in this array and place the new field immediately before it.
-    let order: [String]
+    @usableFromInline let order: [String]
 
     /// The path to the element triggering this trigger.
-    let source: Source
+    @usableFromInline let source: Source
 
     /// A path to the fields to change when this trigger is activated.
-    let fields: Fields
+    @usableFromInline let fields: Fields
 
     /// A path to the attributes to change when this trigger is activated.
-    let attributes: Attributes
+    @usableFromInline let attributes: Attributes
 
     /// Initialise this trigger with paths to relavent properties. This trigger assumes that an object
     /// contains a property with an array of Fields, and a property with a dictionary of Field name to
@@ -102,6 +102,7 @@ public struct MakeAvailableTrigger<
     ///             source will also cause this trigger to fire.
     ///   - fields: A path to the fields to mutate when adding the new field.
     ///   - attributes: A path to the attributes to mutate when this trigger is fired.
+    @inlinable
     public init(field: Field, after order: [String], source: Source, fields: Fields, attributes: Attributes) {
         self.field = field
         self.order = order
@@ -117,6 +118,7 @@ public struct MakeAvailableTrigger<
     /// - Returns: A result indicating the success of the trigger. A success result indicates that
     ///            the new field was made available. The boolean contained within the success case
     ///            indicates whether to redraw the view.
+    @inlinable
     public func performTrigger(
         _ root: inout Source.Root, for _: AnyPath<Root>
     ) -> Result<Bool, AttributeError<Source.Root>> {
@@ -138,6 +140,7 @@ public struct MakeAvailableTrigger<
     ///   - path: The path to check.
     ///   - _: 
     /// - Returns: A boolean indicating whether this trigger is triggered by the path.
+    @inlinable
     public func isTriggerForPath(_ path: AnyPath<Root>, in _: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }

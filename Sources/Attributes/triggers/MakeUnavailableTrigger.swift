@@ -64,24 +64,25 @@ public struct MakeUnavailableTrigger<Source: PathProtocol, Fields: PathProtocol>
     public typealias Root = Fields.Root
 
     /// An AnyPath representation of source.
-    public var path: AnyPath<Root> {
+    @inlinable public var path: AnyPath<Root> {
         AnyPath(source)
     }
 
     /// The field to remove when the trigger is fired.
-    let field: Field
+    @usableFromInline let field: Field
 
     /// The source path containing the field.
-    let source: Source
+    @usableFromInline let source: Source
 
     /// The path to the fields array.
-    let fields: Fields
+    @usableFromInline let fields: Fields
 
     /// Initialise this trigger from the field to remove and the paths affected.
     /// - Parameters:
     ///   - field: The field to remove from the source object.
     ///   - source: A path to the source object containing the Field to remove.
     ///   - fields: A path to the array of fields that hold the Field to remove.
+    @inlinable
     public init(field: Field, source: Source, fields: Fields) {
         self.field = field
         self.source = source
@@ -94,6 +95,7 @@ public struct MakeUnavailableTrigger<Source: PathProtocol, Fields: PathProtocol>
     ///   - _: 
     /// - Returns: Success when this trigger fired successfully. The trigger also returns a bool
     ///            indicating that a view needs to redraw.
+    @inlinable
     public func performTrigger(
         _ root: inout Source.Root, for _: AnyPath<Root>
     ) -> Result<Bool, AttributeError<Source.Root>> {
@@ -117,6 +119,7 @@ public struct MakeUnavailableTrigger<Source: PathProtocol, Fields: PathProtocol>
     ///   - path: The path to check.
     ///   - _: 
     /// - Returns: True if this path fires the trigger, false otherwise.
+    @inlinable
     public func isTriggerForPath(_ path: AnyPath<Root>, in _: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }
