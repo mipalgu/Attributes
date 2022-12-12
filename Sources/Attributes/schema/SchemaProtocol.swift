@@ -56,26 +56,41 @@
  *
  */
 
+/// A schema is the top-level representation of an attribute heirarchy. A schema
+/// contains type information, validators, and triggers for all attributes that
+/// are related. A schema can only contain groups, and you may use the `@Group`
+/// property wrapper to define the groups within this schema.
 public protocol SchemaProtocol {
 
+    /// The data container holding the groups defined by this schema.
     associatedtype Root: Modifiable
 
+    /// The groups within this schema.
     var groups: [AnyGroup<Root>] { get }
 
+    /// The trigger for every group within this schema.
     var trigger: AnyTrigger<Root> { get }
 
+    /// Create a validator for every group within this schema for a given
+    /// root.
+    /// - Parameter root: The root to validate.
+    /// - Returns: The new validator.
     func makeValidator(root: Root) -> AnyValidator<Root>
 
 }
 
+/// Add extra helper functions to a schema.
 public extension SchemaProtocol {
 
+    /// A group definition.
     typealias Group<GroupType: GroupProtocol> = Attributes.Group<GroupType>
 
+    /// The trigger is all the group triggers by default.
     var trigger: AnyTrigger<Root> {
         AnyTrigger(groups.map(\.allTriggers))
     }
 
+    /// All of the groups within the schema.
     var groups: [AnyGroup<Root>] {
         let mirror = Mirror(reflecting: self)
         return mirror.children.compactMap {
@@ -86,6 +101,10 @@ public extension SchemaProtocol {
         }
     }
 
+    /// Creates a validator that is equivalent to every validator within all of the groups
+    /// for a specific root object.
+    /// - Parameter root: The root object.
+    /// - Returns: The new validator.
     func makeValidator(root: Root) -> AnyValidator<Root> {
         let groups: [AnyGroup<Root>] = self.groups
         return AnyValidator(groups.enumerated().map {
@@ -98,26 +117,3 @@ public extension SchemaProtocol {
     }
 
 }
-
-//struct VHDLSettings: GroupProtocol {
-//
-//    var path: Path<EmptyModifiable, AttributeGroup>
-//
-//    typealias Root = EmptyModifiable
-//
-//    @GroupBoolProperty(label: "is_suspensible", trigger: .makeAvailable(\.suspendedState))
-//    var isSuspensible
-//    
-//    @GroupProperty(label: "suspended_state", available: false, type: .line)
-//    var suspendedState
-//
-//}
-//
-//struct TestSchema: SchemaProtocol {
-//
-//    typealias Root = EmptyModifiable
-//
-//    @Group(VHDLSettings(path: EmptyModifiable.path.attributes[0]))
-//    var settings
-//
-//}
