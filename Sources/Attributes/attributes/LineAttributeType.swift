@@ -79,7 +79,7 @@ public enum LineAttributeType: Hashable {
     case line
 
     /// The default value of an attribute type.
-    public var defaultValue: LineAttribute {
+    @inlinable public var defaultValue: LineAttribute {
         switch self {
         case .bool:
             return .bool(false)
