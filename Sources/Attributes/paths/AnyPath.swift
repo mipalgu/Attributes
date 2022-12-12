@@ -74,15 +74,15 @@ public struct AnyPath<Root> {
     // swiftlint:disable identifier_name
 
     /// A function for retrieving the value pointed to by this AnyPath.
-    let _value: (Root) -> Any
+    @usableFromInline let _value: (Root) -> Any
 
     /// A function for discerning whether the value pointed to by this AnyPath
     /// is nil.
-    let _isNil: (Root) -> Bool
+    @usableFromInline let _isNil: (Root) -> Bool
 
     /// A function for discerning whether a PartialKeyPath points to the same value
     /// as this AnyPath.
-    let _isSame: (PartialKeyPath<Root>) -> Bool
+    @usableFromInline let _isSame: (PartialKeyPath<Root>) -> Bool
 
     // swiftlint:enable identifier_name
 
@@ -157,6 +157,7 @@ public struct AnyPath<Root> {
     /// Evaluated whether this AnyPath is a member of another AnyPath's ancestors.
     /// - Parameter path: The path to check.
     /// - Returns: Whether path is a child of self.
+    @inlinable
     public func isParent(of path: AnyPath<Root>) -> Bool {
         path.isChild(of: self)
     }
@@ -164,6 +165,7 @@ public struct AnyPath<Root> {
     /// Evaluated whether this AnyPath is a member of another ReadOnlyPathProtocol's ancestors.
     /// - Parameter path: The path to check.
     /// - Returns: Whether path is a child of self.
+    @inlinable
     public func isParent<Path: ReadOnlyPathProtocol>(of path: Path) -> Bool where Path.Root == Root {
         self.isParent(of: AnyPath(path))
     }
@@ -171,6 +173,7 @@ public struct AnyPath<Root> {
     /// Evaluated whether this AnyPath contains another AnyPath as an ancestor.
     /// - Parameter path: The path to check.
     /// - Returns: Whether path is an ancestor of self.
+    @inlinable
     public func isChild(of path: AnyPath<Root>) -> Bool {
         self.isChild(of: path.partialKeyPath)
     }
@@ -178,6 +181,7 @@ public struct AnyPath<Root> {
     /// Evaluated whether this AnyPath contains another PartialKeyPath as an ancestor.
     /// - Parameter path: The path to check.
     /// - Returns: Whether path is an ancestor of self.
+    @inlinable
     public func isChild(of path: PartialKeyPath<Root>) -> Bool {
         nil != self.ancestors.first { $0.isSame(as: path) }
     }
@@ -185,6 +189,7 @@ public struct AnyPath<Root> {
     /// Evaluated whether this AnyPath contains another ReadOnlyPathProtocol as an ancestor.
     /// - Parameter path: The path to check.
     /// - Returns: Whether path is an ancestor of self.
+    @inlinable
     public func isChild<Path: ReadOnlyPathProtocol>(of path: Path) -> Bool where Path.Root == Root {
         self.isChild(of: path.keyPath)
     }
@@ -192,6 +197,7 @@ public struct AnyPath<Root> {
     /// Checks whether the value in root is nil.
     /// - Parameter root: The object to check.
     /// - Returns: Whether the object contained in root that this path points to is nil.
+    @inlinable
     public func hasValue(_ root: Root) -> Bool {
         !isOptional || !isNil(root)
     }
@@ -199,6 +205,7 @@ public struct AnyPath<Root> {
     /// Use self to retrieve the value it points to in a root object.
     /// - Parameter root: The root object to retrieve from.
     /// - Returns: The fetched value as a type-erased quantity.
+    @inlinable
     public func value(_ root: Root) -> Any {
         self._value(root)
     }
@@ -206,6 +213,7 @@ public struct AnyPath<Root> {
     /// Check whether the value pointed to by this path is nil in a given object.
     /// - Parameter root: The object that contains the value.
     /// - Returns: Whether the value is nil in root.
+    @inlinable
     public func isNil(_ root: Root) -> Bool {
         self._isNil(root)
     }
@@ -213,6 +221,7 @@ public struct AnyPath<Root> {
     /// Check if an AnyPath with the same Root points to the same member as this AnyPath.
     /// - Parameter path: The path to compare against.
     /// - Returns: Whether path points to the same member as self.
+    @inlinable
     public func isSame(as path: AnyPath<Root>) -> Bool {
         self._isSame(path.partialKeyPath)
     }
@@ -220,6 +229,7 @@ public struct AnyPath<Root> {
     /// Check if a PartialKeyPath with the same Root points to the same member as this AnyPath.
     /// - Parameter path: The path to compare against.
     /// - Returns: Whether path points to the same member as self.
+    @inlinable
     public func isSame(as path: PartialKeyPath<Root>) -> Bool {
         self._isSame(path)
     }
@@ -227,6 +237,7 @@ public struct AnyPath<Root> {
     /// Check if a ReadOnlyPathProtocol with the same Root points to the same member as this AnyPath.
     /// - Parameter path: The path to compare against.
     /// - Returns: Whether path points to the same member as self.
+    @inlinable
     public func isSame<Path: ReadOnlyPathProtocol>(as path: Path) -> Bool where Path.Root == Root {
         self._isSame(path.keyPath)
     }

@@ -62,6 +62,7 @@ extension Path: ConvertibleSearchablePath {
     ///   - path: The path to compare too.
     ///   - root: The root object containing the property pointed to by path.
     /// - Returns: True if self is a parent of the path, false otherwise.
+    @inlinable
     public func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
         let anyPath = AnyPath(self)
         return anyPath.isSame(as: path) || anyPath.isParent(of: path)
@@ -70,6 +71,7 @@ extension Path: ConvertibleSearchablePath {
     /// Returns the paths from the Root object to the Value.
     /// - Parameter root: The root object.
     /// - Returns: An array of paths from root to the value pointed to by self.
+    @inlinable
     public func paths(in root: Root) -> [Path<Root, Value>] {
         [self]
     }

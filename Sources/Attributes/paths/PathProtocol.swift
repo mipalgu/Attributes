@@ -97,6 +97,7 @@ extension PathProtocol {
     ///   - lhs: The Path on the left-hand side of the == operator.
     ///   - rhs: The Path on the right-hand side of the == operator.
     /// - Returns: Whether lhs is equal to rhs,
+    @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.path == rhs.path
     }

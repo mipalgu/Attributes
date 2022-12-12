@@ -69,13 +69,14 @@ public struct ValidationPath<P: ReadOnlyPathProtocol>: _ValidationPath {
     // swiftlint:disable identifier_name
 
     /// A validate method used to valid a given object and value.
-    internal let _validate: (PathType.Root, PathType.Value) throws -> Void
+    @usableFromInline internal let _validate: (PathType.Root, PathType.Value) throws -> Void
 
     // swiftlint:enable identifier_name
 
     /// Initialise this object from a path. The validation function in this
     /// initialiser always passes.
     /// - Parameter path: The path to the value being validated.
+    @inlinable
     public init(path: PathType) {
         self.init(path) { _, _ in }
     }
@@ -86,6 +87,7 @@ public struct ValidationPath<P: ReadOnlyPathProtocol>: _ValidationPath {
     /// - Parameters:
     ///   - path: The path pointing to the value to validate.
     ///   - _validate: A validation function used to validate the value.
+    @inlinable
     internal init(_ path: PathType, _validate: @escaping (PathType.Root, PathType.Value) throws -> Void) {
         self.path = path
         self._validate = _validate
@@ -96,6 +98,7 @@ public struct ValidationPath<P: ReadOnlyPathProtocol>: _ValidationPath {
     /// Create a validator that validates the value pointed to by path.
     /// - Parameter builder: The builder used to construct the validator.
     /// - Returns: A type-erased validator.
+    @inlinable
     public func validate(
         @ValidatorBuilder<PathType.Root> builder: (Self) -> AnyValidator<PathType.Root>
     ) -> AnyValidator<PathType.Root> {
@@ -135,12 +138,14 @@ extension ValidationPath where Value: Nilable {
 
     /// Create a required validator for the value.
     /// - Returns: The required validator.
+    @inlinable
     public func required() -> RequiredValidator<P> {
         RequiredValidator(path: self.path)
     }
 
     /// Create an OptionalValidator for the value.
     /// - Returns: The OptionalValidator.
+    @inlinable
     public func optional() -> OptionalValidator<P> {
         OptionalValidator(path: self.path)
     }

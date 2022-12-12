@@ -69,10 +69,10 @@ public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchab
 
     /// A path pointing to the collection within a root object. This collection will store the
     /// elements that correspond to the root of `elementPath`.
-    var collectionPath: Path<Root, Collection>
+    @usableFromInline var collectionPath: Path<Root, Collection>
 
     /// A path from the collection element to a value of interest.
-    var elementPath: Path<Collection.Element, Value>
+    @usableFromInline var elementPath: Path<Collection.Element, Value>
 
     /// Initialise this `CollectionSearchPath` with a path from a root object to the collection and
     /// a path from the collections element to some value.
@@ -80,6 +80,7 @@ public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchab
     ///   - collectionPath: A path pointing to the collection within a root object. This collection will
     /// store the elements that correspond to the root of `elementPath`.
     ///   - elementPath: A path from the collection element to a value of interest.
+    @inlinable
     public init(collectionPath: Path<Root, Collection>, elementPath: Path<Collection.Element, Value>) {
         self.collectionPath = collectionPath
         self.elementPath = elementPath
@@ -99,6 +100,7 @@ public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchab
     ///   - path: The path to check.
     ///   - root: The root object to act upon.
     /// - Returns: True if `self` is an ancestor of `path` inside the root object.
+    @inlinable
     public func isAncestorOrSame(of path: AnyPath<Root>, in root: Root) -> Bool {
         root[keyPath: collectionPath.keyPath].indices.contains {
             let newElementPath = elementPath.changeRoot(path: collectionPath[$0])
@@ -110,6 +112,7 @@ public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchab
     /// - Parameter root: The root object containing the collection.
     /// - Returns: All paths within the root object that this `CollectionSearchPath` references. These paths
     /// will represent the values within the elements contained within the collection.
+    @inlinable
     public func paths(in root: Root) -> [Path<Root, Value>] {
         root[keyPath: collectionPath.keyPath].indices.flatMap { index -> [Path<Root, Value>] in
             let newElementPath = elementPath.toNewRoot(path: collectionPath[index])
@@ -121,6 +124,7 @@ public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchab
     /// - Parameter path: The path to append to self. The root of this path must be the `Value` pointed to
     /// by this `CollectionSearchPath`.
     /// - Returns: A new `CollectionSearchPath` pointing from `Root` to the new paths `Value`.
+    @inlinable
     public func appending<Path: PathProtocol>(
         path: Path
     ) -> AnySearchablePath<Root, Path.Value> where Path.Root == Value {
@@ -135,6 +139,7 @@ public struct CollectionSearchPath<Root, Collection, Value>: ConvertibleSearchab
     /// Change the root of this path to a new value.
     /// - Parameter path: The path to prepend to the start of this `CollectionSearchPath`.
     /// - Returns: A new `CollectionSearchPath` pointing from the given paths `Root` to `Value`.
+    @inlinable
     public func toNewRoot<Path: PathProtocol>(
         path: Path
     ) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root {

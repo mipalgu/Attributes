@@ -126,6 +126,7 @@ public struct Path<Root, Value>: PathProtocol {
     /// Append a path to this Path.
     /// - Parameter path: The path to append to self.
     /// - Returns: A new path pointing from Root to the given paths values.
+    @inlinable
     public func appending<NewValue>(path: Path<Value, NewValue>) -> Path<Root, NewValue> {
         path.changeRoot(path: self)
     }
@@ -206,12 +207,14 @@ extension Path {
     ///   - lhs: The Path on the left-hand side of the == operator.
     ///   - rhs: The Path on the right-hand side of the == operator.
     /// - Returns: Whether lhs is equal to rhs.
+    @inlinable
     public static func == (lhs: Path<Root, Value>, rhs: Path<Root, Value>) -> Bool {
         lhs.ancestors == rhs.ancestors && lhs.keyPath == rhs.keyPath
     }
 
     /// Define the members included in the hashing function for this type.
     /// - Parameter hasher: The hasher that performs the hashing function.
+    @inlinable
     public func hash(into hasher: inout Hasher) {
         hasher.combine(self.ancestors)
         hasher.combine(self.keyPath)

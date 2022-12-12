@@ -92,6 +92,7 @@ public protocol ConvertibleSearchablePath: SearchablePath {
     /// Append a new path to end of this path.
     /// - Parameter path: The path to append to this path.
     /// - Returns: The new path with the path appended to self.
+    @inlinable
     func appending<Path: PathProtocol>(
         path: Path
     ) -> AnySearchablePath<Root, Path.Value> where Path.Root == Value
@@ -99,6 +100,7 @@ public protocol ConvertibleSearchablePath: SearchablePath {
     /// Change the root of this path.
     /// - Parameter path: The path containing the new root.
     /// - Returns: A new path pointing to the same value as this path but with a different root.
+    @inlinable
     func toNewRoot<Path: PathProtocol>(
         path: Path
     ) -> AnySearchablePath<Path.Root, Value> where Path.Value == Root

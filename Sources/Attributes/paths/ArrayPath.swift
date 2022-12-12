@@ -176,6 +176,7 @@ extension Path where Value: MutableCollection, Value.Index: Hashable {
     /// Allows the use of a `map` mechanism accross the paths to each element in the root collection.
     /// - Parameter f: A function to transform the path.
     /// - Returns: An array of transformed paths.
+    @inlinable
     public func each<T>(_ f: @escaping (Value.Index, Path<Root, Value.Element>) -> T) -> (Root) -> [T] {
         { root in
             root[keyPath: self.path].indices.map {
@@ -192,6 +193,7 @@ extension Path where Value: MutableCollection, Value.Index: Hashable, Value.Elem
     /// Allows the use of a `map` mechanism accross the paths to each element in the root collection.
     /// - Parameter f: A function to transform the path.
     /// - Returns: An array of transformed paths.
+    @inlinable
     public func each<T>(_ f: @escaping (Value.Index, Path<Root, Value.Element>) -> T) -> (Root) -> [T] {
         { root in
             root[keyPath: self.path].indices.map {

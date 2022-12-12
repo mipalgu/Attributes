@@ -81,7 +81,7 @@ extension ReadOnlyPathProtocol {
 
     /// An array of all paths between the root object and the value
     /// pointed to by this path inclusive.
-    public var fullPath: [AnyPath<Root>] {
+    @inlinable public var fullPath: [AnyPath<Root>] {
         self.ancestors + [AnyPath(self)]
     }
 

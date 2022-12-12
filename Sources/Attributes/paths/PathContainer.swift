@@ -72,6 +72,7 @@ extension PathContainer {
 
     /// Perform a validation method provided by a ``ValidatorBuilder``.
     /// - Parameter builder: The builder that generates the validator that performs the validation.
+    @inlinable
     public func validate(
         @ValidatorBuilder<Self> builder: (ValidationPath<Path>) -> AnyValidator<Self>
     ) throws {

@@ -158,12 +158,14 @@ extension ReadOnlyPath {
     ///   - lhs: The ReadOnlyPath at the left-hand side of the == operator.
     ///   - rhs: The ReadOnlyPath at the right-hand side of the == operator.
     /// - Returns: Whether lhs is equal to rhs.
+    @inlinable
     public static func == (lhs: ReadOnlyPath<Root, Value>, rhs: ReadOnlyPath<Root, Value>) -> Bool {
         lhs.ancestors == rhs.ancestors && lhs.keyPath == rhs.keyPath
     }
 
     /// Define which properties are to be included in the hash for this object.
     /// - Parameter hasher: The hasher that creates the hash value for this object.
+    @inlinable
     public func hash(into hasher: inout Hasher) {
         hasher.combine(self.ancestors)
         hasher.combine(self.keyPath)
