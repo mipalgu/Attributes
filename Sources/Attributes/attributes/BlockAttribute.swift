@@ -92,7 +92,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     }
 
     /// The type of the attribute.
-    public var type: BlockAttributeType {
+    @inlinable public var type: BlockAttributeType {
         switch self {
         case .code(_, let language):
             return .code(language: language)
@@ -110,7 +110,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     }
 
     /// The string equivalent of the attribute.
-    public var strValue: String? {
+    @inlinable public var strValue: String? {
         switch self {
         case .code(let value, _):
             return value
@@ -130,7 +130,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Represent self as a code value.
     /// - Warning: Using this property when self is not a code value will cause a
     ///            runtime error.
-    public var codeValue: String {
+    @inlinable public var codeValue: String {
         get {
             switch self {
             case .code(let value, _):
@@ -156,7 +156,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Represent self as a text value.
     /// - Warning: Using this property when self is not a text value will cause a
     ///            runtime error.
-    public var textValue: String {
+    @inlinable public var textValue: String {
         get {
             switch self {
             case .text(let value):
@@ -182,7 +182,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Represent self as a collection value.
     /// - Warning: Using this property when self is not a collection value will cause a
     ///            runtime error.
-    public var collectionValue: [Attribute] {
+    @inlinable public var collectionValue: [Attribute] {
         get {
             switch self {
             case .collection(let value, _, _):
@@ -214,7 +214,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the fields in a complex value.
     /// - Warning: Using this property when self is not a complex value will cause a
     ///            runtime error.
-    public var complexFields: [Field] {
+    @inlinable public var complexFields: [Field] {
         get {
             switch self {
             case .complex(_, let fields):
@@ -243,7 +243,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Represent self as a complex value.
     /// - Warning: Using this property when self is not a complex value will cause a
     ///            runtime error.
-    public var complexValue: [Label: Attribute] {
+    @inlinable public var complexValue: [Label: Attribute] {
         get {
             switch self {
             case .complex(let values, _):
@@ -272,7 +272,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Represent self as an enumerable collection value.
     /// - Warning: Using this property when self is not an enumerable collection value will cause a
     ///            runtime error.
-    public var enumerableCollectionValue: Set<String> {
+    @inlinable public var enumerableCollectionValue: Set<String> {
         get {
             switch self {
             case .enumerableCollection(let values, _):
@@ -304,7 +304,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the valid values in self assuming self is an enumerated collection.
     /// - Warning: Using this property when self is not an enumerated collection will cause a
     ///            runtime error.
-    public var enumerableCollectionValidValues: Set<String> {
+    @inlinable public var enumerableCollectionValidValues: Set<String> {
         get {
             switch self {
             case .enumerableCollection(_, let validValues):
@@ -336,7 +336,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Represent self as a table value.
     /// - Warning: Using this property when self is not a table value will cause a
     ///            runtime error.
-    public var tableValue: [[LineAttribute]] {
+    @inlinable public var tableValue: [[LineAttribute]] {
         get {
             switch self {
             case .table(let values, _):
@@ -361,7 +361,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Bools.
     /// - Warning: Using this property when self is not a collection containing Bools will cause a
     ///            runtime error.
-    public var collectionBools: [Bool] {
+    @inlinable public var collectionBools: [Bool] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -413,7 +413,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Integers.
     /// - Warning: Using this property when self is not a collection containing integers will cause a
     ///            runtime error.
-    public var collectionIntegers: [Int] {
+    @inlinable public var collectionIntegers: [Int] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -465,7 +465,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Floats.
     /// - Warning: Using this property when self is not a collection containing Floats will cause a
     ///            runtime error.
-    public var collectionFloats: [Double] {
+    @inlinable public var collectionFloats: [Double] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -517,7 +517,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Expressions.
     /// - Warning: Using this property when self is not a collection containing Expressions will cause a
     ///            runtime error.
-    public var collectionExpressions: [Expression] {
+    @inlinable public var collectionExpressions: [Expression] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -573,7 +573,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Enumerations.
     /// - Warning: Using this property when self is not a collection containing Enumerations will cause a
     ///            runtime error.
-    public var collectionEnumerated: [String] {
+    @inlinable public var collectionEnumerated: [String] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -629,7 +629,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Lines.
     /// - Warning: Using this property when self is not a collection containing Lines will cause a
     ///            runtime error.
-    public var collectionLines: [String] {
+    @inlinable public var collectionLines: [String] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -681,7 +681,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Codes.
     /// - Warning: Using this property when self is not a collection containing Codes will cause a
     ///            runtime error.
-    public var collectionCode: [String] {
+    @inlinable public var collectionCode: [String] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -737,7 +737,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Texts.
     /// - Warning: Using this property when self is not a collection containing Texts will cause a
     ///            runtime error.
-    public var collectionText: [String] {
+    @inlinable public var collectionText: [String] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -789,7 +789,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Complexes.
     /// - Warning: Using this property when self is not a collection containing Complexes will cause a
     ///            runtime error.
-    public var collectionComplex: [[Label: Attribute]] {
+    @inlinable public var collectionComplex: [[Label: Attribute]] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -845,7 +845,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Enumerable Collections.
     /// - Warning: Using this property when self is not a collection containing Enumerable Collections
     ///            will cuase a runtime error.
-    public var collectionEnumerableCollection: [Set<String>] {
+    @inlinable public var collectionEnumerableCollection: [Set<String>] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -901,7 +901,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection values as Tables.
     /// - Warning: Using this property when self is not a collection containing Tables will cause a
     ///            runtime error.
-    public var collectionTable: [[[LineAttribute]]] {
+    @inlinable public var collectionTable: [[[LineAttribute]]] {
         get {
             switch self {
             case .collection(let values, _, type: let type):
@@ -957,7 +957,7 @@ public enum BlockAttribute: Hashable, Identifiable {
     /// Access the collection display.
     /// - Warning: Using this property when self is not a collection will cause a
     ///            runtime error.
-    public var collectionDisplay: ReadOnlyPath<Attribute, LineAttribute>? {
+    @inlinable public var collectionDisplay: ReadOnlyPath<Attribute, LineAttribute>? {
         get {
             switch self {
             case .collection(_, let display, _):
@@ -992,7 +992,7 @@ public enum BlockAttribute: Hashable, Identifiable {
 extension BlockAttribute: XMIConvertible {
 
     /// The XMI name of this attribute.
-    public var xmiName: String? {
+    @inlinable public var xmiName: String? {
         switch self {
         case .code:
             return "CodeAttribute"

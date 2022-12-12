@@ -93,6 +93,7 @@ public enum BlockAttributeType: Hashable {
         /// - Parameters:
         ///   - name: The name of the column.
         ///   - type: The type of the data in the column.
+        @inlinable
         public init(name: String, type: LineAttributeType) {
             self.name = name
             self.type = type
@@ -101,7 +102,7 @@ public enum BlockAttributeType: Hashable {
     }
 
     /// Checks whether the type can contain other types.
-    public var isRecursive: Bool {
+    @inlinable public var isRecursive: Bool {
         switch self {
         case .collection, .complex, .table:
             return true
@@ -111,7 +112,7 @@ public enum BlockAttributeType: Hashable {
     }
 
     /// True if the type is a table.
-    public var isTable: Bool {
+    @inlinable public var isTable: Bool {
         switch self {
         case .table:
             return true
@@ -121,7 +122,7 @@ public enum BlockAttributeType: Hashable {
     }
 
     /// The default value of the type.
-    public var defaultValue: BlockAttribute {
+    @inlinable public var defaultValue: BlockAttribute {
         switch self {
         case .code(let language):
             return .code("", language: language)
@@ -257,7 +258,7 @@ extension BlockAttributeType: Codable {
 extension BlockAttributeType: XMIConvertible {
 
     /// The XMI name of this type.
-    public var xmiName: String? {
+    @inlinable public var xmiName: String? {
         switch self {
         case .code:
             return "CodeAttributeType"
