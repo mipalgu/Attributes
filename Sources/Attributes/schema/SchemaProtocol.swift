@@ -64,8 +64,6 @@ public protocol SchemaProtocol {
 
     var trigger: AnyTrigger<Root> { get }
 
-    func findProperty<Path: PathProtocol>(path: Path, in root: Root) -> SchemaAttribute where Path.Root == Root, Path.Value == Attribute
-
     func makeValidator(root: Root) -> AnyValidator<Root>
 
 }
@@ -86,13 +84,6 @@ public extension SchemaProtocol {
             }
             return nil
         }
-    }
-
-    func findProperty<Path: PathProtocol>(path: Path, in root: Root) -> SchemaAttribute where Path.Root == Root, Path.Value == Attribute {
-        guard let property = groups.compactMap({ $0.findProperty(path: AnyPath(path), in: root) }).first else {
-            fatalError("Failed to find property.")
-        }
-        return property
     }
 
     func makeValidator(root: Root) -> AnyValidator<Root> {

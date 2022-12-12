@@ -155,19 +155,6 @@ final class SchemaProtocolTests: XCTestCase {
         XCTAssertEqual(trigger2.rootPassed, data)
     }
 
-    // /// Test find property retrieves correct property for path.
-    // func testFindProperty() {
-    //     let path: Path<EmptyModifiable, Attribute> = Path(EmptyModifiable.self)
-    //         .attributes[0]
-    //         .attributes["person"]
-    //         .wrappedValue
-    //         .blockAttribute
-    //         .complexValue["first_name"]
-    //         .wrappedValue
-    //     let property = schema.findProperty(path: path, in: data)
-    //     XCTAssertEqual(property, SchemaAttribute(label: "first_name", type: .line))
-    // }
-
     /// Test makeValidator uses all validators within all groups.
     func testMakeValidator() throws {
         let validator = schema.makeValidator(root: data)
