@@ -423,7 +423,6 @@ final class AttributableTriggerTests: XCTestCase {
             .blockAttribute
             .complexValue["friends"]
             .wrappedValue
-            .blockAttribute
             .tableValue[0]
         let trigger = person.WhenChanged(
             path,
@@ -434,22 +433,6 @@ final class AttributableTriggerTests: XCTestCase {
         ) { _ in
             .success(true)
         }
-        XCTAssertFalse(
-            try trigger.performTrigger(&person.data, for: AnyPath(dataPath)).get()
-        )
-        let columns: [(String, LineAttributeType)] = [("first_name", .line), ("last_name", .line)]
-        let newTable = Attribute.table(
-            [[.line("New"), .line("Person")]], columns: columns
-        )
-        guard var complexValues = person.data.attributes[0].attributes["person"]?.complexValue else {
-            XCTFail("No complex values!")
-            return
-        }
-        complexValues["friends"] = newTable
-        person.data.attributes[0].attributes["person"] = .complex(
-            complexValues,
-            layout: personFields + [Field(name: "friends", type: .table(columns: columns))]
-        )
         XCTAssertTrue(
             try trigger.performTrigger(&person.data, for: AnyPath(dataPath)).get()
         )
