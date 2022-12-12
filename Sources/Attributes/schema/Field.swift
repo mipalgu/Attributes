@@ -69,6 +69,7 @@ public struct Field: Hashable, Codable {
     /// - Parameters:
     ///   - name: The label.
     ///   - type: The attribute type.
+    @inlinable
     public init(name: Label, type: AttributeType) {
         self.name = name
         self.type = type
@@ -82,6 +83,7 @@ extension Array: ExpressibleByDictionaryLiteral where Element == Field {
     /// Create an array from a dictionary literal of tuples containing the
     /// field name and field type.
     /// - Parameter elements: The tuples containing the data.
+    @inlinable
     public init(dictionaryLiteral elements: (String, AttributeType)...) {
         self = elements.map { Field(name: $0, type: $1) }
     }

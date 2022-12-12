@@ -11,6 +11,7 @@ import Foundation
 public struct EmptySchema<Root: Modifiable>: SchemaProtocol {
 
     /// Default init.
+    @inlinable
     public init() {}
 
 }

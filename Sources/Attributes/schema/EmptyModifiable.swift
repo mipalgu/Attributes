@@ -102,6 +102,7 @@ public struct EmptyModifiable: Modifiable {
     ///   - item: The new item to add.
     ///   - attribute: A path to the array to append to.
     /// - Returns: Whether the operation was successful.
+    @inlinable
     public mutating func addItem<Path, T>(
         _ item: T, to attribute: Path
     ) -> Result<Bool, AttributeError<EmptyModifiable>> where
@@ -121,6 +122,7 @@ public struct EmptyModifiable: Modifiable {
     ///   - source: The indexes to move in the array.
     ///   - destination: The new destination index of the items.
     /// - Returns: Whether the operation was successful.
+    @inlinable
     public mutating func moveItems<Path, T>(
         table attribute: Path, from source: IndexSet, to destination: Int
     ) -> Result<Bool, AttributeError<Self>> where
@@ -144,6 +146,7 @@ public struct EmptyModifiable: Modifiable {
     ///   - attribute: A path to the array that contains the items to remove.
     ///   - index: The index of the item to delete.
     /// - Returns: Whether the operation was successful.
+    @inlinable
     public mutating func deleteItem<Path, T>(
         table attribute: Path, atIndex index: Int
     ) -> Result<Bool, AttributeError<Self>> where
@@ -163,6 +166,7 @@ public struct EmptyModifiable: Modifiable {
     ///   - attribute: The path to the array containing the items to delete.
     ///   - items: The indexes of the items to delete.
     /// - Returns: Whether the operation was successful.
+    @inlinable
     public mutating func deleteItems<Path, T>(
         table attribute: Path, items: IndexSet
     ) -> Result<Bool, AttributeError<Self>> where
@@ -198,6 +202,7 @@ public struct EmptyModifiable: Modifiable {
 
     /// Validate the items contained within this object. This is a mock implementation that doesn't
     /// perform any operations.
+    @inlinable
     public func validate() throws {}
 
 }

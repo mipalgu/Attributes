@@ -80,6 +80,7 @@ public struct AttributeGroup: Hashable, Codable {
     ///   - fields: The attributes that are currently available.
     ///   - attributes: All of the currently existing attributes.
     ///   - metaData: The metadata associated with the attributes.
+    @inlinable
     public init(
         name: String,
         fields: [Field] = [],
@@ -95,6 +96,7 @@ public struct AttributeGroup: Hashable, Codable {
     /// Access the attributes by using a lookup.
     /// - Parameter member: The label of the attribute to find.
     /// - Returns: The attribute with label `member`.
+    @inlinable
     subscript(dynamicMember member: String) -> Attribute {
         // swiftlint:disable:next force_unwrapping
         self.attributes[member]!

@@ -86,12 +86,12 @@ public extension SchemaProtocol {
     typealias Group<GroupType: GroupProtocol> = Attributes.Group<GroupType>
 
     /// The trigger is all the group triggers by default.
-    var trigger: AnyTrigger<Root> {
+    @inlinable var trigger: AnyTrigger<Root> {
         AnyTrigger(groups.map(\.allTriggers))
     }
 
     /// All of the groups within the schema.
-    var groups: [AnyGroup<Root>] {
+    @inlinable var groups: [AnyGroup<Root>] {
         let mirror = Mirror(reflecting: self)
         return mirror.children.compactMap {
             if let val = ($0.value as? ConvertibleToGroup)?.anyGroup as? AnyGroup<Root> {
@@ -105,6 +105,7 @@ public extension SchemaProtocol {
     /// for a specific root object.
     /// - Parameter root: The root object.
     /// - Returns: The new validator.
+    @inlinable
     func makeValidator(root: Root) -> AnyValidator<Root> {
         let groups: [AnyGroup<Root>] = self.groups
         return AnyValidator(groups.enumerated().map {

@@ -10,14 +10,15 @@ import Foundation
 /// A validator for chaining together a Path to a Root and a validator that validates a value in that
 /// root. This validator allows additional validation of any children existing inside a paths value
 /// that are not pointed to by that path.
+@usableFromInline
 struct ChainValidator<Path: ReadOnlyPathProtocol, Validator: ValidatorProtocol>: ValidatorProtocol where
     Path.Value == Validator.Root {
 
     /// The path to the root object being validated.
-    var path: Path
+    @usableFromInline var path: Path
 
     /// A validator that validates a value in the root object.
-    var validator: Validator
+    @usableFromInline var validator: Validator
 
     /// Create a ChainValidator with a path and validator. This init takes a path that points
     /// to a root object that the validator then acts upon.

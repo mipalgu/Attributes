@@ -55,6 +55,7 @@
 // 
 
 /// Protocol for defining types that can be converted into a ``SchemaAttribute``.
+@usableFromInline
 protocol SchemaAttributeConvertible {
 
     /// The triggeres for the attribute.

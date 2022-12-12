@@ -22,6 +22,7 @@ public struct SchemaAttribute {
     ///   - label: The label for this attribute.
     ///   - type: The type of this attribute.
     ///   - validate: The validator for this attribute.
+    @inlinable
     public init(label: String, type: AttributeType, validate: AnyValidator<Attribute> = AnyValidator()) {
         self.label = label
         self.type = type
