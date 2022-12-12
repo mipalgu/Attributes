@@ -80,6 +80,7 @@ public struct ErrorBag<Root> {
     }
 
     /// Default init. Creates an empty container.
+    @inlinable
     public init() {}
 
     /// Empties the container.
@@ -100,6 +101,7 @@ public struct ErrorBag<Root> {
     /// Finds the errors for a path and all the children of path.
     /// - Parameter path: The path to lookup
     /// - Returns: All the errors for path and paths children.
+    @inlinable
     public func errors<Path: ReadOnlyPathProtocol>(
         includingDescendantsForPath path: Path
     ) -> [AttributeError<Root>] where Path.Root == Root {
@@ -109,6 +111,7 @@ public struct ErrorBag<Root> {
     /// Finds the errors for a path and all the children of path.
     /// - Parameter path: The path to lookup
     /// - Returns: All the errors for path and paths children.
+    @inlinable
     public func errors<Path: PathProtocol>(
         includingDescendantsForPath path: Path
     ) -> [AttributeError<Root>] where Path.Root == Root {
@@ -141,6 +144,7 @@ public struct ErrorBag<Root> {
     /// Finds the errors for a path.
     /// - Parameter path: The path to lookup
     /// - Returns: All the errors for path.
+    @inlinable
     public func errors<Path: ReadOnlyPathProtocol>(
         forPath path: Path
     ) -> [AttributeError<Root>] where Path.Root == Root {
@@ -150,6 +154,7 @@ public struct ErrorBag<Root> {
     /// Finds the errors for a path.
     /// - Parameter path: The path to lookup
     /// - Returns: All the errors for path.
+    @inlinable
     public func errors<Path: PathProtocol>(
         forPath path: Path
     ) -> [AttributeError<Root>] where Path.Root == Root {
@@ -166,6 +171,7 @@ public struct ErrorBag<Root> {
 
     /// Remove the errors matching the path and any children of path.
     /// - Parameter path: The path to remove errors from.
+    @inlinable
     public mutating func remove<Path: ReadOnlyPathProtocol>(
         includingDescendantsForPath path: Path
     ) where Path.Root == Root {
@@ -174,6 +180,7 @@ public struct ErrorBag<Root> {
 
     /// Remove the errors matching the path and any children of path.
     /// - Parameter path: The path to remove errors from.
+    @inlinable
     public mutating func remove<Path: PathProtocol>(
         includingDescendantsForPath path: Path
     ) where Path.Root == Root {
@@ -188,12 +195,14 @@ public struct ErrorBag<Root> {
 
     /// Remove the errors matching the path.
     /// - Parameter path: The path to remove errors from.
+    @inlinable
     public mutating func remove<Path: ReadOnlyPathProtocol>(forPath path: Path) where Path.Root == Root {
         self.remove(forPath: AnyPath(path))
     }
 
     /// Remove the errors matching the path.
     /// - Parameter path: The path to remove errors from.
+    @inlinable
     public mutating func remove<Path: PathProtocol>(forPath path: Path) where Path.Root == Root {
         self.remove(forPath: AnyPath(path))
     }

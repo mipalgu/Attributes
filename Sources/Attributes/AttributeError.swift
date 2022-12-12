@@ -69,6 +69,7 @@ public struct AttributeError<Root>: Error {
     /// - Parameters:
     ///   - message: The error message.
     ///   - path: The value this error belongs too.
+    @inlinable
     public init(message: String, path: AnyPath<Root>) {
         self.message = message
         self.path = path
@@ -78,6 +79,7 @@ public struct AttributeError<Root>: Error {
     /// - Parameters:
     ///   - message: The error message for this error.
     ///   - path: The value this error belongs too.
+    @inlinable
     public init<P: ReadOnlyPathProtocol>(message: String, path: P) where P.Root == Root {
         self.init(message: message, path: AnyPath(path))
     }
@@ -86,6 +88,7 @@ public struct AttributeError<Root>: Error {
     /// - Parameters:
     ///   - message: The error message for this error.
     ///   - path: The value this error belongs too.
+    @inlinable
     public init<P: PathProtocol>(message: String, path: P) where P.Root == Root {
         self.init(message: message, path: AnyPath(path))
     }
@@ -93,6 +96,7 @@ public struct AttributeError<Root>: Error {
     /// Check whether an Error belongs to a Path.
     /// - Parameter path: The path to validate.
     /// - Returns: Whether path points to a value containing this error.
+    @inlinable
     public func isError<P: PathProtocol>(forPath path: P) -> Bool where P.Root == Root {
         self.isError(forPath: AnyPath(path))
     }
@@ -100,6 +104,7 @@ public struct AttributeError<Root>: Error {
     /// Check whether an Error belongs to a ReadOnlyPath.
     /// - Parameter path: The path to validate.
     /// - Returns: Whether path points to a value containing this error.
+    @inlinable
     public func isError<P: ReadOnlyPathProtocol>(forPath path: P) -> Bool where P.Root == Root {
         self.isError(forPath: AnyPath(path))
     }
@@ -107,6 +112,7 @@ public struct AttributeError<Root>: Error {
     /// Check whether an Error belongs to an AnyPath.
     /// - Parameter path: The path to validate.
     /// - Returns: Whether path points to a value containing this error.
+    @inlinable
     public func isError(forPath path: AnyPath<Root>) -> Bool {
         self.path.isSame(as: path) || path.isParent(of: self.path)
     }
@@ -117,7 +123,7 @@ public struct AttributeError<Root>: Error {
 extension AttributeError: CustomStringConvertible {
 
     /// A description of this instance.
-    public var description: String {
+    @inlinable public var description: String {
         "\(self.path): " + self.message
     }
 

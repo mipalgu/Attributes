@@ -65,6 +65,7 @@ extension Array {
     /// - Parameters:
     ///   - source: The indexes containing the elements to be moved.
     ///   - destination: The starting index of the new elements.
+    @inlinable
     public mutating func move(fromOffsets source: IndexSet, toOffset destination: Int) {
         let destinationIndex = Swift.max(Swift.min(destination, self.count), 0)
         let original = self

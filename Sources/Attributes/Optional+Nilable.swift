@@ -74,14 +74,14 @@ public protocol Nilable {
 extension Optional: Nilable {
 
     /// Check for nil.
-    public var isNil: Bool {
+    @inlinable public var isNil: Bool {
         self == nil
     }
 
     // swiftlint:disable force_unwrapping
 
     /// Force-unwrap an Optional-value.
-    public var wrappedValue: Wrapped {
+    @inlinable public var wrappedValue: Wrapped {
         get {
             self!
         } set {
