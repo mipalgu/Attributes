@@ -57,6 +57,7 @@
  */
 
 /// Cache storing ID's for Attributes.
+@usableFromInline
 enum AttributeIDCache {
 
     /// The latest id retrieved.

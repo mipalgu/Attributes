@@ -77,7 +77,7 @@ public enum Attribute: Hashable, Identifiable {
     }
 
     /// The type of the attribute.
-    public var type: AttributeType {
+    @inlinable public var type: AttributeType {
         switch self {
         case .line(let attribute):
             switch attribute {
@@ -113,7 +113,7 @@ public enum Attribute: Hashable, Identifiable {
     }
 
     /// Whether the attribute is a line attribute.
-    public var isLine: Bool {
+    @inlinable public var isLine: Bool {
         switch self {
         case .line:
             return true
@@ -123,7 +123,7 @@ public enum Attribute: Hashable, Identifiable {
     }
 
     /// Whether the attribute is a block attribute.
-    public var isBlock: Bool {
+    @inlinable public var isBlock: Bool {
         switch self {
         case .block:
             return true
@@ -135,7 +135,7 @@ public enum Attribute: Hashable, Identifiable {
     /// The LineAttribute version of this attribute.
     /// - Warning: This property will create runtime errors if the attribute
     ///            is a block attribute.
-    public var lineAttribute: LineAttribute {
+    @inlinable public var lineAttribute: LineAttribute {
         get {
             switch self {
             case .line(let attribute):
@@ -151,7 +151,7 @@ public enum Attribute: Hashable, Identifiable {
     /// The BlockAttribute version of this attribute.
     /// - Warning: This property will create runtime errors if the attribute
     ///            is a line attribute.
-    public var blockAttribute: BlockAttribute {
+    @inlinable public var blockAttribute: BlockAttribute {
         get {
             switch self {
             case .block(let attribute):
@@ -165,7 +165,7 @@ public enum Attribute: Hashable, Identifiable {
     }
 
     /// A string version of this attribute.
-    public var strValue: String? {
+    @inlinable public var strValue: String? {
         switch self {
         case .line(let lineAttribute):
             return lineAttribute.strValue
@@ -177,7 +177,7 @@ public enum Attribute: Hashable, Identifiable {
     /// A Bool value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Bool value.
-    public var boolValue: Bool {
+    @inlinable public var boolValue: Bool {
         get {
             switch self {
             case .line(let attribute):
@@ -199,7 +199,7 @@ public enum Attribute: Hashable, Identifiable {
     /// An Integer value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Integer value.
-    public var integerValue: Int {
+    @inlinable public var integerValue: Int {
         get {
             switch self {
             case .line(let attribute):
@@ -223,7 +223,7 @@ public enum Attribute: Hashable, Identifiable {
     /// A Float value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Float value.
-    public var floatValue: Double {
+    @inlinable public var floatValue: Double {
         get {
             switch self {
             case .line(let value):
@@ -245,7 +245,7 @@ public enum Attribute: Hashable, Identifiable {
     /// An Expression value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Expression value.
-    public var expressionValue: Expression {
+    @inlinable public var expressionValue: Expression {
         get {
             switch self {
             case .line(let value):
@@ -271,7 +271,7 @@ public enum Attribute: Hashable, Identifiable {
     /// An Enumerated value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Enumerated value.
-    public var enumeratedValue: String {
+    @inlinable public var enumeratedValue: String {
         get {
             switch self {
             case .line(let value):
@@ -297,7 +297,7 @@ public enum Attribute: Hashable, Identifiable {
     /// The valid values from an Enumerated attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Enumerated value.
-    public var enumeratedValidValues: Set<String> {
+    @inlinable public var enumeratedValidValues: Set<String> {
         get {
             switch self {
             case .line(let value):
@@ -329,7 +329,7 @@ public enum Attribute: Hashable, Identifiable {
     /// A Line value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Line value.
-    public var lineValue: String {
+    @inlinable public var lineValue: String {
         get {
             switch self {
             case .line(let value):
@@ -351,7 +351,7 @@ public enum Attribute: Hashable, Identifiable {
     /// A Code value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Code value.
-    public var codeValue: String {
+    @inlinable public var codeValue: String {
         get {
             switch self {
             case .block(let value):
@@ -373,7 +373,7 @@ public enum Attribute: Hashable, Identifiable {
     /// A Text value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Text value.
-    public var textValue: String {
+    @inlinable public var textValue: String {
         get {
             switch self {
             case .block(let value):
@@ -395,7 +395,7 @@ public enum Attribute: Hashable, Identifiable {
     /// A Collection value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Collection value.
-    public var collectionValue: [Attribute] {
+    @inlinable public var collectionValue: [Attribute] {
         get {
             switch self {
             case .block(let value):
@@ -424,7 +424,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the Fields of a complex attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Complex value.
-    public var complexFields: [Field] {
+    @inlinable public var complexFields: [Field] {
         get {
             switch self {
             case .block(let value):
@@ -448,7 +448,7 @@ public enum Attribute: Hashable, Identifiable {
     /// A Complex value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Complex value.
-    public var complexValue: [Label: Attribute] {
+    @inlinable public var complexValue: [Label: Attribute] {
         get {
             switch self {
             case .block(let value):
@@ -472,7 +472,7 @@ public enum Attribute: Hashable, Identifiable {
     /// An Enumerable Collection value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Enumerable Collection.
-    public var enumerableCollectionValue: Set<String> {
+    @inlinable public var enumerableCollectionValue: Set<String> {
         get {
             switch self {
             case .block(let value):
@@ -504,7 +504,7 @@ public enum Attribute: Hashable, Identifiable {
     /// The valid values of an enumerable collection attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Enumerable Collection.
-    public var enumerableCollectionValidValues: Set<String> {
+    @inlinable public var enumerableCollectionValidValues: Set<String> {
         get {
             switch self {
             case .block(let value):
@@ -536,7 +536,7 @@ public enum Attribute: Hashable, Identifiable {
     /// A Table value of this attribute.
     /// - Warning: This property will create runtime errors if the attribute is not
     ///            a valid Table value.
-    public var tableValue: [[LineAttribute]] {
+    @inlinable public var tableValue: [[LineAttribute]] {
         get {
             switch self {
             case .block(.table(let rows, _)):
@@ -557,7 +557,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Bool types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Bool types.
-    public var collectionBools: [Bool] {
+    @inlinable public var collectionBools: [Bool] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -608,7 +608,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Integer types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Integer types.
-    public var collectionIntegers: [Int] {
+    @inlinable public var collectionIntegers: [Int] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -662,7 +662,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Float types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Float types.
-    public var collectionFloats: [Double] {
+    @inlinable public var collectionFloats: [Double] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -716,7 +716,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Expression types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Expression types.
-    public var collectionExpressions: [Expression] {
+    @inlinable public var collectionExpressions: [Expression] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -774,7 +774,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Enumerated types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Enumerated types.
-    public var collectionEnumerated: [String] {
+    @inlinable public var collectionEnumerated: [String] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -832,7 +832,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Line types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Line types.
-    public var collectionLines: [String] {
+    @inlinable public var collectionLines: [String] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -886,7 +886,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Code types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Code types.
-    public var collectionCode: [String] {
+    @inlinable public var collectionCode: [String] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -944,7 +944,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Text types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Text types.
-    public var collectionText: [String] {
+    @inlinable public var collectionText: [String] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -998,7 +998,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Complex types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Complex types.
-    public var collectionComplex: [[Label: Attribute]] {
+    @inlinable public var collectionComplex: [[Label: Attribute]] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -1056,7 +1056,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Enumerable Collection types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Enumerable Collection types.
-    public var collectionEnumerableCollection: [Set<String>] {
+    @inlinable public var collectionEnumerableCollection: [Set<String>] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -1114,7 +1114,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection values as Table types.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection value of Table types.
-    public var collectionTable: [[[LineAttribute]]] {
+    @inlinable public var collectionTable: [[[LineAttribute]]] {
         get {
             switch self {
             case .block(.collection(let values, _, type: let type)):
@@ -1172,7 +1172,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Access the collection display.
     /// - Warning: This property will cause runtime errors if the attribute is not
     ///            a collection type.
-    public var collectionDisplay: ReadOnlyPath<Attribute, LineAttribute>? {
+    @inlinable public var collectionDisplay: ReadOnlyPath<Attribute, LineAttribute>? {
         get {
             switch self {
             case .block(.collection(_, let display, _)):
@@ -1203,12 +1203,14 @@ public enum Attribute: Hashable, Identifiable {
 
     /// Initialise this attribute from a LineAttribute.
     /// - Parameter lineAttribute: The equivalent line attribute.
+    @inlinable
     public init(lineAttribute: LineAttribute) {
         self = .line(lineAttribute)
     }
 
     /// Initialise this attribute from a BlockAttribute.
     /// - Parameter blockAttribute: The equivalent block attribute.
+    @inlinable
     public init(blockAttribute: BlockAttribute) {
         self = .block(blockAttribute)
     }
@@ -1216,6 +1218,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Create a bool attribute.
     /// - Parameter value: The value of the attribute.
     /// - Returns: The bool attribute.
+    @inlinable
     public static func bool(_ value: Bool) -> Attribute {
         .line(.bool(value))
     }
@@ -1223,6 +1226,7 @@ public enum Attribute: Hashable, Identifiable {
     // Create an integer attribute.
     /// - Parameter value: The value of the attribute.
     /// - Returns: The integer attribute.
+    @inlinable
     public static func integer(_ value: Int) -> Attribute {
         .line(.integer(value))
     }
@@ -1230,6 +1234,7 @@ public enum Attribute: Hashable, Identifiable {
     // Create a float attribute.
     /// - Parameter value: The value of the attribute.
     /// - Returns: The float attribute.
+    @inlinable
     public static func float(_ value: Double) -> Attribute {
         .line(.float(value))
     }
@@ -1239,6 +1244,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - value: The value of the expression.
     ///   - language: The language of the expression.
     /// - Returns: The expression attribute.
+    @inlinable
     public static func expression(_ value: Expression, language: Language) -> Attribute {
         .line(.expression(value, language: language))
     }
@@ -1246,6 +1252,7 @@ public enum Attribute: Hashable, Identifiable {
     // Create a line attribute.
     /// - Parameter value: The value of the attribute.
     /// - Returns: The line attribute.
+    @inlinable
     public static func line(_ value: String) -> Attribute {
         .line(.line(value))
     }
@@ -1255,6 +1262,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - value: The code.
     ///   - language: The language of the code.
     /// - Returns: The code attribute.
+    @inlinable
     public static func code(_ value: String, language: Language) -> Attribute {
         .block(.code(value, language: language))
     }
@@ -1262,6 +1270,7 @@ public enum Attribute: Hashable, Identifiable {
     // Create a text attribute.
     /// - Parameter value: The value of the attribute.
     /// - Returns: The text attribute.
+    @inlinable
     public static func text(_ value: String) -> Attribute {
         .block(.text(value))
     }
@@ -1269,6 +1278,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Create a collection of bools.
     /// - Parameter bools: The bools in the collection.
     /// - Returns: A collection of bools.
+    @inlinable
     public static func collection(bools: [Bool]) -> Attribute {
         .block(.collection(bools.map { Attribute.bool($0) }, display: nil, type: .bool))
     }
@@ -1276,6 +1286,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Create a collection of integers.
     /// - Parameter integers: The integers in the collection.
     /// - Returns: A collection of integers.
+    @inlinable
     public static func collection(integers: [Int]) -> Attribute {
         .block(.collection(integers.map { Attribute.integer($0) }, display: nil, type: .integer))
     }
@@ -1283,6 +1294,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Create a collection of floats.
     /// - Parameter floats: The floats in the collection.
     /// - Returns: A collection of floats.
+    @inlinable
     public static func collection(floats: [Double]) -> Attribute {
         .block(.collection(floats.map { Attribute.float($0) }, display: nil, type: .float))
     }
@@ -1291,6 +1303,7 @@ public enum Attribute: Hashable, Identifiable {
     /// - Parameter expressions: The expressions in the collection.
     /// - Parameter language: The language of the expressions.
     /// - Returns: A collection of expressions.
+    @inlinable
     public static func collection(expressions: [Expression], language: Language) -> Attribute {
         .block(
             .collection(
@@ -1304,6 +1317,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Create a collection of lines.
     /// - Parameter lines: The lines in the collection.
     /// - Returns: A collection of lines.
+    @inlinable
     public static func collection(lines: [String]) -> Attribute {
         .block(.collection(lines.map { Attribute.line($0) }, display: nil, type: .line))
     }
@@ -1312,6 +1326,7 @@ public enum Attribute: Hashable, Identifiable {
     /// - Parameter code: The expressions in the collection.
     /// - Parameter language: The language of the code.
     /// - Returns: A collection of code.
+    @inlinable
     public static func collection(code: [String], language: Language) -> Attribute {
         .block(
             .collection(
@@ -1325,6 +1340,7 @@ public enum Attribute: Hashable, Identifiable {
     /// Create a collection of text.
     /// - Parameter text: The text in the collection.
     /// - Returns: A collection of text.
+    @inlinable
     public static func collection(text: [String]) -> Attribute {
         .block(.collection(text.map { Attribute.text($0) }, display: nil, type: .text))
     }
@@ -1335,6 +1351,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - layout: The layout of the complex attributes.
     ///   - display: The display path of the collection.
     /// - Returns: A collection of complex attributes.
+    @inlinable
     public static func collection(
         complex: [[Label: Attribute]],
         layout: [Field],
@@ -1355,6 +1372,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - validValues: The valid values of the enumerations.
     ///   - display: The display path of the collection.
     /// - Returns: A collection of enumerated attributes.
+    @inlinable
     public static func collection(
         enumerated: [String],
         validValues: Set<String>,
@@ -1375,6 +1393,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - validValues: The valid values of the enumerated collections.
     ///   - display: The display path of the new collection.
     /// - Returns: A new collection of enumerated collections.
+    @inlinable
     public static func collection(
         enumerables: [Set<String>],
         validValues: Set<String>,
@@ -1395,6 +1414,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - columns: The columns in these tables.
     ///   - display: The display path to the new collection.
     /// - Returns: A collection of tables.
+    @inlinable
     public static func collection(
         tables: [[[LineAttribute]]],
         columns: [(name: Label, type: LineAttributeType)],
@@ -1415,6 +1435,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - type: The type of the elements in the collections.
     ///   - display: The display path of the new collection.
     /// - Returns: A collection of collections.
+    @inlinable
     public static func collection(
         collection: [[Attribute]],
         type: AttributeType,
@@ -1435,6 +1456,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - type: The type of the Attributes. Each Attribute must be the same type.
     ///   - display: The display path of the new collection.
     /// - Returns: A collection of Attributes.
+    @inlinable
     public static func collection(
         _ values: [Attribute],
         type: AttributeType,
@@ -1448,6 +1470,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - values: The values of the complex attribute.
     ///   - layout: The layout of the complex attribute.
     /// - Returns: A new complex attribute.
+    @inlinable
     public static func complex(_ values: [Label: Attribute], layout: [Field]) -> Attribute {
         .block(.complex(values, layout: layout))
     }
@@ -1457,6 +1480,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - value: The value of the enumerated attribute.
     ///   - validValues: The valid values in the enumerated attribute.
     /// - Returns: A new enumerated attribute.
+    @inlinable
     public static func enumerated(_ value: String, validValues: Set<String>) -> Attribute {
         .line(.enumerated(value, validValues: validValues))
     }
@@ -1466,6 +1490,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - value: The values in the enumerable collection.
     ///   - validValues: The valid values in the enumerable collection.
     /// - Returns: A new enumerable collection.
+    @inlinable
     public static func enumerableCollection(_ value: Set<String>, validValues: Set<String>) -> Attribute {
         .block(.enumerableCollection(value, validValues: validValues))
     }
@@ -1475,6 +1500,7 @@ public enum Attribute: Hashable, Identifiable {
     ///   - rows: The row in the table.
     ///   - columns: The columns in the table.
     /// - Returns: A new table attribute.
+    @inlinable
     public static func table(
         _ rows: [[LineAttribute]],
         columns: [(name: Label, type: LineAttributeType)]
@@ -1495,6 +1521,7 @@ public enum Attribute: Hashable, Identifiable {
 extension Attribute: Codable {
 
     /// Decoder init.
+    @inlinable
     public init(from decoder: Decoder) throws {
         if let lineAttribute = try? LineAttribute(from: decoder) {
             self = .line(lineAttribute)
@@ -1513,6 +1540,7 @@ extension Attribute: Codable {
     }
 
     /// Encode function.
+    @inlinable
     public func encode(to encoder: Encoder) throws {
         switch self {
         case .line(let attribute):
@@ -1528,7 +1556,7 @@ extension Attribute: Codable {
 extension Attribute: XMIConvertible {
 
     /// The XMI name of this attribute.
-    public var xmiName: String? {
+    @inlinable public var xmiName: String? {
         switch self {
         case .line(let attribute):
             return attribute.xmiName

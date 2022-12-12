@@ -68,32 +68,32 @@ public enum AttributeType: Hashable {
     case block(BlockAttributeType)
 
     /// A bool type.
-    public static var bool: AttributeType {
+    @inlinable public static var bool: AttributeType {
         .line(.bool)
     }
 
     /// An integer type.
-    public static var integer: AttributeType {
+    @inlinable public static var integer: AttributeType {
         .line(.integer)
     }
 
     /// A float type.
-    public static var float: AttributeType {
+    @inlinable public static var float: AttributeType {
         .line(.float)
     }
 
     /// A text type.
-    public static var text: AttributeType {
+    @inlinable public static var text: AttributeType {
         .block(.text)
     }
 
     /// A line type.
-    public static var line: AttributeType {
+    @inlinable public static var line: AttributeType {
         .line(.line)
     }
 
     /// Whether the AttributeType is a line attribute.
-    public var isLine: Bool {
+    @inlinable public var isLine: Bool {
         switch self {
         case .line:
             return true
@@ -103,7 +103,7 @@ public enum AttributeType: Hashable {
     }
 
     /// Whether the AttributeType is a block attribute.
-    public var isBlock: Bool {
+    @inlinable public var isBlock: Bool {
         switch self {
         case .block:
             return true
@@ -114,7 +114,7 @@ public enum AttributeType: Hashable {
 
     /// Whether the AttributeType is a recursive type. This infers that the
     /// type is also a block attribute type.
-    public var isRecursive: Bool {
+    @inlinable public var isRecursive: Bool {
         switch self {
         case .block(let blockType):
             return blockType.isRecursive
@@ -124,7 +124,7 @@ public enum AttributeType: Hashable {
     }
 
     /// Whether the AttributeType is a table.
-    public var isTable: Bool {
+    @inlinable public var isTable: Bool {
         switch self {
         case .block(let type):
             return type.isTable
@@ -135,7 +135,7 @@ public enum AttributeType: Hashable {
 
     /// The default value of this AttributeType represented as an
     /// Attribute.
-    public var defaultValue: Attribute {
+    @inlinable public var defaultValue: Attribute {
         switch self {
         case .line(let lineAttribute):
             return .line(lineAttribute.defaultValue)
@@ -147,6 +147,7 @@ public enum AttributeType: Hashable {
     /// An expression type with a language.
     /// - Parameter language: The language of the expression.
     /// - Returns: The expression type.
+    @inlinable
     public static func expression(language: Language) -> AttributeType {
         .line(.expression(language: language))
     }
@@ -154,6 +155,7 @@ public enum AttributeType: Hashable {
     /// An enumerated type with a set of valid values.
     /// - Parameter validValues: The valid values for the enumeration.
     /// - Returns: The enumerated type.
+    @inlinable
     public static func enumerated(validValues: Set<String>) -> AttributeType {
         .line(.enumerated(validValues: validValues))
     }
@@ -161,6 +163,7 @@ public enum AttributeType: Hashable {
     /// A code type in a language
     ///  - Parameter lagnuage: The language of the code type.
     ///  - Returns: The code type.
+    @inlinable
     public static func code(language: Language) -> AttributeType {
         .block(.code(language: language))
     }
@@ -168,6 +171,7 @@ public enum AttributeType: Hashable {
     /// A collection of Attributes sharing the same type.
     /// - Parameter type: The type of the elements in the collection.
     /// - Returns: The type of the collection.
+    @inlinable
     public static func collection(type: AttributeType) -> AttributeType {
         .block(.collection(type: type))
     }
@@ -175,6 +179,7 @@ public enum AttributeType: Hashable {
     /// A complex with a specific layout.
     /// - Parameter layout: The layout of this complex type.
     /// - Returns: The complex type with the layout specified.
+    @inlinable
     public static func complex(layout: [Field]) -> AttributeType {
         .block(.complex(layout: layout))
     }
@@ -182,6 +187,7 @@ public enum AttributeType: Hashable {
     /// An enumerated collection drawn from a set of valid values.
     /// - Parameter validValues: The valid values of this collection.
     /// - Returns: The type of the enumerated collection.
+    @inlinable
     public static func enumerableCollection(validValues: Set<String>) -> AttributeType {
         .block(.enumerableCollection(validValues: validValues))
     }
@@ -189,6 +195,7 @@ public enum AttributeType: Hashable {
     /// A table type with a set of columns.
     /// - Parameter columns: The columns in this table type.
     /// - Returns: The table type.
+    @inlinable
     public static func table(columns: [(name: String, type: LineAttributeType)]) -> AttributeType {
         .block(
             .table(columns: columns.map { BlockAttributeType.TableColumn(name: $0.name, type: $0.type) })
@@ -201,6 +208,7 @@ public enum AttributeType: Hashable {
 extension AttributeType: Codable {
 
     /// The Coding Keys for this Attribute Type.
+    @usableFromInline
     enum CodingKeys: CodingKey {
 
         /// The type of the attribute (line or block).
@@ -212,6 +220,7 @@ extension AttributeType: Codable {
     }
 
     /// Decoder init.
+    @inlinable
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(Bool.self, forKey: .type)
@@ -226,6 +235,7 @@ extension AttributeType: Codable {
     }
 
     /// Encode function.
+    @inlinable
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
@@ -244,7 +254,7 @@ extension AttributeType: Codable {
 extension AttributeType: XMIConvertible {
 
     /// The XMI name of this type.
-    public var xmiName: String? {
+    @inlinable public var xmiName: String? {
         switch self {
         case .line(let type):
             return type.xmiName
