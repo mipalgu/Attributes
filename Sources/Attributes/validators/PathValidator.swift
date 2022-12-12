@@ -88,6 +88,7 @@ extension _Push {
     /// - Parameter f: The extra validation function to perform.
     /// - Returns: A new instance of `Self` that uses the existing validation functions and the new
     /// validation function `f`.
+    @inlinable
     public func push(_ f: @escaping (PathType.Root, PathType.Value) throws -> Void) -> Self {
         Self(self.path) {
             try self._validate($0, $1)

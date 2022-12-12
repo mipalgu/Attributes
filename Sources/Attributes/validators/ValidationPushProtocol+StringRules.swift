@@ -60,6 +60,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
     /// All characters must be alphabetic (a-z, A-Z).
     /// - Returns: A new validator that ensures all characters within a given string are alphabetic.
     /// - Note: Empty strings will pass validation.
+    @inlinable
     public func alpha() -> PushValidator {
         push {
             if $1.contains(where: { !$0.isLetter }) {
@@ -71,6 +72,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
     /// All characters must be alphabetic (a-z, A-Z), numeric (0-9), underscores (_) or dashes (-).
     /// - Returns: A new validator that verifies a string only contains alphabetic, numeric, underscores
     /// or dash characters.
+    @inlinable
     public func alphadash() -> PushValidator {
         push {
             if $1.contains(where: { !$0.isLetter && !$0.isNumber && $0 != "_" && $0 != "-" }) {
@@ -84,6 +86,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
     /// The first character in a string must be alphabetic (a-z, A-Z).
     /// - Returns: A new validator that ensures the first character is alphabetic.
     /// - Note: Empty strings will pass validation.
+    @inlinable
     public func alphafirst() -> PushValidator {
         push {
             guard let firstChar = $1.first else {
@@ -99,6 +102,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
     /// - Returns: A new validator that verifies that a string contains only alphabetic or
     /// numeric characters.
     /// - Note: Empty strings will pass validation.
+    @inlinable
     public func alphanumeric() -> PushValidator {
         push {
             if $1.contains(where: { !$0.isLetter && !$0.isNumber }) {
@@ -111,6 +115,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
     /// - Returns: A new validator that ensures all characters within a given string are alphabetic,
     /// numeric, or underscores.
     /// - Note: Empty strings will pass validation.
+    @inlinable
     public func alphaunderscore() -> PushValidator {
         push {
             if $1.contains(where: { !$0.isLetter && !$0.isNumber && $0 != "_" }) {
@@ -123,6 +128,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
     /// - Returns: A new validator that verifies that the first character in a given string is
     /// an alphabetic character or an underscore.
     /// - Note: Empty strings will pass validation.
+    @inlinable
     public func alphaunderscorefirst() -> PushValidator {
         push {
             guard let firstChar = $1.first else {
@@ -139,6 +145,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
     /// All characters within a string must be numeric (0-9).
     /// - Returns: A new validator that ensures all characters within a string are numeric.
     /// - Note: Empty strings will pass validation.
+    @inlinable
     public func numeric() -> PushValidator {
         push {
             if $1.contains(where: { !$0.isNumber }) {
@@ -152,6 +159,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
     /// - Parameter list: The list of banned words.
     /// - Returns: A new validator that ensures a given string is not equal to a banned word
     /// contained within `list`.
+    @inlinable
     public func blacklist(_ list: Set<String>) -> PushValidator {
         push { _, val in
             if list.contains(String(val)) {
@@ -164,6 +172,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
     /// words.
     /// - Parameter list: The list of permissible words.
     /// - Returns: A new validator that verifies that a given string exist within `list`.
+    @inlinable
     public func whitelist(_ list: Set<String>) -> PushValidator {
         push { _, val in
             if !list.contains(String(val)) {
@@ -180,6 +189,7 @@ extension ValidationPushProtocol where Value: StringProtocol {
     /// - Parameter list: The list of permissible words.
     /// - Returns: A new validator that ensures a given string contains a substring existing within
     /// `list`.
+    @inlinable
     public func greyList(_ list: Set<String>) -> PushValidator {
         push { _, val in
             guard list.contains(where: { val.contains($0) }) else {

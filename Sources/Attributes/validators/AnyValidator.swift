@@ -78,6 +78,7 @@ public struct AnyValidator<Root>: ValidatorProtocol {
     /// Initialise this validator with another AnyValidator. This is equivalent to a copy
     /// constructor.
     /// - Parameter validator: The equivalent validator to self.
+    @inlinable
     public init(_ validator: AnyValidator<Root>) {
         self = validator
     }
@@ -117,6 +118,7 @@ public struct AnyValidator<Root>: ValidatorProtocol {
     /// - Parameter path: A path pointing from the new Root to the Root of this AnyValidator.
     /// - Returns: A new validator with a validate method that enacts the same validation rules but
     ///            uses a new Root.
+    @inlinable
     public func toNewRoot<NewPath: ReadOnlyPathProtocol>(path: NewPath)
         -> AnyValidator<NewPath.Root> where NewPath.Value == Root {
         AnyValidator<NewPath.Root> {

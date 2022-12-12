@@ -93,6 +93,7 @@ extension ValidationPushProtocol {
     ///   - builder: The validation function performed when `condition` is true.
     /// - Returns: A new validator that performs the validation functions contained
     /// within `builder` when `condition` is true.
+    @inlinable
     public func `if`(
         _ condition: @escaping (Value) -> Bool,
         @ValidatorBuilder<Root> then builder: @escaping () -> AnyValidator<Root>
@@ -112,6 +113,7 @@ extension ValidationPushProtocol {
     ///   - builder2: The validation function that is executed when `condition` is false.
     /// - Returns: A new validator that performs the validation function `builder1` when `condition`
     /// is true, or `builder2` otherwise.
+    @inlinable
     public func `if`(
         _ condition: @escaping (Value) -> Bool,
         @ValidatorBuilder<Root> then builder1: @escaping () -> AnyValidator<Root>,
@@ -140,6 +142,7 @@ extension ValidationPushProtocol where Value: Equatable {
     /// into a new sequence.
     /// - Returns: A new validator that performs a validation function validating that a specific value exists
     /// in the transformed sequence.
+    @inlinable
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence, S2: Sequence>(
         _ p: P, transform: @escaping (S) -> S2
     ) -> PushValidator where P.Root == Root, P.Value == S, S2.Element == Value {
@@ -159,6 +162,7 @@ extension ValidationPushProtocol where Value: Equatable {
     /// - Parameter p: The path pointing to the sequence that might contain a value.
     /// - Returns: A new validator that performs a validation function that ensures that values exist within
     /// a sequence specified by `p`.
+    @inlinable
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(
         _ p: P
     ) -> PushValidator where P.Root == Root, P.Value == S, S.Element == Value {
@@ -183,6 +187,7 @@ extension ValidationPushProtocol where Value: Hashable {
     /// - Parameter p: The path pointing to the sequence that might contain a value.
     /// - Returns: A new validator that performs a validation function that ensures values are within
     /// a sequence specified by `p`.
+    @inlinable
     public func `in`<P: ReadOnlyPathProtocol, S: Sequence>(
         _ p: P
     ) -> PushValidator where P.Root == Root, P.Value == S, S.Element == Value {
@@ -202,6 +207,7 @@ extension ValidationPushProtocol where Value: Hashable {
     /// - Parameter set: The set of valid values.
     /// - Returns: A new validator that performs a validation function that ensures a given value exists
     /// within `set`.
+    @inlinable
     public func `in`(_ set: Set<Value>) -> PushValidator {
         push {
             if !set.contains($1) {
@@ -219,6 +225,7 @@ extension ValidationPushProtocol where Value: Equatable {
     /// - Parameter value: The value that causes the validation to pass.
     /// - Returns: A new validator that performs a validation that ensures a value is equal to
     /// `value`.
+    @inlinable
     public func equals(_ value: Value) -> PushValidator {
         push {
             if $1 != value {
@@ -232,6 +239,7 @@ extension ValidationPushProtocol where Value: Equatable {
     /// will only pass when a given value is not equal to this `value`.
     /// - Returns: A new validator that passes when a given parameter is not equal
     /// to `value`.
+    @inlinable
     public func notEquals(_ value: Value) -> PushValidator {
         push {
             if $1 == value {
@@ -247,12 +255,14 @@ extension ValidationPushProtocol where Value == Bool {
 
     /// Satisfies a validation when the given value is *false*.
     /// - Returns: A new validator that passes when a given boolean value is *false*.
+    @inlinable
     public func equalsFalse() -> PushValidator {
         self.equals(false)
     }
 
     /// Satisfies a validation when the given value is *true*.
     /// - Returns: A new validator that passes when a given boolean value is *true*.
+    @inlinable
     public func equalsTrue() -> PushValidator {
         self.equals(true)
     }
@@ -269,6 +279,7 @@ extension ValidationPushProtocol where Value: Comparable {
     ///   - max: The maximum value that passes the validator.
     /// - Returns: A new validator that passes when a given value is between `min`
     /// and `max` inclusively.
+    @inlinable
     public func between(min: Value, max: Value) -> PushValidator {
         push {
             if $1 < min || $1 > max {
@@ -281,6 +292,7 @@ extension ValidationPushProtocol where Value: Comparable {
     /// - Parameter value: The value that a given value must be less then. The validator will
     /// only pass when a given value is less than this `value`.
     /// - Returns: A new validator that checks that a given parameter is less than `value`.
+    @inlinable
     public func lessThan(_ value: Value) -> PushValidator {
         push {
             if $1 >= value {
@@ -293,6 +305,7 @@ extension ValidationPushProtocol where Value: Comparable {
     /// - Parameter value: The value that a given value must be less then or equal to. The validator will
     /// only pass when a given value is less than or equal to this `value`.
     /// - Returns: A new validator that checks that a given parameter is less than or equal to `value`.
+    @inlinable
     public func lessThanEqual(_ value: Value) -> PushValidator {
         push {
             if $1 > value {
@@ -305,6 +318,7 @@ extension ValidationPushProtocol where Value: Comparable {
     /// - Parameter value: The value that a given value must be greater then. The validator will
     /// only pass when a given value is greater than this `value`.
     /// - Returns: A new validator that is checks that a given parameter is greater than `value`.
+    @inlinable
     public func greaterThan(_ value: Value) -> PushValidator {
         push {
             if $1 <= value {
@@ -318,6 +332,7 @@ extension ValidationPushProtocol where Value: Comparable {
     /// only pass when a given value is greater than or equal to this `value`.
     /// - Returns: A new validator that checks that a given parameter is greater than or equal to
     /// `value`.
+    @inlinable
     public func greaterThanEqual(_ value: Value) -> PushValidator {
         push {
             if $1 < value {
@@ -334,6 +349,7 @@ extension ValidationPushProtocol where Value: Collection {
     /// Performs a validation that ensures that a given collection is empty.
     /// - Returns: A new validator that checks whether a given collection is empty. A non-empty collection
     /// will throw an error.
+    @inlinable
     public func empty() -> PushValidator {
         push {
             if !$1.isEmpty {
@@ -344,6 +360,7 @@ extension ValidationPushProtocol where Value: Collection {
 
     /// Performs a validation that ensures a given collection is not empty.
     /// - Returns: A new validator that verifies that a given collection is not empty.
+    @inlinable
     public func notEmpty() -> PushValidator {
         push {
             if $1.isEmpty {
@@ -355,6 +372,7 @@ extension ValidationPushProtocol where Value: Collection {
     /// Performs a validation that ensure a given collection has `length` elements.
     /// - Parameter length: The number of elements that passes this validation.
     /// - Returns: A new validator that performs a validation ensuring a collection has `length` elements.
+    @inlinable
     public func length(_ length: Int) -> PushValidator {
         if length == 0 {
             return empty()
@@ -369,6 +387,7 @@ extension ValidationPushProtocol where Value: Collection {
     /// Performs a validation that verifies the given collection has at least `length` elements.
     /// - Parameter length: The minimum length of a given collection.
     /// - Returns: A new validator that verifies that a collection has at least `length` elements.
+    @inlinable
     public func minLength(_ length: Int) -> PushValidator {
         if length == 1 {
             return notEmpty()
@@ -384,6 +403,7 @@ extension ValidationPushProtocol where Value: Collection {
     /// - Parameter length: The maximum number of elements within a given collection.
     /// - Returns: A new validator verifies that a collection has at most `length`
     /// elements.
+    @inlinable
     public func maxLength(_ length: Int) -> PushValidator {
         if length == 0 {
             return empty()
@@ -405,6 +425,7 @@ extension ValidationPushProtocol where Value: Sequence {
     /// - Parameter transform: A function that transforms the given sequence into a sequence of 
     /// hashable elements.
     /// - Returns: A new validator that ensures a transformed collection only contains unique elements.
+    @inlinable
     public func unique<S: Sequence>(
         _ transform: @escaping (Value) -> S
     ) -> PushValidator where S.Element: Hashable {
@@ -430,6 +451,7 @@ extension ValidationPushProtocol where Value: Sequence, Value.Element: Hashable 
     /// Creates a validator that ensures all elements within a given value are unique.
     /// - Returns: A new validator that verifies that all elements within a sequence are
     /// unique.
+    @inlinable
     public func unique() -> PushValidator {
         push { _, value in
             var set = Set<Value.Element>()

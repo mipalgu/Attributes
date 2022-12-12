@@ -124,6 +124,7 @@ public struct ValidatorFactory<Value> {
     /// - Returns: A new factory that incorporates the new validator into the current
     /// stack of validators.
     /// - SeeAlso: ``ValidationPath``.
+    @usableFromInline
     internal func push<Validator: ValidatorProtocol>(
         _ make: @escaping (ValidationPath<ReadOnlyPath<Value, Value>>) -> Validator
     ) -> ValidatorFactory<Value> where Validator.Root == Value {
@@ -141,6 +142,7 @@ extension ValidatorFactory {
     /// Creates a factory that will perform the `if` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func `if`(
         _ condition: @escaping (Value) -> Bool,
         @ValidatorBuilder<Value> then builder: @escaping () -> AnyValidator<Value>
@@ -151,6 +153,7 @@ extension ValidatorFactory {
     /// Creates a factory that will perform the `if` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func `if`(
         _ condition: @escaping (Value) -> Bool,
         @ValidatorBuilder<Value> then builder1: @escaping () -> AnyValidator<Value>,
@@ -209,6 +212,7 @@ extension ValidatorFactory where Value: Equatable {
     /// Creates a factory that will perform the `equals` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func equals(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.equals(value) }
     }
@@ -216,6 +220,7 @@ extension ValidatorFactory where Value: Equatable {
     /// Creates a factory that will perform the `notEquals` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func notEquals(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.notEquals(value) }
     }
@@ -228,6 +233,7 @@ extension ValidatorFactory where Value == Bool {
     /// Creates a factory that will perform the `equalsFalse` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func equalsFalse() -> ValidatorFactory<Value> {
         push { $0.equalsFalse() }
     }
@@ -235,6 +241,7 @@ extension ValidatorFactory where Value == Bool {
     /// Creates a factory that will perform the `equalsTrue` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func equalsTrue() -> ValidatorFactory<Value> {
         push { $0.equalsTrue() }
     }
@@ -247,6 +254,7 @@ extension ValidatorFactory where Value: Comparable {
     /// Creates a factory that will perform the `between` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func between(min: Value, max: Value) -> ValidatorFactory<Value> {
         push { $0.between(min: min, max: max) }
     }
@@ -254,6 +262,7 @@ extension ValidatorFactory where Value: Comparable {
     /// Creates a factory that will perform the `lessThan` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func lessThan(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.lessThan(value) }
     }
@@ -261,6 +270,7 @@ extension ValidatorFactory where Value: Comparable {
     /// Creates a factory that will perform the `lessThanEqual` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func lessThanEqual(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.lessThanEqual(value) }
     }
@@ -268,6 +278,7 @@ extension ValidatorFactory where Value: Comparable {
     /// Creates a factory that will perform the `greaterThan` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func greaterThan(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.greaterThan(value) }
     }
@@ -275,6 +286,7 @@ extension ValidatorFactory where Value: Comparable {
     /// Creates a factory that will perform the `greaterThanEqual` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func greaterThanEqual(_ value: Value) -> ValidatorFactory<Value> {
         push { $0.greaterThanEqual(value) }
     }
@@ -287,6 +299,7 @@ extension ValidatorFactory where Value: Collection {
     /// Creates a factory that will perform the `empty` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func empty() -> ValidatorFactory<Value> {
         push { $0.empty() }
     }
@@ -294,6 +307,7 @@ extension ValidatorFactory where Value: Collection {
     /// Creates a factory that will perform the `notEmpty` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func notEmpty() -> ValidatorFactory<Value> {
         push { $0.notEmpty() }
     }
@@ -301,6 +315,7 @@ extension ValidatorFactory where Value: Collection {
     /// Creates a factory that will perform the `length` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func length(_ length: Int) -> ValidatorFactory<Value> {
         push { $0.length(length) }
     }
@@ -308,6 +323,7 @@ extension ValidatorFactory where Value: Collection {
     /// Creates a factory that will perform the `minLength` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func minLength(_ length: Int) -> ValidatorFactory<Value> {
         push { $0.minLength(length) }
     }
@@ -315,6 +331,7 @@ extension ValidatorFactory where Value: Collection {
     /// Creates a factory that will perform the `maxLength` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func maxLength(_ length: Int) -> ValidatorFactory<Value> {
         push { $0.maxLength(length) }
     }
@@ -327,6 +344,7 @@ extension ValidatorFactory where Value: Sequence {
     /// Creates a factory that will perform the `unique` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func unique<S: Sequence>(
         _ transform: @escaping (Value) -> S
     ) -> ValidatorFactory<Value> where S.Element: Hashable {
@@ -341,6 +359,7 @@ extension ValidatorFactory where Value: Sequence, Value.Element: Hashable {
     /// Creates a factory that will perform the `unique` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func unique() -> ValidatorFactory<Value> {
         push { $0.unique() }
     }
@@ -353,6 +372,7 @@ extension ValidatorFactory where Value: StringProtocol {
     /// Creates a factory that will perform the `alpha` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func alpha() -> ValidatorFactory<Value> {
         push { $0.alpha() }
     }
@@ -360,6 +380,7 @@ extension ValidatorFactory where Value: StringProtocol {
     /// Creates a factory that will perform the `alphadash` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func alphadash() -> ValidatorFactory<Value> {
         push { $0.alphadash() }
     }
@@ -367,6 +388,7 @@ extension ValidatorFactory where Value: StringProtocol {
     /// Creates a factory that will perform the `alphafirst` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func alphafirst() -> ValidatorFactory<Value> {
         push { $0.alphafirst() }
     }
@@ -374,6 +396,7 @@ extension ValidatorFactory where Value: StringProtocol {
     /// Creates a factory that will perform the `alphanumeric` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func alphanumeric() -> ValidatorFactory<Value> {
         push { $0.alphanumeric() }
     }
@@ -381,6 +404,7 @@ extension ValidatorFactory where Value: StringProtocol {
     /// Creates a factory that will perform the `alphaunderscore` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func alphaunderscore() -> ValidatorFactory<Value> {
         push { $0.alphaunderscore() }
     }
@@ -388,6 +412,7 @@ extension ValidatorFactory where Value: StringProtocol {
     /// Creates a factory that will perform the `alphaunderscorefirst` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func alphaunderscorefirst() -> ValidatorFactory<Value> {
         push { $0.alphaunderscorefirst() }
     }
@@ -395,6 +420,7 @@ extension ValidatorFactory where Value: StringProtocol {
     /// Creates a factory that will perform the `blacklist` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func blacklist(_ list: Set<String>) -> ValidatorFactory<Value> {
         push { $0.blacklist(list) }
     }
@@ -402,6 +428,7 @@ extension ValidatorFactory where Value: StringProtocol {
     /// Creates a factory that will perform the `numeric` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func numeric() -> ValidatorFactory<Value> {
         push { $0.numeric() }
     }
@@ -409,6 +436,7 @@ extension ValidatorFactory where Value: StringProtocol {
     /// Creates a factory that will perform the `whitelist` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func whitelist(_ list: Set<String>) -> ValidatorFactory<Value> {
         push { $0.whitelist(list) }
     }
@@ -416,6 +444,7 @@ extension ValidatorFactory where Value: StringProtocol {
     /// Creates a factory that will perform the `greyList` rule. For a full list of rules,
     /// see ``ValidationPushProtocol``.
     /// - SeeAlso: ``ValidationPushProtocol``.
+    @inlinable
     public func greyList(_ list: Set<String>) -> ValidatorFactory<Value> {
         push { $0.greyList(list) }
     }

@@ -74,7 +74,7 @@ public struct RequiredValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
     // swiftlint:disable identifier_name
 
     /// The function performing the validation.
-    internal let _validate: (Root, Value) throws -> Void
+    @usableFromInline internal let _validate: (Root, Value) throws -> Void
 
     // swiftlint:enable identifier_name
 
@@ -82,6 +82,7 @@ public struct RequiredValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
     /// the value. Essentially this init is used to setup the *required* relationship. The validation will
     /// throw errors if the value is equal to nil but perform no other checks.
     /// - Parameter path: The path to the value to validate.
+    @inlinable
     public init(path: PathType) {
         self.init(path) { _, _ in }
     }
@@ -94,6 +95,7 @@ public struct RequiredValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
     /// - Parameters:
     ///   - path: The path to the value being validated.
     ///   - _validate: An additional validation rule performed after the *required* rule is checked.
+    @inlinable
     internal init(_ path: PathType, _validate: @escaping (Root, Value) throws -> Void) {
         self.path = path
         self._validate = _validate
@@ -106,6 +108,7 @@ public struct RequiredValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
     /// - Parameter root: The root object containing the value to be validated.
     /// - Throws: Throws a ValidationError when the value is nil.
     /// - Throws: Throws an Error when the validation is unsusccessful.
+    @inlinable
     public func performValidation(_ root: PathType.Root) throws {
         let value = root[keyPath: self.path.keyPath]
         if value.isNil {
@@ -119,6 +122,7 @@ public struct RequiredValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
     /// - Parameter f: The function to execute after `_validate` is performed.
     /// - Returns: A new validator performing the function composition in it's `performValidation`
     ///            method.
+    @inlinable
     public func push(_ f: @escaping (Root, Value) throws -> Void) -> RequiredValidator<P> {
         RequiredValidator(self.path) {
             try self._validate($0, $1)
@@ -129,6 +133,7 @@ public struct RequiredValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
     /// Create a type-erased validator from self.
     /// - Parameter builder: The builder used to construct the AnyValidator.
     /// - Returns: The new type-erased validator.
+    @inlinable
     public func validate(
         @ValidatorBuilder<PathType.Root> builder: (Self) -> [AnyValidator<PathType.Root>]
     ) -> AnyValidator<PathType.Root> {

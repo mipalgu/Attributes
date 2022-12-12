@@ -68,13 +68,14 @@ public struct Validator<P: ReadOnlyPathProtocol>: _PathValidator {
     // swiftlint:disable identifier_name
 
     /// The function that performs the validation.
-    internal let _validate: (PathType.Root, PathType.Value) throws -> Void
+    @usableFromInline internal let _validate: (PathType.Root, PathType.Value) throws -> Void
 
     // swiftlint:enable identifier_name
 
     /// Initialise this object from a Path. The validation function does nothing in this
     /// initialiser.
     /// - Parameter path: The path to the value that is validated by this validator.
+    @inlinable
     public init(path: PathType) {
         self.init(path) { _, _ in }
     }
@@ -86,6 +87,7 @@ public struct Validator<P: ReadOnlyPathProtocol>: _PathValidator {
     ///   - path: The path to the value that this Validator validates.
     ///   - _validate: The validation function which performs that validation on the value pointed to
     ///                by path.
+    @inlinable
     internal init(_ path: PathType, _validate: @escaping (PathType.Root, PathType.Value) throws -> Void) {
         self.path = path
         self._validate = _validate
@@ -96,6 +98,7 @@ public struct Validator<P: ReadOnlyPathProtocol>: _PathValidator {
     /// Perform the validation of a value contained within a Root object.
     /// - Parameter root: The root object containing the value pointed to by path. This
     ///                   function validates the value using an internal validation function.
+    @inlinable
     public func performValidation(_ root: PathType.Root) throws {
         _ = try self._validate(root, root[keyPath: self.path.keyPath])
     }
@@ -103,6 +106,7 @@ public struct Validator<P: ReadOnlyPathProtocol>: _PathValidator {
     /// Creates a type-erased version of this Validator by using a builder function.
     /// - Parameter builder: The function which creates the validation rules from this validator.
     /// - Returns: A type-erased validator which performs the same validation as this validator.
+    @inlinable
     public func validate(
         @ValidatorBuilder<PathType.Root> builder: (Self) -> [AnyValidator<PathType.Root>]
     ) -> AnyValidator<PathType.Root> {

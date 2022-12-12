@@ -24,6 +24,7 @@ struct ChainValidator<Path: ReadOnlyPathProtocol, Validator: ValidatorProtocol>:
     /// - Parameters:
     ///   - path: A path to the root object of the validator.
     ///   - validator: The validator that acts on the root object to validate some value.
+    @inlinable
     init(path: Path, validator: Validator) {
         self.path = path
         self.validator = validator
@@ -32,6 +33,7 @@ struct ChainValidator<Path: ReadOnlyPathProtocol, Validator: ValidatorProtocol>:
     /// Perform the validation of a root object pointed to by path.
     /// - Parameter root: The parent object containing the object that is to be validated.
     /// - Throws: Throws an AttributeError when the validation is unsusccessful.
+    @inlinable
     func performValidation(_ root: Path.Root) throws {
         let value = root[keyPath: path.keyPath]
         do {

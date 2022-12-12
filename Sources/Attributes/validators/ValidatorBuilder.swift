@@ -63,6 +63,7 @@
 public struct ValidatorBuilder<Root> {
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<V0: ValidatorProtocol>(
         _ v0: V0
     ) -> AnyValidator<Root> where V0.Root == Root {
@@ -70,6 +71,7 @@ public struct ValidatorBuilder<Root> {
     }
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<V0: ValidatorProtocol, V1: ValidatorProtocol>(
         _ v0: V0, _ v1: V1
     ) -> AnyValidator<Root> where V0.Root == Root, V1.Root == Root {
@@ -77,6 +79,7 @@ public struct ValidatorBuilder<Root> {
     }
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -91,6 +94,7 @@ public struct ValidatorBuilder<Root> {
     }
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -107,6 +111,7 @@ public struct ValidatorBuilder<Root> {
     }
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -133,6 +138,7 @@ public struct ValidatorBuilder<Root> {
     // swiftlint:disable function_parameter_count
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -160,6 +166,7 @@ public struct ValidatorBuilder<Root> {
     }
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -190,6 +197,7 @@ public struct ValidatorBuilder<Root> {
     }
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -223,6 +231,7 @@ public struct ValidatorBuilder<Root> {
     }
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -259,6 +268,7 @@ public struct ValidatorBuilder<Root> {
     }
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -298,6 +308,7 @@ public struct ValidatorBuilder<Root> {
     }
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -350,6 +361,7 @@ public struct ValidatorBuilder<Root> {
     }
 
     /// Build a validator.
+    @inlinable
     public static func buildBlock<
         V0: ValidatorProtocol,
         V1: ValidatorProtocol,
@@ -409,13 +421,18 @@ public struct ValidatorBuilder<Root> {
 
     /// Creates a validator without any validation rules.
     /// - Returns: A validator that always passes.
+    @inlinable
     public func buildBlock() -> AnyValidator<Root> { [] }
 
     /// Collapse an array of validators into a single validator.
     /// - Parameter content: A function that creates the validators.
     /// - Returns: A validator that performs a validation using all of the validators created
     /// by `content`.
-    public func makeValidator(@ValidatorBuilder _ content: () -> [AnyValidator<Root>]) -> AnyValidator<Root> {
+    @inlinable
+    public func makeValidator(
+        @ValidatorBuilder
+        _ content: () -> [AnyValidator<Root>]
+    ) -> AnyValidator<Root> {
         AnyValidator(content())
     }
 
