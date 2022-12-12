@@ -61,7 +61,7 @@
 public struct IntegerProperty {
 
     /// A self property.
-    public var projectedValue: IntegerProperty {
+    @inlinable public var projectedValue: IntegerProperty {
         self
     }
 
@@ -70,6 +70,7 @@ public struct IntegerProperty {
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

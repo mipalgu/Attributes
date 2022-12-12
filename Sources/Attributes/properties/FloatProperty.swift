@@ -61,7 +61,7 @@
 public struct FloatProperty {
 
     /// A self property.
-    public var projectedValue: FloatProperty {
+    @inlinable public var projectedValue: FloatProperty {
         self
     }
 
@@ -70,6 +70,7 @@ public struct FloatProperty {
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

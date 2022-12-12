@@ -61,7 +61,7 @@
 public struct TextProperty {
 
     /// A self property.
-    public var projectedValue: TextProperty {
+    @inlinable public var projectedValue: TextProperty {
         self
     }
 
@@ -70,6 +70,7 @@ public struct TextProperty {
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

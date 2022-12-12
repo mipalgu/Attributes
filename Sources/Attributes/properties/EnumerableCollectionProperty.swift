@@ -61,7 +61,7 @@
 public struct EnumerableCollectionProperty {
 
     /// A self property.
-    public var projectedValue: EnumerableCollectionProperty {
+    @inlinable public var projectedValue: EnumerableCollectionProperty {
         self
     }
 
@@ -70,6 +70,7 @@ public struct EnumerableCollectionProperty {
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

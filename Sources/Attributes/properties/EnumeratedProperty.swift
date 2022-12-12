@@ -61,7 +61,7 @@
 public struct EnumeratedProperty {
 
     /// A self property.
-    public var projectedValue: EnumeratedProperty {
+    @inlinable public var projectedValue: EnumeratedProperty {
         self
     }
 
@@ -70,6 +70,7 @@ public struct EnumeratedProperty {
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

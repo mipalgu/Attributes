@@ -61,7 +61,7 @@
 public struct BoolProperty {
 
     /// A self property.
-    public var projectedValue: BoolProperty {
+    @inlinable public var projectedValue: BoolProperty {
         self
     }
 
@@ -70,6 +70,7 @@ public struct BoolProperty {
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

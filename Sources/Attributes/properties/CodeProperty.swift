@@ -61,7 +61,7 @@
 public struct CodeProperty {
 
     /// A self property.
-    public var projectedValue: CodeProperty {
+    @inlinable public var projectedValue: CodeProperty {
         self
     }
 
@@ -70,6 +70,7 @@ public struct CodeProperty {
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

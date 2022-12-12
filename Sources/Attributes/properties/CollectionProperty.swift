@@ -62,7 +62,7 @@
 public struct CollectionProperty {
 
     /// The project value.
-    public var projectedValue: CollectionProperty {
+    @inlinable public var projectedValue: CollectionProperty {
         self
     }
 
@@ -71,6 +71,7 @@ public struct CollectionProperty {
 
     /// Initialise this property from it's wrapped value.
     /// - Parameter wrappedValue: The wrapped value.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

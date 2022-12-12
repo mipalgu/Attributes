@@ -61,7 +61,7 @@
 public struct ExpressionProperty {
 
     /// A self property.
-    public var projectedValue: ExpressionProperty {
+    @inlinable public var projectedValue: ExpressionProperty {
         self
     }
 
@@ -70,6 +70,7 @@ public struct ExpressionProperty {
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

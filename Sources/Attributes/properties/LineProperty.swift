@@ -61,7 +61,7 @@
 public struct LineProperty {
 
     /// A self property.
-    public var projectedValue: LineProperty {
+    @inlinable public var projectedValue: LineProperty {
         self
     }
 
@@ -70,6 +70,7 @@ public struct LineProperty {
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

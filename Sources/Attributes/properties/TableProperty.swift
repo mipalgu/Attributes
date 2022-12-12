@@ -61,7 +61,7 @@
 public struct TableProperty {
 
     /// The project value.
-    public var projectedValue: TableProperty {
+    @inlinable public var projectedValue: TableProperty {
         self
     }
 
@@ -70,6 +70,7 @@ public struct TableProperty {
 
     /// Initialise this property from the wrapped value.
     /// - Parameter wrappedValue: The wrapped value.
+    @inlinable
     public init(wrappedValue: SchemaAttribute) {
         self.wrappedValue = wrappedValue
     }

@@ -65,7 +65,7 @@
 public struct ComplexCollectionProperty<Base: ComplexProtocol> {
 
     /// The projected value.
-    public var projectedValue: ComplexCollectionProperty<Base> {
+    @inlinable public var projectedValue: ComplexCollectionProperty<Base> {
         self
     }
 
@@ -79,6 +79,7 @@ public struct ComplexCollectionProperty<Base: ComplexProtocol> {
     /// - Parameters:
     ///   - base: The type information for each element within the collection.
     ///   - label: The name of the attribute.
+    @inlinable
     public init(base: Base, label: String) {
         self.wrappedValue = base
         self.label = label
@@ -90,12 +91,12 @@ public struct ComplexCollectionProperty<Base: ComplexProtocol> {
 extension ComplexCollectionProperty: SchemaAttributeConvertible {
 
     /// All the triggers for the collection attribute.
-    var allTriggers: Any {
+    @inlinable var allTriggers: Any {
         wrappedValue.allTriggers
     }
 
     /// The equivalent schema attribute for this collection of complex attributes.
-    var schemaAttribute: Any {
+    @inlinable var schemaAttribute: Any {
         let fields = wrappedValue.properties.map {
             Field(name: $0.label, type: $0.type)
         }
