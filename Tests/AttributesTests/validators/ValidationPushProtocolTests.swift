@@ -87,8 +87,8 @@ final class ValidationPushProtocolTests: XCTestCase {
 
     /// Test validation is performed when if condition is true.
     func testIf() throws {
-        let newPath = pointPath
-        .if({
+        // swiftlint:disable:next multiline_arguments_brackets
+        let newPath = pointPath.if({
                 $0.x.isMultiple(of: 2)
             },
             then: {
@@ -107,8 +107,8 @@ final class ValidationPushProtocolTests: XCTestCase {
     /// Test if-else calls correct validators.
     func testIfElse() throws {
         let validator2 = NullValidator<Point>()
-        let newPath = pointPath
-        .if({
+        // swiftlint:disable:next multiline_arguments_brackets
+        let newPath = pointPath.if({
                 $0.x.isMultiple(of: 2)
             },
             then: {

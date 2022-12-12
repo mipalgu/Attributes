@@ -114,8 +114,8 @@ final class WhenChangedTests: XCTestCase {
 
     /// Test when calls trigger correctly for correct condition.
     func testWhen() throws {
-        let falseTrigger = identityTrigger
-        .when({ _ in
+        // swiftlint:disable:next multiline_arguments_brackets
+        let falseTrigger = identityTrigger.when({ _ in
                 false
             },
             then: { _ in
@@ -126,8 +126,8 @@ final class WhenChangedTests: XCTestCase {
         XCTAssertEqual(mockTrigger.timesCalled, 0)
         XCTAssertNil(mockTrigger.pathPassed)
         XCTAssertNil(mockTrigger.rootPassed)
-        let newTrigger = identityTrigger
-        .when({ _ in
+        // swiftlint:disable:next multiline_arguments_brackets
+        let newTrigger = identityTrigger.when({ _ in
                 true
             },
             then: { _ in
