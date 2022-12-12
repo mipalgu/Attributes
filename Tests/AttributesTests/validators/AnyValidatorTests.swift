@@ -81,15 +81,11 @@ final class AnyValidatorTests: XCTestCase {
         }
     }
 
-    // swiftlint:disable empty_xctest_method
-
     /// Reset test parameters.
     override func setUp() {
         timesCalled = 0
         pointsReceived = nil
     }
-
-    // swiftlint:enable empty_xctest_method
 
     /// Test init that takes the validate function.
     func testValidateInit() {

@@ -107,16 +107,12 @@ final class ChainValidatorTests: XCTestCase {
         RequiredValidator(path, _validate: f)
     }
 
-    // swiftlint:disable empty_xctest_method
-
     /// Reset test parameters.
     override func setUp() {
         timesCalled = 0
         pointsReceived = nil
         valuesReceived = nil
     }
-
-    // swiftlint:enable empty_xctest_method
 
     /// Test init.
     func testInit() {

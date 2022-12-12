@@ -93,16 +93,12 @@ final class RequiredValidatorTests: XCTestCase {
     /// A path that points to the x-value of an OptionalPoint.
     let path = ReadOnlyPath(keyPath: \OptionalPoint.x, ancestors: [AnyPath(Path(OptionalPoint.self))])
 
-    // swiftlint:disable empty_xctest_method
-
     /// Reset test parameters.
     override func setUp() {
         timesCalled = 0
         pointsReceived = nil
         valuesReceived = nil
     }
-
-    // swiftlint:enable empty_xctest_method
 
     /// Test init using Path initialiser.
     func testPathInit() {

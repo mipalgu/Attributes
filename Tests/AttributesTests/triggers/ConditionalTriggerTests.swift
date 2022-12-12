@@ -82,15 +82,11 @@ final class ConditionalTriggerTests: XCTestCase {
     /// A path to a Point.
     let path = AnyPath(Path(Point.self))
 
-    // swiftlint:disable empty_xctest_method
-
     /// Reset track data every test.
     override func setUp() {
         timesCalled = 0
         valuePassed = nil
     }
-
-    // swiftlint:enable empty_xctest_method
 
     /// Test init.
     func testInit() {
