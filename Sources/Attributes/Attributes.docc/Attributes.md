@@ -90,7 +90,6 @@ let package = Package(
 - ``FloatProperty``
 - ``IntegerProperty``
 - ``LineProperty``
-- ``SchemaAttributeConvertible``
 - ``TableColumn``
 - ``TableProperty``
 - ``TextProperty``
