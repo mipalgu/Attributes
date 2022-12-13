@@ -50,6 +50,7 @@ let package = Package(
 - <doc:GettingStarted>
 - <doc:AttributeTypes>
 - <doc:Validators>
+- <doc:Triggers>
 
 ### Attributes
 - ``Attribute``
