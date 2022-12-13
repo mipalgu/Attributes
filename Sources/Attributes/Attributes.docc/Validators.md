@@ -24,7 +24,7 @@ use a ``ValidatorFactory`` to create them. The ``ValidatorFactory`` is a struct 
 
 ## Validation Rules
 
-We will now examine the pre-defined rules for the different attributes. These rules exist within the ``ValidatorFactory`` struct.
+We will now examine the pre-defined rules for the different attributes. These rules exist within the ``ValidatorFactory`` struct or ``ValidationPushProtocol``.
 
 | Validation Rule | Description | Supported Attributes|
 | --- | --- | --- |
@@ -44,6 +44,7 @@ We will now examine the pre-defined rules for the different attributes. These ru
 | `greaterThanEqual` | This rule validates that the attribute is greater than or equal to the given value. | Comparable Attributes |
 | `greyList` | This rule validates that the attribute contains a substring that is in the given Set. | `LineAttributeType.line`, `LineAttributeType.expression`, `BlockAttributeType.code`, `BlockAttributeType.text` |
 | `if` | This rule creates a conditional validator. The validator will only be applied if the condition is true. This validator may optionally take an `else` function that is executed in the case the condition is not true | All |
+| `in` | This rule validates that the attribute is in the given Set. | Equatable and Hashable Attributes |
 | `length` | This rule validates that the attribute has the given length. | Collection Attributes |
 | `lessThan` | This rule validates that the attribute is less than the given value. | Comparable Attributes |
 | `lessThanEqual` | This rule validates that the attribute is less than or equal to the given value. | Comparable Attributes |

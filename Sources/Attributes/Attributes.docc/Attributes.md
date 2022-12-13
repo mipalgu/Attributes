@@ -51,6 +51,7 @@ let package = Package(
 - <doc:AttributeTypes>
 - <doc:Validators>
 - <doc:Triggers>
+- <doc:CreatingSchemas>
 
 ### Attributes
 - ``Attribute``
