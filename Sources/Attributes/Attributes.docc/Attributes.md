@@ -95,6 +95,21 @@ let package = Package(
 - ``TableProperty``
 - ``TextProperty``
 
+### Schema
+
+- ``AnyGroup``
+- ``Attributable``
+- ``AttributeGroup``
+- ``ComplexProtocol``
+- ``EmptyModifiable``
+- ``EmptySchema``
+- ``Field``
+- ``Group``
+- ``GroupProtocol``
+- ``Modifiable``
+- ``SchemaAttribute``
+- ``SchemaProtocol``
+
 ### Triggers
 
 - ``AnyTrigger``
