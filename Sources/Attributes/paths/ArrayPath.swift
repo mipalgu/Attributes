@@ -88,21 +88,6 @@ extension ReadOnlyPathProtocol where Value: MutableCollection, Value.Index: Bina
 
 }
 
-/// Add subscript for dictionary access.
-extension ReadOnlyPath where Value: DictionaryProtocol {
-
-    /// Creates a new path to the value located at `key` in the dictionary.
-    public subscript(key: Value.Key) -> ReadOnlyPath<Root, Value.Value?> {
-        ReadOnlyPath<Root, Value.Value?>(
-            keyPath: self.keyPath.appending(path: \.[key]),
-            ancestors: self.ancestors + [AnyPath(self)]
-        ) { root in
-            self.isNil(root) || root[keyPath: keyPath][key].isNil
-        }
-    }
-
-}
-
 /// Add subscript.
 extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteger, Value.Element: Nilable {
 
@@ -180,21 +165,6 @@ extension PathProtocol where Value: MutableCollection, Value.Index: BinaryIntege
                 return true
             }
             return collection[index].isNil
-        }
-    }
-
-}
-
-/// Add subscript for dictionary access.
-extension PathProtocol where Value: DictionaryProtocol {
-
-    /// Creates a new path to the value located at `key` in the dictionary.
-    public subscript(key: Value.Key) -> Path<Root, Value.Value?> {
-        Path<Root, Value.Value?>(
-            path: self.path.appending(path: \.[key]),
-            ancestors: self.ancestors + [AnyPath(self)]
-        ) { root in
-            self.isNil(root) || root[keyPath: keyPath][key].isNil
         }
     }
 
