@@ -58,16 +58,23 @@
 
 import Foundation
 
+/// Add move function.
 extension Array {
-    
+
+    /// Move the values located at a set of indices to a new index collectively.
+    /// - Parameters:
+    ///   - source: The indexes containing the elements to be moved.
+    ///   - destination: The starting index of the new elements.
+    @inlinable
     public mutating func move(fromOffsets source: IndexSet, toOffset destination: Int) {
+        let destinationIndex = Swift.max(Swift.min(destination, self.count), 0)
         let original = self
         let descending = source.sorted(by: >)
         descending.forEach { index in self.remove(at: index) }
-        let index = destination - source.filter { $0 < destination }.count
+        let index = destinationIndex - source.filter { $0 < destinationIndex }.count
         descending.forEach { source in
             self.insert(original[source], at: index)
         }
     }
-    
+
 }

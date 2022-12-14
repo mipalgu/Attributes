@@ -56,13 +56,28 @@
  *
  */
 
+/// Protocol for specifying Dictionary types. This protocol is used to
+/// conform generics to Dictionaries.
 public protocol DictionaryProtocol {
-    
+
+    // swiftlint:disable type_name
+
+    /// The Key type of the dictionary.
     associatedtype Key: Hashable
+
+    // swiftlint:enable type_name
+
+    /// The Value type of the dictionary.
     associatedtype Value
-    
+
+    /// The subscript operation that retrieves the value from the
+    /// dictionary.
+    /// - Parameter key: The key in the dictionary.
+    /// - Returns: nil if the key does not exist in the dictionary
+    ///            or the retrieved value if one is present.
     subscript(key: Key) -> Value? { get set }
-    
+
 }
 
+/// DictionaryProtocol conformance.
 extension Dictionary: DictionaryProtocol {}

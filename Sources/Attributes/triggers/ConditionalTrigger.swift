@@ -56,26 +56,51 @@
  *
  */
 
+/// A trigger that only executes when a condition is true.
 public struct ConditionalTrigger<Trigger: TriggerProtocol>: TriggerProtocol {
-    
-    let condition: (Root) -> Bool
-    
-    let trigger: Trigger
-    
+
+    /// A function that evaluates the condition.
+    @usableFromInline let condition: (Root) -> Bool
+
+    /// The trigger to execute when the condition is true.
+    @usableFromInline let trigger: Trigger
+
+    /// Create a ConditionalTrigger with a condition function and a trigger to execute.
+    /// - Parameters:
+    ///   - condition: The function that determines the condition.
+    ///   - trigger: The trigger that is executed when condition evaluates to true.
+    @inlinable
     public init(condition: @escaping (Root) -> Bool, trigger: Trigger) {
         self.condition = condition
         self.trigger = trigger
     }
-    
-    public func performTrigger(_ root: inout Trigger.Root, for path: AnyPath<Trigger.Root>) -> Result<Bool, AttributeError<Trigger.Root>> {
+
+    /// Perform the trigger for a value contained within a root. This function has a precondition
+    /// associated with the execution of the trigger function. The condition stored property must
+    /// evaluate to true with the given root for the trigger to execute it's actions.
+    /// - Parameters:
+    ///   - root: The root object containing the value that triggers the action.
+    ///   - path: The path to the value in root triggering the action.
+    /// - Returns: A result specifying whether the trigger was successful and a Bool indicating
+    ///            to redraw.
+    @inlinable
+    public func performTrigger(
+        _ root: inout Trigger.Root, for path: AnyPath<Trigger.Root>
+    ) -> Result<Bool, AttributeError<Trigger.Root>> {
         if condition(root) {
             return trigger.performTrigger(&root, for: path)
         }
         return .success(false)
     }
-    
+
+    /// Checks that a trigger is valid for a value in a root object.
+    /// - Parameters:
+    ///   - path: The path that points to the value contained in the root object.
+    ///   - root: The root object to evaluate.
+    /// - Returns: Whether this trigger is used for the value specified.
+    @inlinable
     public func isTriggerForPath(_ path: AnyPath<Trigger.Root>, in root: Trigger.Root) -> Bool {
         trigger.isTriggerForPath(path, in: root)
     }
-    
+
 }

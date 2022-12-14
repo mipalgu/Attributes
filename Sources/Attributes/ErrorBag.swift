@@ -59,9 +59,12 @@
 import Foundation
 import swift_helpers
 
+/// A data container for holding errors specific to a set of related Paths.
 public struct ErrorBag<Root> {
-    
-    private var sortedCollection = SortedCollection(compare: { (lhs: AttributeError<Root>, rhs: AttributeError<Root>) -> ComparisonResult in
+
+    /// The underlying collection type storing the data.
+    private var sortedCollection = SortedCollection { (lhs: AttributeError<Root>, rhs: AttributeError<Root>)
+        -> ComparisonResult in
         if lhs.path.isSame(as: rhs.path) {
             return .orderedSame
         }
@@ -69,87 +72,157 @@ public struct ErrorBag<Root> {
             return .orderedAscending
         }
         return .orderedDescending
-    })
-    
-    public var allErrors: [AttributeError<Root>] {
-        return Array(sortedCollection)
     }
-    
+
+    /// All of the errors stored in this container.
+    public var allErrors: [AttributeError<Root>] {
+        Array(sortedCollection)
+    }
+
+    /// Default init. Creates an empty container.
+    @inlinable
     public init() {}
-    
+
+    /// Empties the container.
     public mutating func empty() {
         self.sortedCollection.empty()
     }
-    
-    public func errors(includingDescendantsForPath path: AnyPath<Root>) -> [AttributeError<Root>] {
-        return Array(sortedCollection[index(includingDescendantsForPath: path)])
+
+    /// Finds the errors for a path and all the children of path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path and paths children.
+    public func errors(
+        includingDescendantsForPath path: AnyPath<Root>
+    ) -> [AttributeError<Root>] {
+        let indexes = index(includingDescendantsForPath: path)
+        return Array(sortedCollection.enumerated().filter { indexes.contains($0.0) }.map(\.1))
     }
-    
-    public func errors<Path: ReadOnlyPathProtocol>(includingDescendantsForPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
-        return self.errors(includingDescendantsForPath: AnyPath(path))
+
+    /// Finds the errors for a path and all the children of path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path and paths children.
+    @inlinable
+    public func errors<Path: ReadOnlyPathProtocol>(
+        includingDescendantsForPath path: Path
+    ) -> [AttributeError<Root>] where Path.Root == Root {
+        self.errors(includingDescendantsForPath: AnyPath(path))
     }
-    
-    public func errors<Path: PathProtocol>(includingDescendantsForPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
-        return self.errors(includingDescendantsForPath: AnyPath(path))
+
+    /// Finds the errors for a path and all the children of path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path and paths children.
+    @inlinable
+    public func errors<Path: PathProtocol>(
+        includingDescendantsForPath path: Path
+    ) -> [AttributeError<Root>] where Path.Root == Root {
+        self.errors(includingDescendantsForPath: AnyPath(path))
     }
-    
+
+    /// Finds the errors for a path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path.
     public func errors(forPath path: AnyPath<Root>) -> [AttributeError<Root>] {
+        /// Check if a type is an attribute.
+        /// - Parameter type: The type to check.
+        /// - Returns: Whether type is an Attribute.
         func isAttributeType(_ type: Any.Type) -> Bool {
-            return type == Attribute.self || type == BlockAttribute.self || type == LineAttribute.self
+            type == Attribute.self || type == BlockAttribute.self || type == LineAttribute.self
         }
         // Do we have an ancestor who is an attribute type?
-        let ancestorIndex = path.ancestors.lastIndex(where: { isAttributeType($0.targetType) })
+        let ancestorIndex = path.ancestors.lastIndex { isAttributeType($0.targetType) }
         // Is path an attribute type or does it have an ancestor which is an attribute type?
-        guard isAttributeType(path.targetType) || nil != ancestorIndex else {
-            let range = sortedCollection.range(of: AttributeError(message: "", path: path))
-            return Array(self.sortedCollection[range])
+        guard isAttributeType(path.targetType) || ancestorIndex != nil else {
+            return sortedCollection.filter { $0.path == path }
         }
         // Operate with the path that is the attribute type.
+        // swiftlint:disable:next force_unwrapping
         let path = isAttributeType(path.targetType) ? path : path.ancestors[ancestorIndex!]
         // Treat all subpaths of the attribute type as the same when fetching the errors.
         return self.errors(includingDescendantsForPath: path)
     }
-    
-    public func errors<Path: ReadOnlyPathProtocol>(forPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
-        return self.errors(forPath: AnyPath(path))
+
+    /// Finds the errors for a path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path.
+    @inlinable
+    public func errors<Path: ReadOnlyPathProtocol>(
+        forPath path: Path
+    ) -> [AttributeError<Root>] where Path.Root == Root {
+        self.errors(forPath: AnyPath(path))
     }
-    
-    public func errors<Path: PathProtocol>(forPath path: Path) -> [AttributeError<Root>] where Path.Root == Root {
-        return self.errors(forPath: AnyPath(path))
+
+    /// Finds the errors for a path.
+    /// - Parameter path: The path to lookup
+    /// - Returns: All the errors for path.
+    @inlinable
+    public func errors<Path: PathProtocol>(
+        forPath path: Path
+    ) -> [AttributeError<Root>] where Path.Root == Root {
+        self.errors(forPath: AnyPath(path))
     }
-    
+
+    /// Remove the errors matching the path and any children of path.
+    /// - Parameter path: The path to remove errors from.
     public mutating func remove(includingDescendantsForPath path: AnyPath<Root>) {
-        sortedCollection.removeSubrange(self.index(includingDescendantsForPath: path))
+        self.index(includingDescendantsForPath: path).sorted().reversed().forEach {
+            _ = sortedCollection.remove(at: $0)
+        }
     }
-    
-    public mutating func remove<Path: ReadOnlyPathProtocol>(includingDescendantsForPath path: Path) where Path.Root == Root {
+
+    /// Remove the errors matching the path and any children of path.
+    /// - Parameter path: The path to remove errors from.
+    @inlinable
+    public mutating func remove<Path: ReadOnlyPathProtocol>(
+        includingDescendantsForPath path: Path
+    ) where Path.Root == Root {
         self.remove(includingDescendantsForPath: AnyPath(path))
     }
-    
-    public mutating func remove<Path: PathProtocol>(includingDescendantsForPath path: Path) where Path.Root == Root {
+
+    /// Remove the errors matching the path and any children of path.
+    /// - Parameter path: The path to remove errors from.
+    @inlinable
+    public mutating func remove<Path: PathProtocol>(
+        includingDescendantsForPath path: Path
+    ) where Path.Root == Root {
         self.remove(includingDescendantsForPath: AnyPath(path))
     }
-    
+
+    /// Remove the errors matching the path.
+    /// - Parameter path: The path to remove errors from.
     public mutating func remove(forPath path: AnyPath<Root>) {
         sortedCollection.removeAll(AttributeError(message: "", path: path))
     }
-    
+
+    /// Remove the errors matching the path.
+    /// - Parameter path: The path to remove errors from.
+    @inlinable
     public mutating func remove<Path: ReadOnlyPathProtocol>(forPath path: Path) where Path.Root == Root {
         self.remove(forPath: AnyPath(path))
     }
-    
+
+    /// Remove the errors matching the path.
+    /// - Parameter path: The path to remove errors from.
+    @inlinable
     public mutating func remove<Path: PathProtocol>(forPath path: Path) where Path.Root == Root {
         self.remove(forPath: AnyPath(path))
     }
-    
+
+    /// Insert a new error in the container.
+    /// - Parameter error: The error to insert.
     public mutating func insert(_ error: AttributeError<Root>) {
         self.sortedCollection.insert(error)
     }
-    
-    private func index(includingDescendantsForPath path: AnyPath<Root>) -> Range<Int> {
-        let elements = self.sortedCollection.right(ofAndIncluding: AttributeError(message: "", path: path))
-        let index = elements.firstIndex { !path.isParent(of: $0.path) } ?? elements.endIndex
-        return elements.startIndex..<index
+
+    /// Find the indexes of the error who share a path.
+    /// - Parameter path: The path to find errors for.
+    /// - Returns: A set containing the indexes of the errors matching the path.
+    private func index(includingDescendantsForPath path: AnyPath<Root>) -> IndexSet {
+        IndexSet(
+            self.sortedCollection
+                .enumerated()
+                .filter { path.isParent(of: $1.path) || path == $1.path }
+                .map(\.0)
+        )
     }
-    
+
 }

@@ -56,18 +56,39 @@
  *
  */
 
-public struct ForEach<SearchPath: SearchablePath, Trigger: TriggerProtocol>: TriggerProtocol where Trigger.Root == SearchPath.Root {
-    
+/// A trigger that will apply a separate trigger to all elements within a collection.
+public struct ForEach<SearchPath: SearchablePath, Trigger: TriggerProtocol>: TriggerProtocol where
+    Trigger.Root == SearchPath.Root {
+
+    /// The path to the root object that contains the elements to iterate over.
     private let path: SearchPath
-    
+
+    /// A builder that will create a suitable trigger for each element.
     private let builder: (Path<SearchPath.Root, SearchPath.Value>) -> Trigger
-    
-    public init(_ path: SearchPath, @TriggerBuilder<SearchPath.Root> each builder: @escaping (Path<SearchPath.Root, SearchPath.Value>) -> Trigger) {
+
+    /// Create a `ForEach` trigger that will be applied to all subpaths within `path`. This trigger
+    /// applies a separate trigger created from `builder`.
+    /// - Parameters:
+    ///   - path: The path to the root object containing the elements to iterate over.
+    ///   - builder: The trigger to apply to each element.
+    public init(
+        _ path: SearchPath,
+        @TriggerBuilder<SearchPath.Root> each builder: @escaping (
+            Path<SearchPath.Root, SearchPath.Value>
+        ) -> Trigger
+    ) {
         self.path = path
         self.builder = builder
     }
-    
-    public func performTrigger(_ root: inout SearchPath.Root, for path: AnyPath<SearchPath.Root>) -> Result<Bool, AttributeError<SearchPath.Root>> {
+
+    /// Perform the trigger within `builder` to each element within `root` pointed to by `path`.
+    /// - Parameters:
+    ///   - root: The root object containing the elements to iterate over.
+    ///   - path: The path to the property containing the elements.
+    /// - Returns: A result from the `performTrigger` method of the trigger created from `builder`.
+    public func performTrigger(
+        _ root: inout SearchPath.Root, for path: AnyPath<SearchPath.Root>
+    ) -> Result<Bool, AttributeError<SearchPath.Root>> {
         var changed = false
         for subpath in self.path.paths(in: root) {
             let trigger = builder(subpath)
@@ -82,49 +103,123 @@ public struct ForEach<SearchPath: SearchablePath, Trigger: TriggerProtocol>: Tri
         }
         return .success(changed)
     }
-    
+
+    /// Check whether a given path within a root object will cause this trigger to fire.
+    /// - Parameters:
+    ///   - path: The path to the element within root that might cause this trigger to fire.
+    ///   - root: The root object.
+    /// - Returns: Whether this trigger is fired by `path` within `root`.
     public func isTriggerForPath(_ path: AnyPath<SearchPath.Root>, in root: SearchPath.Root) -> Bool {
         self.path.isAncestorOrSame(of: path, in: root)
     }
-    
+
 }
 
-extension ForEach where Trigger == WhenChanged<Path<SearchPath.Root, SearchPath.Value>, IdentityTrigger<SearchPath.Root>> {
-    
+/// Add standard triggers.
+extension ForEach where
+    Trigger == WhenChanged<Path<SearchPath.Root, SearchPath.Value>,
+    IdentityTrigger<SearchPath.Root>> {
+
+    /// Create ``WhenChanged`` trigger.
+    /// - Parameters:
+    ///   - condition: The condition causing the trigger to fire.
+    ///   - builder: The trigger eneacted when the `condition` is true.
+    /// - Returns: The new trigger.
+    /// - SeeAlso: ``WhenChanged``.
     public func when<NewTrigger: TriggerProtocol>(
         _ condition: @escaping (Root) -> Bool,
         @TriggerBuilder<Root> then builder: @escaping (Trigger) -> NewTrigger
-    ) -> ForEach<SearchPath, WhenChanged<Path<SearchPath.Root, SearchPath.Value>, ConditionalTrigger<NewTrigger>>> where NewTrigger.Root == Root {
-        ForEach<SearchPath, WhenChanged<Path<SearchPath.Root, SearchPath.Value>, ConditionalTrigger<NewTrigger>>>(self.path) { (actualPath) -> WhenChanged<Path<SearchPath.Root, SearchPath.Value>, ConditionalTrigger<NewTrigger>> in
+    ) -> ForEach<
+        SearchPath, WhenChanged<Path<SearchPath.Root, SearchPath.Value>, ConditionalTrigger<NewTrigger>>
+    > where NewTrigger.Root == Root {
+        ForEach<
+            SearchPath, WhenChanged<Path<SearchPath.Root, SearchPath.Value>, ConditionalTrigger<NewTrigger>>
+        >(self.path) { actualPath -> WhenChanged<
+            Path<SearchPath.Root, SearchPath.Value>, ConditionalTrigger<NewTrigger>
+        > in
             WhenChanged<Path<SearchPath.Root, SearchPath.Value>, ConditionalTrigger<NewTrigger>>(
                 actualPath: actualPath,
-                trigger: ConditionalTrigger<NewTrigger>(condition: condition, trigger: builder(self.builder(actualPath)))
+                trigger: ConditionalTrigger<NewTrigger>(
+                    condition: condition, trigger: builder(self.builder(actualPath))
+                )
             )
         }
     }
-    
-    public func sync<TargetPath: SearchablePath>(target: TargetPath) -> ForEach<SearchPath, SyncTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>> where TargetPath.Root == Root, TargetPath.Value == SearchPath.Value {
+
+    /// Create a ``SyncTrigger``.
+    /// - Parameter target: The target to update when this trigger fires.
+    /// - Returns: The new trigger.
+    /// - SeeAlso: ``SyncTrigger``.
+    public func sync<TargetPath: SearchablePath>(
+        target: TargetPath
+    ) -> ForEach<SearchPath, SyncTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>> where
+        TargetPath.Root == Root, TargetPath.Value == SearchPath.Value {
         ForEach<SearchPath, SyncTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>>(path) {
             SyncTrigger(source: $0, target: target)
         }
     }
-    
-    public func sync<TargetPath: SearchablePath>(target: TargetPath, transform: @escaping (SearchPath.Value, TargetPath.Value) -> TargetPath.Value) -> ForEach<SearchPath, SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>> where TargetPath.Root == Root {
-        ForEach<SearchPath, SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>>(path) {
+
+    /// Create a ``SyncTrigger`` that enacts a transform.
+    /// - Parameters:
+    ///   - target: The target to update when the new trigger fires.
+    ///   - transform: The transform applied to the source to create the target.
+    /// - Returns: The new trigger.
+    /// - SeeAlso: ``SyncTrigger``.
+    public func sync<TargetPath: SearchablePath>(
+        target: TargetPath,
+        transform: @escaping (SearchPath.Value, TargetPath.Value) -> TargetPath.Value
+    ) -> ForEach<
+        SearchPath,
+        SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>
+    > where TargetPath.Root == Root {
+        ForEach<
+            SearchPath, SyncWithTransformTrigger<Path<SearchPath.Root, SearchPath.Value>, TargetPath>
+        >(path) {
             SyncWithTransformTrigger(source: $0, target: target, transform: transform)
         }
     }
 
-    public func makeAvailable<FieldsPath: PathProtocol, AttributesPath: PathProtocol>(field: Field, after order: [String], fields: FieldsPath, attributes: AttributesPath) -> ForEach<SearchPath, MakeAvailableTrigger<Path<SearchPath.Root, SearchPath.Value>, FieldsPath, AttributesPath>> where FieldsPath.Root == Root, FieldsPath.Value == [Field], AttributesPath.Value == [String: Attribute] {
-        ForEach<SearchPath, MakeAvailableTrigger<Path<SearchPath.Root, SearchPath.Value>, FieldsPath, AttributesPath>>(path) {
-            MakeAvailableTrigger(field: field, after: order, source: $0, fields: fields, attributes: attributes)
+    /// Create a ``MakeAvailableTrigger``.
+    /// - Parameters:
+    ///   - field: The new field to make available.
+    ///   - order: The order to place the new field in. (see ``MakeAvailableTrigger``).
+    ///   - fields: A path to the fields array to mutate.
+    ///   - attributes: A path to the attributes array to mutate.
+    /// - Returns: The new trigger.
+    /// - SeeAlso: ``MakeAvailableTrigger``.
+    public func makeAvailable<FieldsPath: PathProtocol, AttributesPath: PathProtocol>(
+        field: Field, after order: [String], fields: FieldsPath, attributes: AttributesPath
+    ) -> ForEach<
+        SearchPath,
+        MakeAvailableTrigger<Path<SearchPath.Root, SearchPath.Value>, FieldsPath, AttributesPath>
+    > where FieldsPath.Root == Root, FieldsPath.Value == [Field],
+        AttributesPath.Value == [String: Attribute] {
+        ForEach<
+            SearchPath,
+            MakeAvailableTrigger<Path<SearchPath.Root, SearchPath.Value>, FieldsPath, AttributesPath>
+        >(path) {
+            MakeAvailableTrigger(
+                field: field, after: order, source: $0, fields: fields, attributes: attributes
+            )
         }
     }
 
-    public func makeUnavailable<FieldsPath: PathProtocol>(field: Field, fields: FieldsPath) -> ForEach<SearchPath, MakeUnavailableTrigger<Path<SearchPath.Root, SearchPath.Value>, FieldsPath>> where FieldsPath.Root == Root, FieldsPath.Value == [Field] {
-        ForEach<SearchPath, MakeUnavailableTrigger<Path<SearchPath.Root, SearchPath.Value>, FieldsPath>>(path) {
+    /// Create a ``MakeUnavailableTrigger``.
+    /// - Parameters:
+    ///   - field: The field to remove.
+    ///   - fields: A path to the fields array to mutate.
+    /// - Returns: The new trigger.
+    /// - SeeAlso: ``MakeUnavailableTrigger``.
+    public func makeUnavailable<FieldsPath: PathProtocol>(
+        field: Field, fields: FieldsPath
+    ) -> ForEach<
+        SearchPath, MakeUnavailableTrigger<Path<SearchPath.Root, SearchPath.Value>, FieldsPath>
+    > where FieldsPath.Root == Root, FieldsPath.Value == [Field] {
+        ForEach<
+            SearchPath, MakeUnavailableTrigger<Path<SearchPath.Root, SearchPath.Value>, FieldsPath>
+        >(path) {
             MakeUnavailableTrigger(field: field, source: $0, fields: fields)
         }
     }
-    
+
 }

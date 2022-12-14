@@ -56,36 +56,72 @@
  *
  */
 
-public struct MakeUnavailableTrigger<Source: PathProtocol, Fields: PathProtocol>: TriggerProtocol where Source.Root == Fields.Root, Fields.Value == [Field] {
-    
+/// A trigger that removes a field when fired.
+public struct MakeUnavailableTrigger<Source: PathProtocol, Fields: PathProtocol>: TriggerProtocol where
+    Source.Root == Fields.Root, Fields.Value == [Field] {
+
+    /// The Root is the same as the paths.
     public typealias Root = Fields.Root
-    
-    public var path: AnyPath<Root> {
+
+    /// An AnyPath representation of source.
+    @inlinable public var path: AnyPath<Root> {
         AnyPath(source)
     }
-    
-    let field: Field
-    
-    let source: Source
-    
-    let fields: Fields
-    
+
+    /// The field to remove when the trigger is fired.
+    @usableFromInline let field: Field
+
+    /// The source path containing the field.
+    @usableFromInline let source: Source
+
+    /// The path to the fields array.
+    @usableFromInline let fields: Fields
+
+    /// Initialise this trigger from the field to remove and the paths affected.
+    /// - Parameters:
+    ///   - field: The field to remove from the source object.
+    ///   - source: A path to the source object containing the Field to remove.
+    ///   - fields: A path to the array of fields that hold the Field to remove.
+    @inlinable
     public init(field: Field, source: Source, fields: Fields) {
         self.field = field
         self.source = source
         self.fields = fields
     }
-    
-    public func performTrigger(_ root: inout Source.Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Source.Root>> {
+
+    /// Perform the trigger function which removes the Field from the objects fields array.
+    /// - Parameters:
+    ///   - root: The source object containing the fields.
+    ///   - _: 
+    /// - Returns: Success when this trigger fired successfully. The trigger also returns a bool
+    ///            indicating that a view needs to redraw.
+    @inlinable
+    public func performTrigger(
+        _ root: inout Source.Root, for _: AnyPath<Root>
+    ) -> Result<Bool, AttributeError<Source.Root>> {
         if fields.isNil(root) {
             return .success(false)
         }
-        root[keyPath: fields.path].removeAll(where: { $0.name == field.name })
+        let indexes = root[keyPath: fields.keyPath].indices.filter {
+            root[keyPath: fields.keyPath][$0] == field
+        }
+        guard !indexes.isEmpty else {
+            return .success(false)
+        }
+        indexes.reversed().forEach {
+            root[keyPath: fields.path].remove(at: $0)
+        }
         return .success(true)
     }
-    
+
+    /// Whether the path given will fire the trigger.
+    /// - Parameters:
+    ///   - path: The path to check.
+    ///   - _: 
+    /// - Returns: True if this path fires the trigger, false otherwise.
+    @inlinable
     public func isTriggerForPath(_ path: AnyPath<Root>, in _: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }
-    
+
 }

@@ -56,32 +56,62 @@
  *
  */
 
-public struct SyncTrigger<Source: PathProtocol, Target: SearchablePath>: TriggerProtocol where Source.Root == Target.Root, Source.Value == Target.Value {
-    
+/// A trigger that updates a target value with a source value when that source value changes.
+public struct SyncTrigger<Source: PathProtocol, Target: SearchablePath>: TriggerProtocol where
+    Source.Root == Target.Root, Source.Value == Target.Value {
+
+    /// The Root of the Trigger matches the `Source` and `Target`.
     public typealias Root = Source.Root
-    
-    public var path: AnyPath<Root> {
+
+    /// The source path as a type-erased path.
+    @inlinable public var path: AnyPath<Root> {
         AnyPath(source)
     }
-    
-    let source: Source
-    
-    let target: Target
-    
+
+    /// The source path.
+    @usableFromInline let source: Source
+
+    /// The target path.
+    @usableFromInline let target: Target
+
+    /// Initialise this trigger with a source and target. This initialiser sets the source paths that
+    /// specify that value to update the target paths with when the trigger fires.
+    /// - Parameters:
+    ///   - source: The source path. This path points to the values to copy into the properties located
+    ///             in the target path.
+    ///   - target: The target path. These values will be mutated when the trigger fires.
+    @inlinable
     public init(source: Source, target: Target) {
         self.source = source
         self.target = target
     }
-    
-    public func performTrigger(_ root: inout Source.Root, for _: AnyPath<Root>) -> Result<Bool, AttributeError<Source.Root>> {
+
+    /// Perform the synchonisation function of this trigger. This functions updates the target values with
+    /// the source values.
+    /// - Parameters:
+    ///   - root: The object containing the source and target values.
+    ///   - _: Unused. This parameter remains in the function delcaration to preserve protocol conformance
+    ///        with ``TriggerProtocol``.
+    /// - Returns: Always returns `.succes(true)` indicating that the target was successfully updated.
+    @inlinable
+    public func performTrigger(
+        _ root: inout Source.Root, for _: AnyPath<Root>
+    ) -> Result<Bool, AttributeError<Source.Root>> {
         for path in target.paths(in: root) {
             root[keyPath: path.path] = root[keyPath: source.keyPath]
         }
         return .success(true)
     }
-    
+
+    /// Check whether this trigger is fired by a value pointed to by a path.
+    /// - Parameters:
+    ///   - path: The path is check.
+    ///   - _: Unused. This parameter remains in the function delcaration to preserve protocol conformance
+    ///        with ``TriggerProtocol``.
+    /// - Returns: Whether this trigger is fired by `path`.
+    @inlinable
     public func isTriggerForPath(_ path: AnyPath<Root>, in _: Root) -> Bool {
         path.isChild(of: self.path) || path.isSame(as: self.path)
     }
-    
+
 }
