@@ -232,4 +232,14 @@ final class ReadOnlyPathTests: XCTestCase {
         XCTAssertFalse(readPath.isNil(point2))
     }
 
+    /// Test dictionary subscript access.
+    func testDictionaryAccess() {
+        let path = ReadOnlyPath([String: String].self)["key"]
+        var dict = ["A": "a"]
+        XCTAssertTrue(path.isNil(dict))
+        dict["key"] = "b"
+        XCTAssertFalse(path.isNil(dict))
+        XCTAssertEqual("b", dict[keyPath: path.keyPath])
+    }
+
 }

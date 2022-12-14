@@ -110,6 +110,30 @@ extension ReadOnlyPathProtocol where Value: Collection, Value.Index: BinaryInteg
 
 }
 
+/// Add subscript for dictionary access.
+extension ReadOnlyPathProtocol where Value: Collection,
+    Value: ExpressibleByDictionaryLiteral, Value.Key: Hashable {
+
+    /// Creates a new path to the value located at `key` in the dictionary.
+    /// - Parameter key: The key to access in the dictionary.
+    /// - Returns: A new path to the value located at `key` in the dictionary.
+    /// - Warning: Using this subscript on a non-dictionary type will cause a
+    /// run-time crash.
+    public subscript(key: Value.Key) -> ReadOnlyPath<Root, Value.Value?> {
+        guard let path = self as? ReadOnlyPath<Root, [Value.Key: Value.Value]> else {
+            fatalError("Using dictionary subscript on a non-dictionary path.")
+        }
+        let newKp = path.keyPath.appending(path: \.[key])
+        return ReadOnlyPath(
+            keyPath: newKp,
+            ancestors: self.ancestors + [AnyPath(self)]
+        ) { root in
+            self.isNil(root) || root[keyPath: newKp].isNil
+        }
+    }
+
+}
+
 /// Add subscript.
 extension ReadOnlyPathProtocol where
     Value: MutableCollection, Value.Index: BinaryInteger, Value.Element: Nilable {
@@ -165,6 +189,29 @@ extension PathProtocol where Value: MutableCollection, Value.Index: BinaryIntege
                 return true
             }
             return collection[index].isNil
+        }
+    }
+
+}
+
+/// Add subscript for dictionary access.
+extension PathProtocol where Value: Collection, Value: ExpressibleByDictionaryLiteral, Value.Key: Hashable {
+
+    /// Creates a new path to the value located at `key` in the dictionary.
+    /// - Parameter key: The key to access in the dictionary.
+    /// - Returns: A new path to the value located at `key` in the dictionary.
+    /// - Warning: Using this subscript on a non-dictionary type will cause a
+    /// run-time crash.
+    public subscript(key: Value.Key) -> Path<Root, Value.Value?> {
+        guard let path = self as? Path<Root, [Value.Key: Value.Value]> else {
+            fatalError("Using dictionary subscript on a non-dictionary path.")
+        }
+        let newKp = path.path.appending(path: \.[key])
+        return Path<Root, Value.Value?>(
+            path: newKp,
+            ancestors: self.ancestors + [AnyPath(self)]
+        ) { root in
+            self.isNil(root) || root[keyPath: newKp].isNil
         }
     }
 

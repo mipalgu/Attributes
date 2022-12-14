@@ -327,4 +327,14 @@ final class PathTests: XCTestCase {
         XCTAssertEqual(trigger.rootPassed, root)
     }
 
+    /// Test dictionary subscript access.
+    func testDictionaryAccess() {
+        let path = Path([String: String].self)["key"]
+        var dict = ["A": "a"]
+        XCTAssertTrue(path.isNil(dict))
+        dict["key"] = "b"
+        XCTAssertFalse(path.isNil(dict))
+        XCTAssertEqual("b", dict[keyPath: path.keyPath])
+    }
+
 }
