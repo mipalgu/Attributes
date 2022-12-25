@@ -63,8 +63,7 @@
 public protocol GroupProtocol: Attributable where AttributeRoot == AttributeGroup {
 
     /// The trigger for this group.
-    @TriggerBuilder<Root>
-    var triggers: TriggerType { get }
+    var triggers: AnyTrigger<Root> { get }
 
     /// The validator for common attributes existing within the same ``AttributeGroup``.
     @ValidatorBuilder<AttributeGroup>
