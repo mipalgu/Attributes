@@ -83,8 +83,7 @@ public protocol Attributable {
     associatedtype AttributeRoot
 
     /// The type of the triggers that are defined for this protocol.
-    associatedtype TriggerType where TriggerType: TriggerProtocol, TriggerType.Root == Root,
-        TriggerType.Root == SearchPath.Root
+    associatedtype TriggerType where TriggerType: TriggerProtocol, TriggerType.Root == Root
 
     /// The type of the path from the root to the root attribute.
     associatedtype SearchPath: ConvertibleSearchablePath where
