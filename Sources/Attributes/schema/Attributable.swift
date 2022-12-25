@@ -82,6 +82,9 @@ public protocol Attributable {
     /// The type of the root Attribute.
     associatedtype AttributeRoot
 
+    /// The type of the triggers that are defined for this protocol.
+    associatedtype TriggerType where TriggerType: TriggerProtocol, TriggerType.Root == Root
+
     /// The type of the path from the root to the root attribute.
     associatedtype SearchPath: ConvertibleSearchablePath where
         SearchPath.Root == Root, SearchPath.Value == AttributeRoot
@@ -104,7 +107,7 @@ public protocol Attributable {
     var propertiesValidator: AnyValidator<AttributeRoot> { get }
 
     /// Additional triggers that are not defined for each attribute.
-    var triggers: AnyTrigger<Root> { get }
+    var triggers: TriggerType { get }
 
     /// All triggers within this protocol.
     var allTriggers: AnyTrigger<Root> { get }
@@ -114,6 +117,17 @@ public protocol Attributable {
 
     /// The validator for the root object.
     var rootValidation: AnyValidator<Root> { get }
+
+}
+
+/// Add default triggers.
+public extension Attributable where TriggerType == AnyTrigger<Root> {
+
+    /// No additional triggers by default.
+    @TriggerBuilder<Root>
+    @inlinable var triggers: TriggerType {
+        AnyTrigger<Root>()
+    }
 
 }
 
@@ -128,11 +142,6 @@ public extension Attributable {
     typealias ComplexProperty<Base> = Attributes.ComplexProperty<Base> where
         Base: ComplexProtocol, Base.Root == AttributeRoot
 
-    /// No additional triggers by default.
-    @inlinable var triggers: AnyTrigger<Root> {
-        AnyTrigger<Root>()
-    }
-
     /// All of the triggers are those defined in the attribute properties and the additional
     /// triggers within the `triggers` property.
     @inlinable var allTriggers: AnyTrigger<Root> {
@@ -146,7 +155,7 @@ public extension Attributable {
             }
             return triggers
         }
-        return AnyTrigger([triggers, AnyTrigger(childTriggers)])
+        return AnyTrigger([AnyTrigger(triggers), AnyTrigger(childTriggers)])
     }
 
     /// No validation by default.

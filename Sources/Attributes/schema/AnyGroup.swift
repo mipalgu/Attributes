@@ -145,7 +145,7 @@ public struct AnyGroup<Root: Modifiable> {
         self._pathToAttributes = { base.pathToAttributes }
         self._properties = { base.properties }
         self._propertiesValidator = { base.propertiesValidator }
-        self._triggers = { base.triggers }
+        self._triggers = { AnyTrigger(base.triggers) }
         self._allTriggers = { base.allTriggers }
         self._groupValidation = { base.groupValidation }
         self._rootValidation = { base.rootValidation }
