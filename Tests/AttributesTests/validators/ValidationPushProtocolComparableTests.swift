@@ -55,6 +55,7 @@
 // 
 
 @testable import Attributes
+import AttributesTestUtils
 import XCTest
 
 /// Test class for ``ValidationPushProtocol`` methods where Value is `Equatable`, `Hashable`, or `Comparable`.
