@@ -64,12 +64,12 @@ public class MockTrigger<Root>: TriggerProtocol {
     public private(set) var timesCalled: Int = 0
 
     /// The last root passed to the trigger function.
-    public var rootPassed: Root? {
+    @inlinable public var rootPassed: Root? {
         rootsPassed.last
     }
 
     /// The last path passed to the trigger function.
-    public var pathPassed: AnyPath<Root>? {
+    @inlinable public var pathPassed: AnyPath<Root>? {
         pathsPassed.last
     }
 
@@ -83,13 +83,14 @@ public class MockTrigger<Root>: TriggerProtocol {
     public private(set) var pathsPassed: [AnyPath<Root>] = []
 
     /// Has this trigger been called in any way?
-    public var isCalled: Bool {
-        timesCalled == 0 && rootPassed == nil && pathPassed == nil
+    @inlinable public var isCalled: Bool {
+        timesCalled != 0 || rootPassed != nil || pathPassed != nil
     }
 
     /// Initialise this MockTrigger.
     /// 
     /// - Parameter result: The result returned by the `performTrigger` method.
+    @inlinable
     public init(result: Result<Bool, AttributeError<Root>> = .success(false)) {
         self.result = result
     }
