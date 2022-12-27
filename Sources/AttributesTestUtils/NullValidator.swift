@@ -1,4 +1,4 @@
-// ValidatorPushTests.swift 
+// NullValidator.swift 
 // Attributes 
 // 
 // Created by Morgan McColl.
@@ -54,54 +54,31 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import Attributes
-import AttributesTestUtils
-import XCTest
+import Attributes
+import Foundation
 
-/// Test class for ``_PathValidator`` default implementations.
-final class ValidatorPushTests: XCTestCase {
+/// A validator that does nothing.
+public final class NullValidator<Root>: ValidatorProtocol {
 
-    /// A helper validator.
-    var validator0 = NullValidator<Person>()
+    /// The numer of times performValidation is called.
+    public private(set) var timesCalled: Int = 0
 
-    /// A helper validator.
-    var validator1 = NullValidator<Person>()
-
-    /// A person to validate.
-    let person = Person(fields: [], attributes: [:])
-
-    /// Initialise the validators before every test case.
-    override func setUp() {
-        validator0 = NullValidator<Person>()
-        validator1 = NullValidator<Person>()
+    /// The last parameter passed to `performValidation`.
+    @inlinable public var lastParameter: Root? {
+        parameters.last
     }
 
-    /// Test push function adds new validator onto stack.
-    func testPush() throws {
-        let validator = Validator(path: Path(Person.self).readOnly)
-        let pushedValidator = validator.push { root, _ in
-            try self.validator0.performValidation(root)
-        }
-        try pushedValidator.performValidation(person)
-        XCTAssertEqual(validator0.timesCalled, 1)
-        XCTAssertEqual(validator0.lastParameter, person)
-        XCTAssertEqual(validator1.timesCalled, 0)
-        XCTAssertNil(validator1.lastParameter)
-    }
+    /// All parameters passed to performValidation in order of how it was called.
+    public private(set) var parameters: [Root] = []
 
-    /// Test push function adds both validators onto stack.
-    func testPushTwoValidators() throws {
-        let validator = Validator(path: Path(Person.self).readOnly).push { root, _ in
-            try self.validator0.performValidation(root)
-        }
-        .push { root, _ in
-            try self.validator1.performValidation(root)
-        }
-        try validator.performValidation(person)
-        XCTAssertEqual(validator0.timesCalled, 1)
-        XCTAssertEqual(validator0.lastParameter, person)
-        XCTAssertEqual(validator1.timesCalled, 1)
-        XCTAssertEqual(validator1.lastParameter, person)
+    /// Create a `NullValidator`.
+    @inlinable
+    public init() {}
+
+    /// A validation that will count the times it is called.
+    public func performValidation(_ root: Root) throws {
+        parameters.append(root)
+        timesCalled += 1
     }
 
 }

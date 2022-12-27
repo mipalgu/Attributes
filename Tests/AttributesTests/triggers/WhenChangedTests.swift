@@ -55,6 +55,7 @@
 // 
 
 @testable import Attributes
+import AttributesTestUtils
 import XCTest
 
 /// Test class for ``WhenChanged``.

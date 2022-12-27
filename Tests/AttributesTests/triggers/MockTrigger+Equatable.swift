@@ -1,5 +1,5 @@
-// NullValidator.swift 
-// Attributes 
+// MockTrigger+Equatable.swift
+// Attributes
 // 
 // Created by Morgan McColl.
 // Copyright © 2022 Morgan McColl. All rights reserved.
@@ -54,27 +54,14 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-import Attributes
-import Foundation
+import AttributesTestUtils
 
-/// A validator that does nothing.
-final class NullValidator<Root>: ValidatorProtocol {
+/// Equatable conformance.
+extension MockTrigger: Equatable where Root: Equatable {
 
-    /// The numer of times performValidation is called.
-    private(set) var timesCalled: Int = 0
-
-    /// The last parameter passed to `performValidation`.
-    var lastParameter: Root? {
-        parameters.last
-    }
-
-    /// All parameters passed to performValidation in order of how it was called.
-    private(set) var parameters: [Root] = []
-
-    /// A validation that will count the times it is called.
-    func performValidation(_ root: Root) throws {
-        parameters.append(root)
-        timesCalled += 1
+    /// Use reference equality.
+    public static func == (lhs: MockTrigger<Root>, rhs: MockTrigger<Root>) -> Bool {
+        lhs === rhs
     }
 
 }
