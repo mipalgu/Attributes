@@ -64,7 +64,7 @@ public final class NullValidator<Root>: ValidatorProtocol {
     public private(set) var timesCalled: Int = 0
 
     /// The last parameter passed to `performValidation`.
-    public var lastParameter: Root? {
+    @inlinable public var lastParameter: Root? {
         parameters.last
     }
 
@@ -72,6 +72,7 @@ public final class NullValidator<Root>: ValidatorProtocol {
     public private(set) var parameters: [Root] = []
 
     /// Create a `NullValidator`.
+    @inlinable
     public init() {}
 
     /// A validation that will count the times it is called.
