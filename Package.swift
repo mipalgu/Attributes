@@ -21,7 +21,8 @@ let package = Package(
         .library(
             name: "Attributes",
             targets: ["Attributes"]
-        )
+        ),
+        .library(name: "AttributesTestUtils", targets: ["AttributesTestUtils"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -37,9 +38,13 @@ let package = Package(
             name: "Attributes",
             dependencies: ["XMI", "swift_helpers"]
         ),
+        .target(
+            name: "AttributesTestUtils",
+            dependencies: ["Attributes"]
+        ),
         .testTarget(
             name: "AttributesTests",
-            dependencies: ["Attributes"]
+            dependencies: ["Attributes", "AttributesTestUtils"]
         )
     ]
 )

@@ -1,5 +1,5 @@
-// ConditionalTriggerTests.swift 
-// Attributes 
+// MockTrigger+Equatable.swift
+// Attributes
 // 
 // Created by Morgan McColl.
 // Copyright © 2022 Morgan McColl. All rights reserved.
@@ -54,79 +54,14 @@
 // Fifth Floor, Boston, MA  02110-1301, USA.
 // 
 
-@testable import Attributes
 import AttributesTestUtils
-import XCTest
 
-/// Test class for ConditionalTrigger.
-final class ConditionalTriggerTests: XCTestCase {
+/// Equatable conformance.
+extension MockTrigger: Equatable where Root: Equatable {
 
-    /// Keep track of function calls.
-    var timesCalled = 0
-
-    /// Keep track of value passed to condition functions.
-    var valuePassed: Point?
-
-    /// A function that always returns true.
-    var trueCondition: (Point) -> Bool {
-        { self.timesCalled += 1; self.valuePassed = $0; return true }
-    }
-
-    /// A function that always returns false.
-    var falseCondition: (Point) -> Bool {
-        { self.timesCalled += 1; self.valuePassed = $0; return false }
-    }
-
-    /// The trigger the ConditionalTrigger uses.
-    let mockTrigger = MockTrigger<Point>()
-
-    /// A path to a Point.
-    let path = AnyPath(Path(Point.self))
-
-    /// Reset track data every test.
-    override func setUp() {
-        timesCalled = 0
-        valuePassed = nil
-    }
-
-    /// Test init.
-    func testInit() {
-        let trigger = ConditionalTrigger(condition: trueCondition, trigger: mockTrigger)
-        XCTAssertEqual(trigger.trigger, mockTrigger)
-    }
-
-    /// Test performTrigger when condition is true.
-    func testTriggerForTrue() {
-        var point = Point(x: 3, y: 4)
-        let trigger = ConditionalTrigger(condition: trueCondition, trigger: mockTrigger)
-        XCTAssertEqual(trigger.performTrigger(&point, for: path), .success(false))
-        XCTAssertEqual(timesCalled, 1)
-        XCTAssertEqual(valuePassed, point)
-        XCTAssertEqual(mockTrigger.rootPassed, point)
-        XCTAssertEqual(mockTrigger.timesCalled, 1)
-        XCTAssertEqual(mockTrigger.pathPassed, path)
-    }
-
-    /// Test performTrigger when the condition is false.
-    func testTriggerForFalse() {
-        var point = Point(x: 3, y: 4)
-        let trigger = ConditionalTrigger(condition: falseCondition, trigger: mockTrigger)
-        XCTAssertEqual(trigger.performTrigger(&point, for: AnyPath(Path(Point.self))), .success(false))
-        XCTAssertEqual(timesCalled, 1)
-        XCTAssertEqual(valuePassed, point)
-        XCTAssertNil(mockTrigger.rootPassed)
-        XCTAssertEqual(mockTrigger.timesCalled, 0)
-        XCTAssertNil(mockTrigger.pathPassed)
-    }
-
-    /// Test isTriggerForPath function.
-    func testIsTriggerForPath() {
-        let point = Point(x: 3, y: 4)
-        let trigger = ConditionalTrigger(condition: falseCondition, trigger: mockTrigger)
-        XCTAssertTrue(trigger.isTriggerForPath(path, in: point))
-        XCTAssertEqual(mockTrigger.rootPassed, point)
-        XCTAssertEqual(mockTrigger.timesCalled, 1)
-        XCTAssertEqual(mockTrigger.pathPassed, path)
+    /// Use reference equality.
+    public static func == (lhs: MockTrigger<Root>, rhs: MockTrigger<Root>) -> Bool {
+        lhs === rhs
     }
 
 }
