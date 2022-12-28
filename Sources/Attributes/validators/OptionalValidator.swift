@@ -112,6 +112,9 @@ public struct OptionalValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
     /// - Throws: Throws an Error when the validation is unsusccessful.
     @inlinable
     public func performValidation(_ root: PathType.Root) throws {
+        guard !path.isNil(root) else {
+            return
+        }
         let value = root[keyPath: self.path.keyPath]
         guard !value.isNil else {
             return

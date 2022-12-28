@@ -218,4 +218,13 @@ final class OptionalValidatorTests: XCTestCase {
         }
     }
 
+    /// Test validator passes for nil path.
+    func testValidationPassesForNilPath() {
+        let path = Path([OptionalPoint].self)[0].x
+        let validator = OptionalValidator(path) { _, _ in
+            throw AttributeError(message: "Error!", path: path)
+        }
+        XCTAssertNoThrow(try validator.performValidation([]))
+    }
+
 }
