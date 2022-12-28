@@ -142,4 +142,17 @@ final class TableColumnTests: XCTestCase {
         XCTAssertEqual(validator.lastParameter, "B")
     }
 
+    /// Test enumerated validation rule tests column values.
+    func testEnumeratedDefaultValidation() {
+        let validValues: Set<String> = ["A", "B"]
+        let column = TableColumn.enumerated(
+            label: "A",
+            validValues: validValues
+        )
+        XCTAssertNoThrow(try column.validator.performValidation(.enumerated("B", validValues: validValues)))
+        XCTAssertThrowsError(
+            try column.validator.performValidation(.enumerated("abc", validValues: validValues))
+        )
+    }
+
 }

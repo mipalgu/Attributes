@@ -142,8 +142,13 @@ public struct TableColumn {
         label: String, validValues: Set<String>, validation validatorFactories: ValidatorFactory<String> ...
     ) -> TableColumn {
         let path = ReadOnlyPath(keyPath: \LineAttribute.self, ancestors: []).enumeratedValue
+        let enumeratedValidator = AnyValidator(ValidationPath(path: path).in(validValues))
         let validator = AnyValidator(validatorFactories.map { $0.make(path: path) })
-        return Self(label: label, type: .enumerated(validValues: validValues), validator: validator)
+        return Self(
+            label: label,
+            type: .enumerated(validValues: validValues),
+            validator: AnyValidator([enumeratedValidator, validator])
+        )
     }
 
     /// Create a table column that stores line values.
