@@ -140,7 +140,7 @@ final class ChainValidatorTests: XCTestCase {
             try validator.performValidation(newLine)
             XCTFail("Failed to throw error for nil value.")
         } catch {
-            guard let error = error as? AttributeError<OptionalLine> else {
+            guard let error = error as? ValidationError<OptionalLine> else {
                 XCTFail("Failed to cast error to correct type.")
                 return
             }
@@ -166,7 +166,7 @@ final class ChainValidatorTests: XCTestCase {
         let path = Path([OptionalPoint].self)[0]
         let validator = ChainValidator(path: path, validator: requiredValidator)
         XCTAssertThrowsError(try validator.performValidation(points)) {
-            guard let error = $0 as? AttributeError<[OptionalPoint]> else {
+            guard let error = $0 as? ValidationError<[OptionalPoint]> else {
                 XCTFail("Failed to cast error to correct error type.")
                 return
             }

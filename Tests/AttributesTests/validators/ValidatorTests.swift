@@ -107,4 +107,18 @@ final class ValidatorTests: XCTestCase {
         XCTAssertNotNil(try? result.performValidation(point))
     }
 
+    /// Test validator throws correct error for a nil path.
+    func testValidatorThrowsErrorForNilPath() {
+        let path = Path([Point].self)[0]
+        let validator = Validator(path) { _, _ in }
+        XCTAssertThrowsError(try validator.performValidation([])) {
+            guard let error = $0 as? ValidationError<[Point]> else {
+                XCTFail("Failed to cast error.")
+                return
+            }
+            XCTAssertEqual(error.message, "Path is nil!")
+            XCTAssertEqual(error.path, AnyPath(path))
+        }
+    }
+
 }

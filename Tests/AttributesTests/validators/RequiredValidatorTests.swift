@@ -169,4 +169,18 @@ final class RequiredValidatorTests: XCTestCase {
         }
     }
 
+    /// Test validator throws error for nil path.
+    func testValidatorThrowsErrorForNilPath() {
+        let path = Path([OptionalPoint].self)[0].x
+        let validator = RequiredValidator(path) { _, _ in }
+        XCTAssertThrowsError(try validator.performValidation([])) {
+            guard let error = $0 as? ValidationError<[OptionalPoint]> else {
+                XCTFail("Failed to cast error.")
+                return
+            }
+            XCTAssertEqual(error.message, "Required")
+            XCTAssertEqual(error.path, AnyPath(path))
+        }
+    }
+
 }

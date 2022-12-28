@@ -185,6 +185,27 @@ final class CollectionPropertyTests: XCTestCase {
         )
     }
 
+    /// Test validator uses default enumerated rule.
+    func testEnumerationValidation() {
+        let validValues: Set<String> = ["int x;", "abc", "def"]
+        let property = CollectionProperty(
+            label: "Property",
+            enumerations: ValidatorFactory.required(),
+            validValues: validValues
+        )
+        let validator = property.wrappedValue.validate
+        XCTAssertNoThrow(
+            try validator.performValidation(
+                .collection(enumerated: ["int x;", "abc"], validValues: validValues)
+            )
+        )
+        XCTAssertThrowsError(
+            try validator.performValidation(
+                .collection(enumerated: ["int x;", "abc", "cc", "def"], validValues: validValues)
+            )
+        )
+    }
+
     /// Perform test case for a CollectionProperty.
     /// - Parameters:
     ///   - validator: The validator used by the property.

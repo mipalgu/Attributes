@@ -37,14 +37,14 @@ struct ChainValidator<Path: ReadOnlyPathProtocol, Validator: ValidatorProtocol>:
     @inlinable
     func performValidation(_ root: Path.Root) throws {
         guard !path.isNil(root) else {
-            throw AttributeError(message: "Path is nil!", path: path)
+            throw ValidationError(message: "Path is nil!", path: path)
         }
         let value = root[keyPath: path.keyPath]
         do {
             try validator.performValidation(value)
         } catch let e as AttributeError<Validator.Root> {
             // swiftlint:disable:next force_unwrapping
-            throw AttributeError(message: e.message, path: AnyPath(path).appending(e.path)!)
+            throw ValidationError(message: e.message, path: AnyPath(path).appending(e.path)!)
         }
     }
 

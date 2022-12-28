@@ -256,7 +256,7 @@ final class ValidationPushProtocolTests: XCTestCase {
         let path = TestValidationPath(path: readPath.first)
         let points: Set<Point> = [Point(x: 1, y: 2)]
         let newPath = path.in(points)
-        XCTAssertThrowsError(try newPath.performValidation(Set<Point>())) {
+        XCTAssertThrowsError(try newPath.performValidation(Set([Point(x: 2, y: 3)]))) {
             guard let error = $0 as? ValidationError<Set<Point>> else {
                 XCTFail("Incorrect error thrown.")
                 return

@@ -187,9 +187,11 @@ public struct CollectionProperty {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
         let validator = ValidationPath(path: path).validate {
             $0.each { _, elementPath in
-                AnyValidator(validatorFactories.map {
+                let enumeratedRule = AnyValidator(elementPath.lineAttribute.enumeratedValue.in(validValues))
+                let factoryRules = AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.enumeratedValue)
                 })
+                return AnyValidator([enumeratedRule, factoryRules])
             }
         }
         let attribute = SchemaAttribute(

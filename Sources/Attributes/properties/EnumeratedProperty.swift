@@ -89,10 +89,11 @@ public struct EnumeratedProperty {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).lineAttribute.enumeratedValue
         let validationPath = ValidationPath(path: path)
         let validator = builder(validationPath)
+        let enumeratedValidator = AnyValidator(validationPath.in(validValues))
         let attribute = SchemaAttribute(
             label: label,
             type: .enumerated(validValues: validValues),
-            validate: validator
+            validate: AnyValidator([enumeratedValidator, validator])
         )
         self.init(wrappedValue: attribute)
     }
