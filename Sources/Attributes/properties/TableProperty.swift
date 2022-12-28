@@ -56,6 +56,8 @@
  *
  */
 
+import Foundation
+
 /// A property that represents data in a table.
 @propertyWrapper
 public struct TableProperty {
@@ -90,10 +92,27 @@ public struct TableProperty {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.tableValue
         let validationPath = ValidationPath(path: path)
         let tableValidator = builder(validationPath)
+        let rowValidator: (Attribute) -> AnyValidator<Attribute> = {
+            let path = CollectionSearchPath(
+                collectionPath: Path(Attribute.self).tableValue,
+                elementPath: Path([LineAttribute].self)
+            )
+            let paths = path.paths(in: $0)
+            return AnyValidator(paths.map { path in
+                AnyValidator(columns.enumerated().map {
+                    ChainValidator(path: path[$0], validator: $1.validator)
+                })
+            })
+        }
+        let customValidator = AnyValidator(
+            Validator(Path(Attribute.self)) { root, _ in
+                try rowValidator(root).performValidation(root)
+            }
+        )
         let attribute = SchemaAttribute(
             label: label,
             type: .table(columns: columns.map { ($0.label, $0.type) }),
-            validate: tableValidator
+            validate: AnyValidator([customValidator, tableValidator])
         )
         self.init(wrappedValue: attribute)
     }

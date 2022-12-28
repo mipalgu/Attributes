@@ -68,10 +68,10 @@ final class TablePropertyTests: XCTestCase {
     var columns: [TableColumn] {
         [
             TableColumn.bool(
-                label: "A", validation: ValidatorFactory.required()
+                label: "A", validation: ValidatorFactory.required().equalsTrue()
             ),
             TableColumn.line(
-                label: "B", validation: ValidatorFactory.required()
+                label: "B", validation: ValidatorFactory.required().notEmpty()
             )
         ]
     }
@@ -100,7 +100,7 @@ final class TablePropertyTests: XCTestCase {
         XCTAssertEqual(wrapped.label, attribute.label)
         XCTAssertEqual(wrapped.type, attribute.type)
         let tableAttribute = Attribute.block(BlockAttribute.table(
-            [[.bool(true)], [.line("test")]],
+            [[.bool(true), .line("test")]],
             columns: [
                 BlockAttributeType.TableColumn(name: "A", type: .bool),
                 BlockAttributeType.TableColumn(name: "B", type: .line)
@@ -126,7 +126,7 @@ final class TablePropertyTests: XCTestCase {
         XCTAssertEqual(wrapped.label, attribute.label)
         XCTAssertEqual(wrapped.type, attribute.type)
         let tableAttribute = Attribute.block(BlockAttribute.table(
-            [[.bool(true)], [.line("test")]],
+            [[.bool(true), .line("test")]],
             columns: [
                 BlockAttributeType.TableColumn(name: "A", type: .bool),
                 BlockAttributeType.TableColumn(name: "B", type: .line)
@@ -142,6 +142,66 @@ final class TablePropertyTests: XCTestCase {
         try wrapped2.validate.performValidation(tableAttribute)
         XCTAssertEqual(attributeValidator.timesCalled, 2)
         XCTAssertEqual(attributeValidator.parameters, [tableAttribute, tableAttribute])
+    }
+
+    /// Test the validation fails when a column value is incorrect.
+    func testColumnValidatorThrowsForInvalidColumn() {
+        let table = TableProperty(label: "Table", columns: columns) { _ in
+            attributeValidator
+        }
+        let tableAttribute = Attribute.block(BlockAttribute.table(
+            [[.bool(false), .line("test")]],
+            columns: [
+                BlockAttributeType.TableColumn(name: "A", type: .bool),
+                BlockAttributeType.TableColumn(name: "B", type: .line)
+            ]
+        ))
+        XCTAssertThrowsError(try table.wrappedValue.validate.performValidation(tableAttribute))
+    }
+
+    /// Test the validation fails when the second column value is incorrect.
+    func testColumnValidatorThrowsForInvalidSecondColumn() {
+        let table = TableProperty(label: "Table", columns: columns) { _ in
+            attributeValidator
+        }
+        let tableAttribute = Attribute.block(BlockAttribute.table(
+            [[.bool(true), .line("")]],
+            columns: [
+                BlockAttributeType.TableColumn(name: "A", type: .bool),
+                BlockAttributeType.TableColumn(name: "B", type: .line)
+            ]
+        ))
+        XCTAssertThrowsError(try table.wrappedValue.validate.performValidation(tableAttribute))
+    }
+
+    /// Test the validation fails when both column values are incorrect.
+    func testColumnValidatorThrowsForBothColumnsInvalid() {
+        let table = TableProperty(label: "Table", columns: columns) { _ in
+            attributeValidator
+        }
+        let tableAttribute = Attribute.block(BlockAttribute.table(
+            [[.bool(false), .line("")]],
+            columns: [
+                BlockAttributeType.TableColumn(name: "A", type: .bool),
+                BlockAttributeType.TableColumn(name: "B", type: .line)
+            ]
+        ))
+        XCTAssertThrowsError(try table.wrappedValue.validate.performValidation(tableAttribute))
+    }
+
+    /// Test the validation fails when both column values are incorrect in the second row.
+    func testColumnValidatorThrowsForBothColumnsInvalidSecondRow() {
+        let table = TableProperty(label: "Table", columns: columns) { _ in
+            attributeValidator
+        }
+        let tableAttribute = Attribute.block(BlockAttribute.table(
+            [[.bool(true), .line("test")], [.bool(false), .line("")]],
+            columns: [
+                BlockAttributeType.TableColumn(name: "A", type: .bool),
+                BlockAttributeType.TableColumn(name: "B", type: .line)
+            ]
+        ))
+        XCTAssertThrowsError(try table.wrappedValue.validate.performValidation(tableAttribute))
     }
 
 }
