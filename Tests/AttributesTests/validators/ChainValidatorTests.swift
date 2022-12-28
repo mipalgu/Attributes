@@ -160,4 +160,19 @@ final class ChainValidatorTests: XCTestCase {
         }
     }
 
+    /// Test that performValidation throws the correct error when the path is nil.
+    func testThrowsErrorForNilPath() {
+        let points: [OptionalPoint] = []
+        let path = Path([OptionalPoint].self)[0]
+        let validator = ChainValidator(path: path, validator: requiredValidator)
+        XCTAssertThrowsError(try validator.performValidation(points)) {
+            guard let error = $0 as? AttributeError<[OptionalPoint]> else {
+                XCTFail("Failed to cast error to correct error type.")
+                return
+            }
+            XCTAssertEqual(error.message, "Path is nil!")
+            XCTAssertEqual(error.path, AnyPath(path))
+        }
+    }
+
 }

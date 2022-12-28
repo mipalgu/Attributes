@@ -36,6 +36,9 @@ struct ChainValidator<Path: ReadOnlyPathProtocol, Validator: ValidatorProtocol>:
     /// - Throws: Throws an AttributeError when the validation is unsusccessful.
     @inlinable
     func performValidation(_ root: Path.Root) throws {
+        guard !path.isNil(root) else {
+            throw AttributeError(message: "Path is nil!", path: path)
+        }
         let value = root[keyPath: path.keyPath]
         do {
             try validator.performValidation(value)
