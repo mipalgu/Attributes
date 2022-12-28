@@ -77,13 +77,13 @@ public struct EnumeratedProperty {
             )
         }
         set {
-            self.label = newValue.label
             guard
                 case AttributeType.line(let attribute) = newValue.type,
                 case LineAttributeType.enumerated(let values) = attribute
             else {
                 fatalError("Invalid attribute type!")
             }
+            self.label = newValue.label
             self.validValues = values
             self.validator = newValue.validate
         }
