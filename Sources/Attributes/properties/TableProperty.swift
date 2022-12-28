@@ -94,7 +94,7 @@ public struct TableProperty {
         let tableValidator = builder(validationPath)
         let rowValidator: (Attribute) -> AnyValidator<Attribute> = {
             let path = CollectionSearchPath(
-                collectionPath: Path(Attribute.self).tableValue,
+                collectionPath: Path(Attribute.self).blockAttribute.tableValue,
                 elementPath: Path([LineAttribute].self)
             )
             let paths = path.paths(in: $0)
