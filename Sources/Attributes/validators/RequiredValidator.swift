@@ -110,6 +110,9 @@ public struct RequiredValidator<P: ReadOnlyPathProtocol>: PathValidator where P.
     /// - Throws: Throws an Error when the validation is unsusccessful.
     @inlinable
     public func performValidation(_ root: PathType.Root) throws {
+        guard !path.isNil(root) else {
+            throw ValidationError(message: "Required", path: path)
+        }
         let value = root[keyPath: self.path.keyPath]
         if value.isNil {
             throw ValidationError(message: "Required", path: self.path)
