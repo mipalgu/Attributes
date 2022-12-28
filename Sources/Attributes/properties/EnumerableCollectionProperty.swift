@@ -86,7 +86,6 @@ public struct EnumerableCollectionProperty {
                 fatalError("Invalid type!")
             }
             self.label = newValue.label
-            self.validator = newValue.validate
             self.validValues = values
         }
     }

@@ -85,7 +85,6 @@ public struct EnumeratedProperty {
             }
             self.label = newValue.label
             self.validValues = values
-            self.validator = newValue.validate
         }
     }
 

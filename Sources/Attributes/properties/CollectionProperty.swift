@@ -72,7 +72,6 @@ public struct CollectionProperty {
             self.createSchemaAttribute(self.label, self.type, self.validator)
         }
         set {
-            self.validator = self.createValidator(newValue)
             self.label = newValue.label
             self.type = newValue.type
         }
@@ -87,9 +86,6 @@ public struct CollectionProperty {
     /// The user-specified validation rules.
     private var validator: AnyValidator<Attribute>
 
-    /// A function to create a validator from a ``SchemaAttribute``.
-    private var createValidator: (SchemaAttribute) -> AnyValidator<Attribute> = { $0.validate }
-
     /// A function to create a ``SchemaAttribute`` from the label, type and validator.
     private var createSchemaAttribute: (String, AttributeType, AnyValidator<Attribute>) -> SchemaAttribute = {
         SchemaAttribute(label: $0, type: $1, validate: $2)
@@ -100,7 +96,7 @@ public struct CollectionProperty {
     public init(wrappedValue: SchemaAttribute) {
         self.label = wrappedValue.label
         self.type = wrappedValue.type
-        self.validator = self.createValidator(wrappedValue)
+        self.validator = wrappedValue.validate
     }
 
     /// Create a collection of boolean values.
