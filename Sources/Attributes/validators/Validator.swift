@@ -100,6 +100,9 @@ public struct Validator<P: ReadOnlyPathProtocol>: _PathValidator {
     ///                   function validates the value using an internal validation function.
     @inlinable
     public func performValidation(_ root: PathType.Root) throws {
+        guard !path.isNil(root) else {
+            throw ValidationError(message: "Path is nil!", path: path)
+        }
         _ = try self._validate(root, root[keyPath: self.path.keyPath])
     }
 
