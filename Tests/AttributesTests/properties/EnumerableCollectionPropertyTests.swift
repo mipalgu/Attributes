@@ -111,4 +111,22 @@ final class EnumerableCollectionPropertyTests: XCTestCase, PropertyTestable {
         XCTAssertEqual(property.projectedValue.wrappedValue, schema)
     }
 
+    /// Test validator passes valid values.
+    func testValidatorPassesWithValidValues() {
+        let property = EnumerableCollectionProperty(label: "collection", validValues: validValues)
+        let validator = property.wrappedValue.validate
+        XCTAssertNoThrow(
+            try validator.performValidation(.enumerableCollection(["1"], validValues: validValues))
+        )
+    }
+
+    /// Test validator throws error for invalid values.
+    func testValidatorThrowsWithInvalidValues() {
+        let property = EnumerableCollectionProperty(label: "collection", validValues: validValues)
+        let validator = property.wrappedValue.validate
+        XCTAssertThrowsError(
+            try validator.performValidation(.enumerableCollection(["1", "a"], validValues: validValues))
+        )
+    }
+
 }

@@ -91,11 +91,14 @@ public struct EnumerableCollectionProperty {
             .blockAttribute
             .enumerableCollectionValue
         let validationPath = ValidationPath(path: path)
+        let enumeratedRule = AnyValidator(validationPath.each { _, elementPath in
+            elementPath.in(validValues)
+        })
         let validator = builder(validationPath)
         let attribute = SchemaAttribute(
             label: label,
             type: .enumerableCollection(validValues: validValues),
-            validate: validator
+            validate: AnyValidator([enumeratedRule, validator])
         )
         self.init(wrappedValue: attribute)
     }
