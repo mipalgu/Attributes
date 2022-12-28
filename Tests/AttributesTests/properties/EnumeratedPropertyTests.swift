@@ -109,4 +109,20 @@ final class EnumeratedPropertyTests: XCTestCase, PropertyTestable {
         XCTAssertEqual(property.projectedValue.wrappedValue, schema)
     }
 
+    /// Test validator passes for value that exists within the `validValues` Set.
+    func testValidatorPassesWithValidValue() {
+        let property = EnumeratedProperty(label: label, validValues: validValues)
+        XCTAssertNoThrow(
+            try property.wrappedValue.validate.performValidation(.enumerated("1", validValues: validValues))
+        )
+    }
+
+    /// Test validator throws an error when the value does not exist within the `validValues` Set.
+    func testValidatorFailsWithInvalidValue() {
+        let property = EnumeratedProperty(label: label, validValues: validValues)
+        XCTAssertThrowsError(
+            try property.wrappedValue.validate.performValidation(.enumerated("abc", validValues: validValues))
+        )
+    }
+
 }
