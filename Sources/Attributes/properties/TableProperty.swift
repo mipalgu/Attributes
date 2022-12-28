@@ -99,9 +99,12 @@ public struct TableProperty {
             )
             let paths = path.paths(in: $0)
             return AnyValidator(paths.map { path in
-                AnyValidator(columns.enumerated().map {
+                let validationPath = ValidationPath(path: path)
+                let lengthRule = AnyValidator(validationPath.length(columns.count))
+                let columnRules = AnyValidator(columns.enumerated().map {
                     ChainValidator(path: path[$0], validator: $1.validator)
                 })
+                return AnyValidator([lengthRule, columnRules])
             })
         }
         let customValidator = AnyValidator(

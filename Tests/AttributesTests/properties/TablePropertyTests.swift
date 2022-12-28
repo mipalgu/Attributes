@@ -204,4 +204,26 @@ final class TablePropertyTests: XCTestCase {
         XCTAssertThrowsError(try table.wrappedValue.validate.performValidation(tableAttribute))
     }
 
+    /// Test the validator checks the row lengths by default.
+    func testColumnLengthValidationRule() {
+        let table = TableProperty(label: "Table", columns: columns)
+        let tableAttribute = Attribute.block(BlockAttribute.table(
+            [[.bool(true), .line("test")]],
+            columns: [
+                BlockAttributeType.TableColumn(name: "A", type: .bool),
+                BlockAttributeType.TableColumn(name: "B", type: .line)
+            ]
+        ))
+        let validator = table.wrappedValue.validate
+        XCTAssertNoThrow(try validator.performValidation(tableAttribute))
+        let attribute2 = Attribute.block(BlockAttribute.table(
+            [[.bool(true)]],
+            columns: [
+                BlockAttributeType.TableColumn(name: "A", type: .bool),
+                BlockAttributeType.TableColumn(name: "B", type: .line)
+            ]
+        ))
+        XCTAssertThrowsError(try validator.performValidation(attribute2))
+    }
+
 }
