@@ -62,11 +62,15 @@ public struct EnumerableCollectionProperty {
 
     /// A self property.
     @inlinable public var projectedValue: EnumerableCollectionProperty {
-        self
+        get {
+            self
+        } set {
+            self = newValue
+        }
     }
 
     /// The underlying SchemaAttribute.
-    public let wrappedValue: SchemaAttribute
+    public private(set) var wrappedValue: SchemaAttribute
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
@@ -110,6 +114,31 @@ public struct EnumerableCollectionProperty {
         })
         self.wrappedValue = SchemaAttribute(
             label: label,
+            type: .enumerableCollection(validValues: validValues),
+            validate: AnyValidator([enumeratedRule, builder(validationPath)])
+        )
+    }
+
+    /// Change the validValues of the enumeratedCollection property.
+    ///
+    /// - Parameter validValues: The new validValues.
+    ///
+    /// - Parameter builder: A function that creates a validator for the new
+    /// validValues.
+    public mutating func update(
+        validValues: Set<String>,
+        @ValidatorBuilder<Attribute>
+            validation builder: (ValidationPath<ReadOnlyPath<Attribute, Set<String>>>)
+            -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
+    ) {
+        let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute
+        .enumerableCollectionValue
+        let validationPath = ValidationPath(path: path)
+        let enumeratedRule = AnyValidator(validationPath.each { _, elementPath in
+            elementPath.in(validValues)
+        })
+        self.wrappedValue = SchemaAttribute(
+            label: self.wrappedValue.label,
             type: .enumerableCollection(validValues: validValues),
             validate: AnyValidator([enumeratedRule, builder(validationPath)])
         )
