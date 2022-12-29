@@ -226,6 +226,7 @@ final class TablePropertyTests: XCTestCase {
         XCTAssertThrowsError(try validator.performValidation(attribute2))
     }
 
+    /// Test that makes sure validator still works when updating the columns.
     func testValidatorStillWorksWhenColumnsAreAdded() {
         var table = TableProperty(label: "Table", columns: columns)
         let tableAttribute = Attribute.block(BlockAttribute.table(
@@ -249,7 +250,7 @@ final class TablePropertyTests: XCTestCase {
         ))
         XCTAssertNoThrow(try table.wrappedValue.validate.performValidation(attribute2))
         let attribute3 = Attribute.block(BlockAttribute.table(
-            [[.bool(false), .line("test"), .integer(5)]],
+            [[.bool(true), .line("test"), .integer(5), .line("hello")]],
             columns: [
                 BlockAttributeType.TableColumn(name: "A", type: .bool),
                 BlockAttributeType.TableColumn(name: "B", type: .line),
@@ -257,15 +258,6 @@ final class TablePropertyTests: XCTestCase {
             ]
         ))
         XCTAssertThrowsError(try table.wrappedValue.validate.performValidation(attribute3))
-        let attribute4 = Attribute.block(BlockAttribute.table(
-            [[.bool(true), .line(""), .integer(5)]],
-            columns: [
-                BlockAttributeType.TableColumn(name: "A", type: .bool),
-                BlockAttributeType.TableColumn(name: "B", type: .line),
-                BlockAttributeType.TableColumn(name: "C", type: .integer)
-            ]
-        ))
-        XCTAssertThrowsError(try table.wrappedValue.validate.performValidation(attribute4))
     }
 
 }

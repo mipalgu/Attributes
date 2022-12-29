@@ -73,7 +73,7 @@ public struct TableProperty {
             SchemaAttribute(
                 label: self.label,
                 type: .table(columns: columns.map { ($0.label, $0.type) }),
-                validate: AnyValidator([self.tableValidator, self.validator])
+                validate: self.createValidator()
             )
         }
         set {
@@ -87,6 +87,10 @@ public struct TableProperty {
             self.columns = columns.map {
                 TableColumn(label: $0.name, type: $0.type, validator: AnyValidator())
             }
+            let validate = wrappedValue.validate
+            self.validator = validate
+            let tableVal = self.tableValidator
+            self.createValidator = { tableVal }
         }
     }
 
@@ -108,6 +112,9 @@ public struct TableProperty {
         )
     }
 
+    /// A function to create the validator.
+    private var createValidator: () -> AnyValidator<Attribute> = { AnyValidator() }
+
     /// Initialise this property from the wrapped value.
     /// - Parameter wrappedValue: The wrapped value.
     public init(wrappedValue: SchemaAttribute) {
@@ -121,7 +128,11 @@ public struct TableProperty {
         self.columns = columns.map {
             TableColumn(label: $0.name, type: $0.type, validator: AnyValidator())
         }
-        self.validator = wrappedValue.validate
+        let validate = wrappedValue.validate
+        self.validator = validate
+        self.createValidator = {
+            validate
+        }
     }
 
     /// Intialise this property from table data.
@@ -141,6 +152,10 @@ public struct TableProperty {
         self.label = label
         self.columns = columns
         self.validator = builder(validationPath)
+        let validator = AnyValidator([self.tableValidator, self.validator])
+        self.createValidator = {
+            validator
+        }
     }
 
     /// Create the default validation rules for each row.
