@@ -206,27 +206,6 @@ final class CollectionPropertyTests: XCTestCase {
         )
     }
 
-    /// Test validator uses updated values when mutating the collection property.
-    func testEnumerationValidatorWorksWhenUpdatingValidValues() {
-        let validValues: Set<String> = ["a", "b", "c"]
-        var property = CollectionProperty(
-            label: "Property",
-            enumerations: ValidatorFactory.required(),
-            validValues: validValues
-        )
-        XCTAssertNoThrow(
-            try property.wrappedValue.validate.performValidation(
-                .collection(enumerated: ["a", "b"], validValues: validValues)
-            )
-        )
-        property.wrappedValue.type = .collection(type: .enumerated(validValues: ["a", "c"]))
-        XCTAssertThrowsError(
-            try property.wrappedValue.validate.performValidation(
-                .collection(enumerated: ["a", "b"], validValues: validValues)
-            )
-        )
-    }
-
     /// Perform test case for a CollectionProperty.
     /// - Parameters:
     ///   - validator: The validator used by the property.
