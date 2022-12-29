@@ -118,7 +118,7 @@ public struct EnumeratedProperty {
     ///
     /// - Parameter builder: A function that creates a validator for the new
     /// validValues.
-    mutating func update(
+    public mutating func update(
         validValues: Set<String>,
         @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, String>>)
             -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
