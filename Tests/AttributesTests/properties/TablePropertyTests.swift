@@ -226,4 +226,41 @@ final class TablePropertyTests: XCTestCase {
         XCTAssertThrowsError(try validator.performValidation(attribute2))
     }
 
+    /// Test that makes sure validator still works when updating the columns.
+    func testValidatorStillWorksWhenColumnsAreAdded() {
+        var table = TableProperty(label: "Table", columns: columns)
+        let tableAttribute = Attribute.block(BlockAttribute.table(
+            [[.bool(true), .line("test")]],
+            columns: [
+                BlockAttributeType.TableColumn(name: "A", type: .bool),
+                BlockAttributeType.TableColumn(name: "B", type: .line),
+                BlockAttributeType.TableColumn(name: "C", type: .integer)
+            ]
+        ))
+        XCTAssertNoThrow(try table.wrappedValue.validate.performValidation(tableAttribute))
+        table = TableProperty(
+            label: "Table",
+            columns: columns + [TableColumn(label: "C", type: .integer, validator: AnyValidator())]
+        )
+        XCTAssertThrowsError(try table.wrappedValue.validate.performValidation(tableAttribute))
+        let attribute2 = Attribute.block(BlockAttribute.table(
+            [[.bool(true), .line("test"), .integer(5)]],
+            columns: [
+                BlockAttributeType.TableColumn(name: "A", type: .bool),
+                BlockAttributeType.TableColumn(name: "B", type: .line),
+                BlockAttributeType.TableColumn(name: "C", type: .integer)
+            ]
+        ))
+        XCTAssertNoThrow(try table.wrappedValue.validate.performValidation(attribute2))
+        let attribute3 = Attribute.block(BlockAttribute.table(
+            [[.bool(true), .line("test"), .integer(5), .line("hello")]],
+            columns: [
+                BlockAttributeType.TableColumn(name: "A", type: .bool),
+                BlockAttributeType.TableColumn(name: "B", type: .line),
+                BlockAttributeType.TableColumn(name: "C", type: .integer)
+            ]
+        ))
+        XCTAssertThrowsError(try table.wrappedValue.validate.performValidation(attribute3))
+    }
+
 }

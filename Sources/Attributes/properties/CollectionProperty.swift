@@ -67,13 +67,41 @@ public struct CollectionProperty {
     }
 
     /// The equivalent ``SchemaAttribute``.
-    public var wrappedValue: SchemaAttribute
+    /// - Warning: The validate property within the wrapped value does not update this attribute property
+    /// when using the setter. Once this property is created, it assumes the layout of the elements and
+    /// usees the default rules for the attribute types. If you intend on making changes that break the
+    /// validation rules, or inserting your own rules, the you need to create this `CollectionProperty` using
+    /// the initialiser.
+    public var wrappedValue: SchemaAttribute {
+        get {
+            self.createSchemaAttribute(self.label, self.type, self.validator)
+        }
+        set {
+            self.label = newValue.label
+            self.type = newValue.type
+        }
+    }
+
+    /// The label of the property.
+    private var label: String
+
+    /// The attribute type of the property.
+    private var type: AttributeType
+
+    /// The user-specified validation rules.
+    private var validator: AnyValidator<Attribute>
+
+    /// A function to create a ``SchemaAttribute`` from the label, type and validator.
+    private var createSchemaAttribute: (String, AttributeType, AnyValidator<Attribute>) -> SchemaAttribute = {
+        SchemaAttribute(label: $0, type: $1, validate: $2)
+    }
 
     /// Initialise this property from it's wrapped value.
     /// - Parameter wrappedValue: The wrapped value.
-    @inlinable
     public init(wrappedValue: SchemaAttribute) {
-        self.wrappedValue = wrappedValue
+        self.label = wrappedValue.label
+        self.type = wrappedValue.type
+        self.validator = wrappedValue.validate
     }
 
     /// Create a collection of boolean values.
@@ -85,19 +113,15 @@ public struct CollectionProperty {
         bools validatorFactories: ValidatorFactory<Bool> ...
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
-        let validator = ValidationPath(path: path).validate {
+        self.label = label
+        self.type = .collection(type: .bool)
+        self.validator = ValidationPath(path: path).validate {
             $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.boolValue)
                 })
             }
         }
-        let attribute = SchemaAttribute(
-            label: label,
-            type: .collection(type: .bool),
-            validate: validator
-        )
-        self.init(wrappedValue: attribute)
     }
 
     /// Create a collection of integer values.
@@ -109,19 +133,15 @@ public struct CollectionProperty {
         integers validatorFactories: ValidatorFactory<Int> ...
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
-        let validator = ValidationPath(path: path).validate {
+        self.label = label
+        self.type = .collection(type: .integer)
+        self.validator = ValidationPath(path: path).validate {
             $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.integerValue)
                 })
             }
         }
-        let attribute = SchemaAttribute(
-            label: label,
-            type: .collection(type: .integer),
-            validate: validator
-        )
-        self.init(wrappedValue: attribute)
     }
 
     /// Create a collection of floating point values.
@@ -133,19 +153,15 @@ public struct CollectionProperty {
         floats validatorFactories: ValidatorFactory<Double> ...
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
-        let validator = ValidationPath(path: path).validate {
+        self.label = label
+        self.type = .collection(type: .float)
+        self.validator = ValidationPath(path: path).validate {
             $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.floatValue)
                 })
             }
         }
-        let attribute = SchemaAttribute(
-            label: label,
-            type: .collection(type: .float),
-            validate: validator
-        )
-        self.init(wrappedValue: attribute)
     }
 
     /// Create a collection of expression values.
@@ -159,19 +175,15 @@ public struct CollectionProperty {
         language: Language
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
-        let validator = ValidationPath(path: path).validate {
+        self.label = label
+        self.type = .collection(type: .expression(language: language))
+        self.validator = ValidationPath(path: path).validate {
             $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.expressionValue)
                 })
             }
         }
-        let attribute = SchemaAttribute(
-            label: label,
-            type: .collection(type: .expression(language: language)),
-            validate: validator
-        )
-        self.init(wrappedValue: attribute)
     }
 
     /// Create a collection of enumerated values.
@@ -185,21 +197,32 @@ public struct CollectionProperty {
         validValues: Set<String>
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
-        let validator = ValidationPath(path: path).validate {
+        self.label = label
+        self.type = .collection(type: .enumerated(validValues: validValues))
+        let validationPath = ValidationPath(path: path)
+        self.validator = validationPath.validate {
             $0.each { _, elementPath in
-                let enumeratedRule = AnyValidator(elementPath.lineAttribute.enumeratedValue.in(validValues))
-                let factoryRules = AnyValidator(validatorFactories.map {
+                AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.enumeratedValue)
                 })
-                return AnyValidator([enumeratedRule, factoryRules])
             }
         }
-        let attribute = SchemaAttribute(
-            label: label,
-            type: .collection(type: .enumerated(validValues: validValues)),
-            validate: validator
-        )
-        self.init(wrappedValue: attribute)
+        self.createSchemaAttribute = { label, type, validator in
+            guard
+                case AttributeType.block(let blockType) = type,
+                case BlockAttributeType.collection(let lineAttributeType) = blockType,
+                case AttributeType.line(let lineType) = lineAttributeType,
+                case LineAttributeType.enumerated(let values) = lineType
+            else {
+                fatalError("Invalid type")
+            }
+            let val = validationPath.validate {
+                $0.each { _, elementPath in
+                    AnyValidator(elementPath.lineAttribute.enumeratedValue.in(values))
+                }
+            }
+            return SchemaAttribute(label: label, type: type, validate: AnyValidator([val, validator]))
+        }
     }
 
     /// Create a collection of line values.
@@ -211,19 +234,15 @@ public struct CollectionProperty {
         lines validatorFactories: ValidatorFactory<String> ...
     ) {
         let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
-        let validator = ValidationPath(path: path).validate {
+        self.label = label
+        self.type = .collection(type: .line)
+        self.validator = ValidationPath(path: path).validate {
             $0.each { _, elementPath in
                 AnyValidator(validatorFactories.map {
                     $0.make(path: elementPath.path.lineAttribute.lineValue)
                 })
             }
         }
-        let attribute = SchemaAttribute(
-            label: label,
-            type: .collection(type: .line),
-            validate: validator
-        )
-        self.init(wrappedValue: attribute)
     }
 
 }

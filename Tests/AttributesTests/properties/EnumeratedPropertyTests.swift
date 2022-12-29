@@ -125,4 +125,16 @@ final class EnumeratedPropertyTests: XCTestCase, PropertyTestable {
         )
     }
 
+    /// Test validator works when valid values are mutated in wrapper.
+    func testValidatorWorksWhenUpdatingValidValues() {
+        var property = EnumeratedProperty(label: label, validValues: validValues)
+        XCTAssertNoThrow(
+            try property.wrappedValue.validate.performValidation(.enumerated("1", validValues: validValues))
+        )
+        property.wrappedValue.type = .enumerated(validValues: ["3", "4"])
+        XCTAssertThrowsError(
+            try property.wrappedValue.validate.performValidation(.enumerated("1", validValues: validValues))
+        )
+    }
+
 }

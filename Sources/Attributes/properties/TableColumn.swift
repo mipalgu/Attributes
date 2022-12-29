@@ -73,7 +73,7 @@ public struct TableColumn {
     ///   - label: The label.
     ///   - type: The type.
     ///   - validator: The validator.
-    private init(label: String, type: LineAttributeType, validator: AnyValidator<LineAttribute>) {
+    init(label: String, type: LineAttributeType, validator: AnyValidator<LineAttribute>) {
         self.label = label
         self.type = type
         self.validator = validator
