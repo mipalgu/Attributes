@@ -66,54 +66,27 @@ public struct EnumeratedProperty {
     }
 
     /// The underlying SchemaAttribute.
-    public var wrappedValue: SchemaAttribute {
-        get {
-            let validationPath = ValidationPath(path: path)
-            let enumeratedValidator = AnyValidator(validationPath.in(validValues))
-            return SchemaAttribute(
-                label: label,
-                type: .enumerated(validValues: validValues),
-                validate: AnyValidator([enumeratedValidator, validator])
-            )
-        }
-        set {
-            guard
-                case AttributeType.line(let attribute) = newValue.type,
-                case LineAttributeType.enumerated(let values) = attribute
-            else {
-                fatalError("Invalid attribute type!")
-            }
-            self.label = newValue.label
-            self.validValues = values
-        }
-    }
-
-    /// The path to the enumerated value.
-    private let path: ReadOnlyPath<Attribute, String> = ReadOnlyPath(
-        keyPath: \Attribute.self, ancestors: []
-    ).lineAttribute.enumeratedValue
-
-    /// The label of this property.
-    private var label: String
-
-    /// The valid values in this enumeration.
-    private var validValues: Set<String>
-
-    /// The user-specified validation rules.
-    private var validator: AnyValidator<Attribute>
+    public let wrappedValue: SchemaAttribute
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
     public init(wrappedValue: SchemaAttribute) {
-        self.label = wrappedValue.label
         guard
             case AttributeType.line(let attribute) = wrappedValue.type,
             case LineAttributeType.enumerated(let values) = attribute
         else {
             fatalError("Invalid attribute type!")
         }
-        self.validValues = values
-        self.validator = wrappedValue.validate
+        let path: ReadOnlyPath<Attribute, String> = ReadOnlyPath(
+            keyPath: \Attribute.self, ancestors: []
+        ).lineAttribute.enumeratedValue
+        let validationPath = ValidationPath(path: path)
+        let enumeratedValidator = AnyValidator(validationPath.in(values))
+        self.wrappedValue = SchemaAttribute(
+            label: wrappedValue.label,
+            type: .enumerated(validValues: values),
+            validate: AnyValidator([enumeratedValidator, wrappedValue.validate])
+        )
     }
 
     /// Create the property from a label and builder function.
@@ -127,9 +100,16 @@ public struct EnumeratedProperty {
         @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, String>>)
             -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
     ) {
-        self.label = label
-        self.validValues = validValues
-        self.validator = builder(ValidationPath(path: path))
+        let path: ReadOnlyPath<Attribute, String> = ReadOnlyPath(
+            keyPath: \Attribute.self, ancestors: []
+        ).lineAttribute.enumeratedValue
+        let validationPath = ValidationPath(path: path)
+        let enumeratedValidator = AnyValidator(validationPath.in(validValues))
+        self.wrappedValue = SchemaAttribute(
+            label: label,
+            type: .enumerated(validValues: validValues),
+            validate: AnyValidator([enumeratedValidator, builder(ValidationPath(path: path))])
+        )
     }
 
 }
