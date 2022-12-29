@@ -129,20 +129,4 @@ final class EnumerableCollectionPropertyTests: XCTestCase, PropertyTestable {
         )
     }
 
-    /// Test validator updates correctly when wrapped value is mutated.
-    func testValidatorWorksOnUpdatedValidValues() {
-        var property = EnumerableCollectionProperty(label: "EnumCollection", validValues: ["a", "b", "c"])
-        XCTAssertNoThrow(
-            try property.wrappedValue.validate.performValidation(
-                .enumerableCollection(["b", "a"], validValues: validValues)
-            )
-        )
-        property.wrappedValue.type = .enumerableCollection(validValues: ["a", "c"])
-        XCTAssertThrowsError(
-            try property.wrappedValue.validate.performValidation(
-                .enumerableCollection(["b", "a"], validValues: validValues)
-            )
-        )
-    }
-
 }
