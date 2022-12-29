@@ -67,6 +67,11 @@ public struct CollectionProperty {
     }
 
     /// The equivalent ``SchemaAttribute``.
+    /// - Warning: The validate property within the wrapped value does not update this attribute property
+    /// when using the setter. Once this property is created, it assumes the layout of the elements and
+    /// usees the default rules for the attribute types. If you intend on making changes that break the
+    /// validation rules, or inserting your own rules, the you need to create this `CollectionProperty` using
+    /// the initialiser.
     public var wrappedValue: SchemaAttribute {
         get {
             self.createSchemaAttribute(self.label, self.type, self.validator)
