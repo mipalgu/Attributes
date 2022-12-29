@@ -238,7 +238,10 @@ final class TablePropertyTests: XCTestCase {
             ]
         ))
         XCTAssertNoThrow(try table.wrappedValue.validate.performValidation(tableAttribute))
-        table.wrappedValue.type = .table(columns: [("A", .bool), ("B", .line), ("C", .integer)])
+        table = TableProperty(
+            label: "Table",
+            columns: columns + [TableColumn(label: "C", type: .integer, validator: AnyValidator())]
+        )
         XCTAssertThrowsError(try table.wrappedValue.validate.performValidation(tableAttribute))
         let attribute2 = Attribute.block(BlockAttribute.table(
             [[.bool(true), .line("test"), .integer(5)]],
