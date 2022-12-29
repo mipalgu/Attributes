@@ -64,11 +64,16 @@ public struct TableProperty {
 
     /// The project value.
     @inlinable public var projectedValue: TableProperty {
-        self
+        get {
+            self
+        }
+        set {
+            self = newValue
+        }
     }
 
     /// The equivalent attribute.
-    public let wrappedValue: SchemaAttribute
+    public private(set) var wrappedValue: SchemaAttribute
 
     /// Initialise this property from the wrapped value.
     /// - Parameter wrappedValue: The wrapped value.
@@ -139,6 +144,47 @@ public struct TableProperty {
         )
         self.wrappedValue = SchemaAttribute(
             label: label,
+            type: type,
+            validate: AnyValidator([tableValidator, validator])
+        )
+    }
+
+    /// Update the table with new columns and validation rules.
+    /// - Parameters:
+    ///   - columns: The new columns for this table.
+    ///   - builder: The validator that validates the table rows.
+    public mutating func update(
+        columns: [TableColumn],
+        @ValidatorBuilder<Attribute> validation builder: (
+            ValidationPath<ReadOnlyPath<Attribute, [[LineAttribute]]>>
+        ) -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
+    ) {
+        let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.tableValue
+        let validationPath = ValidationPath(path: path)
+        let validator = builder(validationPath)
+        let type: AttributeType = .table(columns: columns.map { ($0.label, $0.type) })
+        let row: (Attribute, [TableColumn]) -> AnyValidator<Attribute> = { attribute, columns in
+            let path = CollectionSearchPath(
+                collectionPath: Path(Attribute.self).blockAttribute.tableValue,
+                elementPath: Path([LineAttribute].self)
+            )
+            let paths = path.paths(in: attribute)
+            return AnyValidator(paths.map { path in
+                let validationPath = ValidationPath(path: path)
+                let lengthRule = AnyValidator(validationPath.length(columns.count))
+                let columnRules = AnyValidator(columns.enumerated().map {
+                    ChainValidator(path: path[$0], validator: $1.validator)
+                })
+                return AnyValidator([lengthRule, columnRules])
+            })
+        }
+        let tableValidator = AnyValidator(
+            Validator(Path(Attribute.self)) { root, _ in
+                try row(root, columns).performValidation(root)
+            }
+        )
+        self.wrappedValue = SchemaAttribute(
+            label: self.wrappedValue.label,
             type: type,
             validate: AnyValidator([tableValidator, validator])
         )
