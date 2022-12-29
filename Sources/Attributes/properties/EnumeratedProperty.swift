@@ -66,7 +66,7 @@ public struct EnumeratedProperty {
     }
 
     /// The underlying SchemaAttribute.
-    public let wrappedValue: SchemaAttribute
+    public private(set) var wrappedValue: SchemaAttribute
 
     /// Create the Property from a SchemaAttribute.
     /// - Parameter wrappedValue: The attribute.
@@ -107,6 +107,29 @@ public struct EnumeratedProperty {
         let enumeratedValidator = AnyValidator(validationPath.in(validValues))
         self.wrappedValue = SchemaAttribute(
             label: label,
+            type: .enumerated(validValues: validValues),
+            validate: AnyValidator([enumeratedValidator, builder(ValidationPath(path: path))])
+        )
+    }
+
+    /// Change the validValues of the enumerated property.
+    ///
+    /// - Parameter validValues: The new validValues.
+    ///
+    /// - Parameter builder: A function that creates a validator for the new
+    /// validValues.
+    mutating func update(
+        validValues: Set<String>,
+        @ValidatorBuilder<Attribute> validation builder: (ValidationPath<ReadOnlyPath<Attribute, String>>)
+            -> AnyValidator<Attribute> = { _ in AnyValidator([]) }
+    ) {
+        let path: ReadOnlyPath<Attribute, String> = ReadOnlyPath(
+            keyPath: \Attribute.self, ancestors: []
+        ).lineAttribute.enumeratedValue
+        let validationPath = ValidationPath(path: path)
+        let enumeratedValidator = AnyValidator(validationPath.in(validValues))
+        self.wrappedValue = SchemaAttribute(
+            label: self.wrappedValue.label,
             type: .enumerated(validValues: validValues),
             validate: AnyValidator([enumeratedValidator, builder(ValidationPath(path: path))])
         )
