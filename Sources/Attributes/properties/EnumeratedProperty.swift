@@ -62,7 +62,11 @@ public struct EnumeratedProperty {
 
     /// A self property.
     @inlinable public var projectedValue: EnumeratedProperty {
-        self
+        get {
+            self
+        } set {
+            self = newValue
+        }
     }
 
     /// The underlying SchemaAttribute.
