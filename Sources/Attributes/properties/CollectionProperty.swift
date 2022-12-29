@@ -63,7 +63,12 @@ public struct CollectionProperty {
 
     /// The project value.
     @inlinable public var projectedValue: CollectionProperty {
-        self
+        get {
+            self
+        }
+        set {
+            self = newValue
+        }
     }
 
     /// The equivalent ``SchemaAttribute``.
@@ -72,7 +77,7 @@ public struct CollectionProperty {
     /// usees the default rules for the attribute types. If you intend on making changes that break the
     /// validation rules, or inserting your own rules, the you need to create this `CollectionProperty` using
     /// the initialiser.
-    public let wrappedValue: SchemaAttribute
+    public private(set) var wrappedValue: SchemaAttribute
 
     /// Initialise this property from it's wrapped value.
     /// - Parameter wrappedValue: The wrapped value.
@@ -192,22 +197,15 @@ public struct CollectionProperty {
                 })
             }
         }
-        self.wrappedValue = { label, type, validator in
-            guard
-                case AttributeType.block(let blockType) = type,
-                case BlockAttributeType.collection(let lineAttributeType) = blockType,
-                case AttributeType.line(let lineType) = lineAttributeType,
-                case LineAttributeType.enumerated(let values) = lineType
-            else {
-                fatalError("Invalid type")
+        let val = validationPath.validate {
+            $0.each { _, elementPath in
+                AnyValidator(elementPath.lineAttribute.enumeratedValue.in(validValues))
             }
-            let val = validationPath.validate {
-                $0.each { _, elementPath in
-                    AnyValidator(elementPath.lineAttribute.enumeratedValue.in(values))
-                }
-            }
-            return SchemaAttribute(label: label, type: type, validate: AnyValidator([val, validator]))
-        }(label, .collection(type: .enumerated(validValues: validValues)), validator)
+        }
+        let type = AttributeType.collection(type: .enumerated(validValues: validValues))
+        self.wrappedValue = SchemaAttribute(
+            label: label, type: type, validate: AnyValidator([val, validator])
+        )
     }
 
     /// Create a collection of line values.
@@ -230,6 +228,34 @@ public struct CollectionProperty {
             label: label,
             type: .collection(type: .line),
             validate: validator
+        )
+    }
+
+    /// Update the collection valid values when the elements are enumerations. This function will recreate
+    /// the enumeration elements to fit within the new valid values and validation rules.
+    /// - Parameters:
+    ///   - validValues: The new valid values.
+    ///   - validatorFactories: The validation rules for the new enumerations.
+    public mutating func update(
+        validValues: Set<String>, enumerations validatorFactories: ValidatorFactory<String> ...
+    ) {
+        let path = ReadOnlyPath(keyPath: \Attribute.self, ancestors: []).blockAttribute.collectionValue
+        let validationPath = ValidationPath(path: path)
+        let validator = validationPath.validate {
+            $0.each { _, elementPath in
+                AnyValidator(validatorFactories.map {
+                    $0.make(path: elementPath.path.lineAttribute.enumeratedValue)
+                })
+            }
+        }
+        let val = validationPath.validate {
+            $0.each { _, elementPath in
+                AnyValidator(elementPath.lineAttribute.enumeratedValue.in(validValues))
+            }
+        }
+        let type = AttributeType.collection(type: .enumerated(validValues: validValues))
+        self.wrappedValue = SchemaAttribute(
+            label: self.wrappedValue.label, type: type, validate: AnyValidator([val, validator])
         )
     }
 
