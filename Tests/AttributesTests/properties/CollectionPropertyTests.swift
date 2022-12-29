@@ -219,10 +219,20 @@ final class CollectionPropertyTests: XCTestCase {
                 .collection(enumerated: ["a", "b"], validValues: validValues)
             )
         )
-        property.update(validValues: ["a", "c"])
+        property.update(validValues: ["a", "c"], enumerations: .required())
         XCTAssertThrowsError(
             try property.wrappedValue.validate.performValidation(
                 .collection(enumerated: ["a", "b"], validValues: validValues)
+            )
+        )
+        XCTAssertThrowsError(
+            try property.wrappedValue.validate.performValidation(
+                .collection(enumerated: [""], validValues: validValues)
+            )
+        )
+        XCTAssertNoThrow(
+            try property.wrappedValue.validate.performValidation(
+                .collection(enumerated: ["a", "c"], validValues: validValues)
             )
         )
     }
