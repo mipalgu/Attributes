@@ -28,7 +28,7 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
         .package(url: "git@github.com:mipalgu/XMI.git", from: "0.1.0"),
-        .package(url: "https://github.com/mipalgu/swift_helpers.git", from: "1.0.1")
+        .package(url: "https://github.com/mipalgu/swift_helpers.git", from: "2.0.0")
     ] + dependencies,
     targets: [
         // Targets are the basic building blocks of a package. A target can define a
